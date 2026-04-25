@@ -8,5 +8,6 @@ namespace Services.Contracts
 {
     public interface IServiceManager
     {
+        IPatientService PatientService { get; }
     }
 }

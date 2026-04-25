@@ -10,5 +10,6 @@ namespace Repositories.Contracts
     public interface IPatientRepository
     {
         void CreatePatient(Patient patient);
+        Task<Patient?> GetMaxProtokol();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,14 @@ namespace Repositories.EFCore
 
         public void CreatePatient(Patient patient)
         {
+            _repositoryContext.Patients.Add(patient);          
         }
+
+        public async Task<Patient?> GetMaxProtokol()
+        {
+            var maxProtokol = await _repositoryContext.Patients.OrderByDescending(p => p.Protocol).FirstOrDefaultAsync();
+            return maxProtokol;
+        }
+
     }
 }

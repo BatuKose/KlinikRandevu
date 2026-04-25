@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entities.Data_Transfer_Objects.Patient;
+using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,11 @@ namespace Presentation.Controllers
         {
             _ServiceManager=ıserviceManager;
         }
-        
+        [HttpPost]
+        public async Task<IActionResult> InsertPatientAsync([FromBody] CreatePatientDto patient)
+        {
+            await _ServiceManager.PatientService.CreatePatientAsync(patient);
+            return NoContent();
+        }
     }
 }

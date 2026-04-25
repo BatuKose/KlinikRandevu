@@ -15,7 +15,7 @@ namespace Repositories.EFCore
     {
         public RepositoryContext(DbContextOptions options) : base(options){ }
 
-        public DbSet<Patient> Users { get; set; }
+        public DbSet<Patient> Patients { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

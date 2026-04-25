@@ -8,16 +8,26 @@ using System.Threading.Tasks;
 
 namespace Repositories.EFCore
 {
-    public class RepositorManager : IRepositoryManager
+    public class RepositoryManager : IRepositoryManager
     {
         private readonly RepositoryContext _repositoryContext;
-        private readonly IPatientRepository _patientRepository;
-        public RepositorManager(RepositoryContext repositoryContext,IPatientRepository patient)
-        {
-            _repositoryContext=repositoryContext;
-            _patientRepository = new Lazy<IPatientRepository>(() => new PatientRepository(_repositoryContext));
-        }
-        public IPatientRepository Patient => _patientRepository;
+        private readonly Lazy<IPatientRepository> _patientRepository;
 
+        public RepositoryManager(RepositoryContext repositoryContext)
+        {
+            _repositoryContext = repositoryContext;
+            _patientRepository = new Lazy<IPatientRepository>(() =>new PatientRepository(_repositoryContext));
+        }
+
+        public IPatientRepository Patient => _patientRepository.Value;
+
+        public async Task saveAsyc()
+        {
+           await _repositoryContext.SaveChangesAsync();
+        }
+        public void Save()
+        {
+            _repositoryContext.SaveChanges();
+        }
     }
 }

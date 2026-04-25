@@ -27,7 +27,7 @@ namespace Repositories.Config
                     Id = 1,
                     Name = "BATUHAN",
                     Surname = "KÖSE",
-                    Protocol = "20261",
+                    Protocol = 20261,
                     Address = "BURSA, Türkiye",
                     Phone = "5378102935",
                     BirthDate = new DateTime(2001, 2, 21),

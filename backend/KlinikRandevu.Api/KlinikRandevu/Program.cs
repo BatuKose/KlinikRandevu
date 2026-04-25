@@ -1,7 +1,7 @@
 using KlinikRandevu.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddControllers().AddApplicationPart(typeof(Presentation.Controllers.PatientController).Assembly);
 
 
 builder.Services.AddControllers();
@@ -10,7 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.ConfigureRepositoryManager();
-builder.Services.ConfigureRepositoryManager();
+builder.Services.ConfigureServiceManager();
 var app = builder.Build();
 
 

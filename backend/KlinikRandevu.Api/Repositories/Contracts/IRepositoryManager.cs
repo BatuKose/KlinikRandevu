@@ -8,6 +8,9 @@ namespace Repositories.Contracts
 {
     public interface IRepositoryManager
     {
+        Task saveAsyc();
+        void Save();
         IPatientRepository Patient { get; }
+
     }
 }

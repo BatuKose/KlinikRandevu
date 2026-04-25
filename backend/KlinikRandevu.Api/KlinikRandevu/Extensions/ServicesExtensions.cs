@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using Repositories.EFCore;
+using Services;
+using Services.Contracts;
 
 namespace KlinikRandevu.Extensions
 {
@@ -17,5 +19,10 @@ namespace KlinikRandevu.Extensions
         {
             services.AddScoped<IRepositoryManager, RepositorManager>();
         }
+        public static void ConfigureServiceManager(this IServiceCollection services)
+        {
+            services.AddScoped<IServiceManager, ServiceManager>();
+        }
+
     }
 }

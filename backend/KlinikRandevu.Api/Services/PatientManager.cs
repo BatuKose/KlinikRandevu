@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Entities.Exeptions.CustomExceptions;
 namespace Services
 {
     public class PatientManager: IPatientService
@@ -21,6 +21,7 @@ namespace Services
         public async Task<CreatePatientDto>CreatePatientAsync(CreatePatientDto dto)
         {
             // iş mantık kuralı gelecek
+            // if (dto.Name is  null) throw new BadRequestException("Hasta adı yazılması zorunludur.");
             var maxProtokol= await _repositoryManager.Patient.GetMaxProtokol();
             var yeniProtol = (maxProtokol.Protocol)+1;
             var patientDto = new Patient

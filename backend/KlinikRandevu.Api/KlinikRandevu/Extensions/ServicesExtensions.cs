@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Entities.Exeptions;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using Repositories.EFCore;
 using Services;
@@ -24,5 +26,9 @@ namespace KlinikRandevu.Extensions
             services.AddScoped<IServiceManager, ServiceManager>();
         }
 
+        public static void UseGlobalExceptionMiddleware(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<GlobalExceptionMiddleware>();
+        }
     }
 }

@@ -3,6 +3,7 @@ using Entities.Exeptions;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using Repositories.EFCore;
+using Serilog;
 using Services;
 using Services.Contracts;
 
@@ -29,6 +30,13 @@ namespace KlinikRandevu.Extensions
         public static void UseGlobalExceptionMiddleware(this IApplicationBuilder app)
         {
             app.UseMiddleware<GlobalExceptionMiddleware>();
+        }
+        public static void AddSerilogLogging(this WebApplicationBuilder builder)
+        {
+            Log.Logger= new LoggerConfiguration().WriteTo.Console()
+                .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+                .MinimumLevel.Debug().CreateLogger(); // prod ortamında info'ya geçirilcek
+            builder.Host.UseSerilog();
         }
     }
 }

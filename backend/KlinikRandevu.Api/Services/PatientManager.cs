@@ -21,7 +21,7 @@ namespace Services
         public async Task<CreatePatientDto>CreatePatientAsync(CreatePatientDto dto)
         {
             // iş mantık kuralı gelecek
-            // if (dto.Name is  null) throw new BadRequestException("Hasta adı yazılması zorunludur.");
+          if (dto.Name is not  null) throw new BadRequestException("TEST");
             var maxProtokol= await _repositoryManager.Patient.GetMaxProtokol();
             var yeniProtol = (maxProtokol.Protocol)+1;
             var patientDto = new Patient

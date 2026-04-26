@@ -1,5 +1,6 @@
 ﻿using Entities.Exeptions.CustomExceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 
@@ -8,10 +9,11 @@ namespace Entities.Exeptions
     public class GlobalExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-
-        public GlobalExceptionMiddleware(RequestDelegate next)
+        private readonly ILogger<GlobalExceptionMiddleware> _logger;
+        public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
         {
             _next=next;
+            _logger=logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -22,11 +24,11 @@ namespace Entities.Exeptions
             }
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, ex);
+                await HandleExceptionAsync(context, ex,_logger);
             }
 
         }
-        private static Task HandleExceptionAsync(HttpContext context,Exception ex)
+        private static Task HandleExceptionAsync(HttpContext context,Exception ex,ILogger logger)
         {
             context.Response.ContentType="application/json";
             int statusCode;
@@ -45,6 +47,7 @@ namespace Entities.Exeptions
             {
                 statusCode=(int)HttpStatusCode.InternalServerError;
                 message="Something went wrong. Please try again later.";
+                logger.LogError(ex,ex.Message);
             }
             context.Response.StatusCode = statusCode;
             var result = JsonSerializer.Serialize(new

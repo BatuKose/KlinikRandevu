@@ -19,11 +19,7 @@ namespace Presentation.Controllers
         {
             _ServiceManager=ıserviceManager;
         }
-        //[HttpGet("test-server-error")]
-        //public IActionResult TestServerError()
-        //{
-        //    throw new Exception("Test 500 hatası");
-        //}
+ 
         [HttpPost]
         public async Task<IActionResult> InsertPatientAsync([FromBody] CreatePatientDto patient)
         {

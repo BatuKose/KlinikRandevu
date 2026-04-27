@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entities.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,8 +16,8 @@ namespace Entities.Models
         public string Address { get; set; }
         public string Phone { get; set; }
         public DateTime BirthDate { get; set; }
-        public char Gender { get; set; }
-        public string BloodType { get; set; } 
+        public GenderEnum Gender { get; set; }
+        public BloodTypeEnum BloodType { get; set; }
         public DateTime CreatedAt { get; set; }= DateTime.Now;
         public bool IsActive { get; set; }
     }

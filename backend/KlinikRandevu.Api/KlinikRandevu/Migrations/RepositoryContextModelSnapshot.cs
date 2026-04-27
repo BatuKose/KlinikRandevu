@@ -38,17 +38,14 @@ namespace KlinikRandevu.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("BloodType")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("nvarchar(3)");
+                    b.Property<int>("BloodType")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(1)");
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -63,10 +60,8 @@ namespace KlinikRandevu.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Protocol")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<int>("Protocol")
+                        .HasColumnType("int");
 
                     b.Property<string>("Surname")
                         .IsRequired()
@@ -75,7 +70,7 @@ namespace KlinikRandevu.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Patients");
 
                     b.HasData(
                         new
@@ -83,13 +78,13 @@ namespace KlinikRandevu.Migrations
                             Id = 1,
                             Address = "BURSA, Türkiye",
                             BirthDate = new DateTime(2001, 2, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            BloodType = "0+",
-                            CreatedAt = new DateTime(2026, 4, 24, 22, 48, 42, 207, DateTimeKind.Local).AddTicks(8294),
-                            Gender = "M",
+                            BloodType = 6,
+                            CreatedAt = new DateTime(2026, 4, 27, 21, 59, 52, 159, DateTimeKind.Local).AddTicks(9898),
+                            Gender = 2,
                             IsActive = true,
                             Name = "BATUHAN",
                             Phone = "5378102935",
-                            Protocol = "20261",
+                            Protocol = 20261,
                             Surname = "KÖSE"
                         });
                 });

@@ -31,6 +31,7 @@ namespace Services
             if(!phone.Any(char.IsDigit)) throw new BadRequestException("Telefon numarası karakter içeremez");
             string tcKontrol = Convert.ToString(dto.TcKimlik);
             if(!tcKontrol.Any(char.IsDigit)) throw new BadRequestException("Tc kimliklik numarası karakter içeremez");
+            if (tcKontrol.Length<11) throw new BadRequestException("Tc kimlik numarası 11 haneden küçük olamaz");
             bool phoneExists = await _repositoryManager.Patient.PhoneExists(phone);
             if (phoneExists) throw new BadRequestException("Telefon numarası sistemde kayıtlıdır");
             bool tcExists = await _repositoryManager.Patient.TcExists(dto.TcKimlik);

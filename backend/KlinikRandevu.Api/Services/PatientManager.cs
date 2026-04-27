@@ -21,11 +21,20 @@ namespace Services
         }
         public async Task<CreatePatientDto>CreatePatientAsync(CreatePatientDto dto)
         {
-            if (dto is null) throw new BadRequestException("Hasta bilgilerin dolu olması gerekiyor");
+            string phone = dto.Phone.TrimStart('0');
+            if (dto is null) throw new NotFoundException("Hasta bilgilerin dolu olması gerekiyor");
             if (dto.BirthDate>DateTime.Now) throw new BadRequestException("Doğum tarihi güncel tarihten büyük olamaz");
-
+            var age = DateTime.Now.Year-dto.BirthDate.Year;
+            if (age>120) throw new BadRequestException("Geçerli doğum tarihi giriniz");
+            if (dto.Name.Any(char.IsDigit)) throw new BadRequestException("İsim rakam içeremez");
+            if(dto.Surname.Any(char.IsDigit)) throw new BadRequestException("Soyisim rakam içeremez");
+            if(!dto.Phone.Any(char.IsDigit)) throw new BadRequestException("Telefon numarası karakter içeremez");
+            bool phoneExists = await _repositoryManager.Patient.PhoneExists(dto.Phone);
+            if (phoneExists) throw new BadRequestException("Telefon numarası sistemde kayıtlıdır");
             var maxProtokol= await _repositoryManager.Patient.GetMaxProtokol();
-            var yeniProtol = (maxProtokol.Protocol)+1;
+            if(maxProtokol<=0) maxProtokol=20260;
+           
+            var yeniProtol = (maxProtokol)+1;
             var patientDto = new Patient
             {
                 Address = dto.Address,
@@ -35,12 +44,12 @@ namespace Services
                 Gender=dto.gender,
                 Surname = dto.Surname,
                 Name = dto.Name,
-                Phone=dto.Phone,
+                Phone=phone,
                 Protocol=yeniProtol
             };
             _repositoryManager.Patient.CreatePatient(patientDto);
             await _repositoryManager.saveAsyc();
-            var result = new CreatePatientDto
+            return new CreatePatientDto
             {
                 Address=patientDto.Address,
                 BirthDate=patientDto.BirthDate,
@@ -50,7 +59,7 @@ namespace Services
                 Name = patientDto.Name,
                 Phone=patientDto.Phone
             };
-            return result;
+            
         }
     }
 }

@@ -23,6 +23,7 @@ namespace Presentation.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertPatientAsync([FromBody] CreatePatientDto patient)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             await _ServiceManager.PatientService.CreatePatientAsync(patient);
             return NoContent();
         }

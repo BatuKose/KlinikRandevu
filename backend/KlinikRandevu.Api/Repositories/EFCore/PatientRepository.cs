@@ -23,11 +23,16 @@ namespace Repositories.EFCore
             _repositoryContext.Patients.Add(patient);          
         }
 
-        public async Task<Patient?> GetMaxProtokol()
+        public async Task<int> GetMaxProtokol()
         {
-            var maxProtokol = await _repositoryContext.Patients.OrderByDescending(p => p.Protocol).FirstOrDefaultAsync();
+            var maxProtokol = await _repositoryContext.Patients.OrderByDescending(p => p.Protocol).Select(p=>p.Protocol).FirstOrDefaultAsync();
             return maxProtokol;
         }
 
+        public async Task<bool> PhoneExists(string number)
+        {
+            var phone = await _repositoryContext.Patients.AnyAsync(p => p.Phone==number);
+            return phone;
+        }
     }
 }

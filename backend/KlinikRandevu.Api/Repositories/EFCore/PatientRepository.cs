@@ -34,5 +34,12 @@ namespace Repositories.EFCore
             var phone = await _repositoryContext.Patients.AnyAsync(p => p.Phone==number);
             return phone;
         }
+
+        public async Task<bool> TcExists(long number)
+        {
+            var tc = await _repositoryContext.Patients.AnyAsync(t => t.TcKimlik==number);
+            return tc;
+           
+        }
     }
 }

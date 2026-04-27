@@ -12,5 +12,6 @@ namespace Repositories.Contracts
         void CreatePatient(Patient patient);
         Task<int> GetMaxProtokol();
         Task<bool> PhoneExists(string number);
+        Task<bool> TcExists(long number);
     }
 }

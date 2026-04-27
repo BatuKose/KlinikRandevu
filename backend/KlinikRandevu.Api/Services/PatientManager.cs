@@ -28,9 +28,13 @@ namespace Services
             if (age>120) throw new BadRequestException("Geçerli doğum tarihi giriniz");
             if (dto.Name.Any(char.IsDigit)) throw new BadRequestException("İsim rakam içeremez");
             if(dto.Surname.Any(char.IsDigit)) throw new BadRequestException("Soyisim rakam içeremez");
-            if(!dto.Phone.Any(char.IsDigit)) throw new BadRequestException("Telefon numarası karakter içeremez");
-            bool phoneExists = await _repositoryManager.Patient.PhoneExists(dto.Phone);
+            if(!phone.Any(char.IsDigit)) throw new BadRequestException("Telefon numarası karakter içeremez");
+            string tcKontrol = Convert.ToString(dto.TcKimlik);
+            if(!tcKontrol.Any(char.IsDigit)) throw new BadRequestException("Tc kimliklik numarası karakter içeremez");
+            bool phoneExists = await _repositoryManager.Patient.PhoneExists(phone);
             if (phoneExists) throw new BadRequestException("Telefon numarası sistemde kayıtlıdır");
+            bool tcExists = await _repositoryManager.Patient.TcExists(dto.TcKimlik);
+            if (tcExists) throw new BadRequestException("TC numarası sistemde kayıtlıdır");
             var maxProtokol= await _repositoryManager.Patient.GetMaxProtokol();
             if(maxProtokol<=0) maxProtokol=20260;
            
@@ -45,7 +49,8 @@ namespace Services
                 Surname = dto.Surname,
                 Name = dto.Name,
                 Phone=phone,
-                Protocol=yeniProtol
+                Protocol=yeniProtol,
+                TcKimlik=dto.TcKimlik
             };
             _repositoryManager.Patient.CreatePatient(patientDto);
             await _repositoryManager.saveAsyc();
@@ -57,7 +62,8 @@ namespace Services
                 gender = patientDto.Gender,
                 Surname = patientDto.Surname,
                 Name = patientDto.Name,
-                Phone=patientDto.Phone
+                Phone=patientDto.Phone,
+                TcKimlik=patientDto.TcKimlik
             };
             
         }

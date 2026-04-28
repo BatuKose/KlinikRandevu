@@ -38,5 +38,18 @@ namespace KlinikRandevu.Extensions
                 .MinimumLevel.Debug().CreateLogger(); // prod ortamında info'ya geçirilcek
             builder.Host.UseSerilog();
         }
+        public static IServiceCollection CorsConfigure(this IServiceCollection services) // prod ortamında kısıtlama getirilcek
+        {
+            services.AddCors(options=>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+                });
+            });
+            return services;
+        }
     }
 }

@@ -5,7 +5,7 @@ builder.Services.AddControllers().AddApplicationPart(typeof(Presentation.Control
 
 
 builder.Services.AddControllers();
-
+builder.Services.CorsConfigure();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureSqlContext(builder.Configuration);
@@ -20,6 +20,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowAll");
 app.UseGlobalExceptionMiddleware();
 app.UseHttpsRedirection();
 app.UseAuthorization();

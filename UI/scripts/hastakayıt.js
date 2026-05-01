@@ -69,3 +69,40 @@ document.getElementById("kInsert").addEventListener("click", async () => {
     }
     
 });
+
+document.getElementById("hastaAra").addEventListener("click",async()=>
+{
+  try{
+    const ara = document.getElementById("ara").value.trim();
+    if(!ara) return alert("Hasta arayı doldurun");
+    const istek= await fetch(`
+    https://localhost:1000/api/Patient/hastakayithastagetir?arama=${ara}    
+        `);
+        const data = await istek.json()
+        //console.log(data)
+        if (!istek.ok)
+        {
+            throw new Error(data.message||"Bilinmeyen hata");
+        }
+        const hasta = data[0];
+        document.getElementById("kName").value = hasta.name;
+        document.getElementById("kSurname").value = hasta.surname;
+        document.getElementById("kTC").value = hasta.tcKimlik;
+        document.getElementById("kAddress").value = hasta.address;
+        document.getElementById("kPhone").value = hasta.phone;
+        document.getElementById("kGender").value = hasta.gender;
+        document.getElementById("kBloodType").value = hasta.bloodType;
+        document.getElementById("kBirthDate").value = hasta.birthDate.split("T")[0];
+        document.getElementById("hastProtokol").value = hasta.protocol;  
+        }
+  catch(err)
+  {
+    alert(err.message)
+  }
+  finally
+  {
+    const ara = document.getElementById("ara").value="";
+  }
+
+
+});

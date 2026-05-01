@@ -72,6 +72,7 @@ namespace Services
         public async Task<List<GetPatientDTO>> getPatientAsync(string aramaMetni)
         {
             if (aramaMetni is null) throw new BadRequestException("Arama kriterlerini giriniz");
+            if (aramaMetni.Length<3) throw new BadRequestException("Arama metni 3 karakterden küçük olamaz");
             var result = await _repositoryManager.Patient.getPatientAsync(aramaMetni);
             if (!result.Any()) throw new NotFoundException("Hasta kaydı bulunamadı"); 
             return result;

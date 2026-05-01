@@ -7,6 +7,7 @@ ASP.NET Core 8 Web API ile geliştirilmiş klinik randevu yönetim sistemi.
 - .NET 8
 - ASP.NET Core Web API
 - Entity Framework Core 8
+-javascript
 - SQL Server
 - Git
 

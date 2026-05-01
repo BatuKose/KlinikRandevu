@@ -65,6 +65,12 @@ namespace Repositories.EFCore
             }).ToListAsync();
         }
 
+        public Task<Patient> GetPatientByProtokolASycn(int protokol)
+        {
+            var result = _repositoryContext.Patients.SingleOrDefaultAsync(p=>p.Protocol==protokol);
+            return result;
+        }
+
         public async Task<bool> PhoneExists(string number)
         {
             var phone = await _repositoryContext.Patients.AnyAsync(p => p.Phone==number);
@@ -74,8 +80,8 @@ namespace Repositories.EFCore
         public async Task<bool> TcExists(long number)
         {
             var tc = await _repositoryContext.Patients.AnyAsync(t => t.TcKimlik==number);
-            return tc;
-           
+            return tc;        
         }
+
     }
 }

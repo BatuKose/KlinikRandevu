@@ -10,5 +10,6 @@ namespace Services.Contracts
     public interface IPatientService
     {
         Task<CreatePatientDto> CreatePatientAsync(CreatePatientDto dto);
+        Task<List<GetPatientDTO>> getPatientAsync(string aramaMetni);
     }
 }

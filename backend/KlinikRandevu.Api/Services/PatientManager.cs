@@ -11,7 +11,7 @@ using Entities.Exeptions.CustomExceptions;
 using Entities.Enums;
 namespace Services
 {
-    public class PatientManager: IPatientService
+    public class PatientManager : IPatientService
     {
         private readonly IRepositoryManager _repositoryManager;
 
@@ -67,6 +67,14 @@ namespace Services
                 TcKimlik=patientDto.TcKimlik
             };
             
+        }
+
+        public async Task<List<GetPatientDTO>> getPatientAsync(string aramaMetni)
+        {
+            if (aramaMetni is null) throw new BadRequestException("Arama kriterlerini giriniz");
+            var result = await _repositoryManager.Patient.getPatientAsync(aramaMetni);
+            if (!result.Any()) throw new NotFoundException("Hasta kaydı bulunamadı"); 
+            return result;
         }
     }
 }

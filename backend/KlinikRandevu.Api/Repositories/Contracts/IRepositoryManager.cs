@@ -11,6 +11,7 @@ namespace Repositories.Contracts
         Task saveAsyc();
         void Save();
         IPatientRepository Patient { get; }
+        IPoliklinikRepository Poliklinik { get; }
 
     }
 }

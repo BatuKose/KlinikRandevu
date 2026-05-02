@@ -35,7 +35,8 @@ namespace Repositories.Config
                     BirthDate = new DateTime(2001, 2, 21),
                     BloodType = BloodTypeEnum.OPositive,   
                     Gender = GenderEnum.male,         
-                    IsActive = true
+                    IsActive = true,
+                    TcKimlik=11111111111
                 });
         }
     }

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Services.Contracts
 {
-    public interface IServiceManager
+    public interface IPoliklinikService
     {
-        IPatientService PatientService { get; }
-        IPoliklinikService PoliklinikService { get; }
+
     }
 }

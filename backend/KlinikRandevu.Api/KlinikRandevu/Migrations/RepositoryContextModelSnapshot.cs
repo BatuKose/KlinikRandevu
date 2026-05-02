@@ -82,7 +82,7 @@ namespace KlinikRandevu.Migrations
                             Address = "BURSA, Türkiye",
                             BirthDate = new DateTime(2001, 2, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BloodType = 6,
-                            CreatedAt = new DateTime(2026, 4, 27, 22, 50, 43, 12, DateTimeKind.Local).AddTicks(9861),
+                            CreatedAt = new DateTime(2026, 5, 2, 21, 58, 6, 639, DateTimeKind.Local).AddTicks(4840),
                             Gender = 2,
                             IsActive = true,
                             Name = "BATUHAN",
@@ -90,6 +90,85 @@ namespace KlinikRandevu.Migrations
                             Protocol = 20261,
                             Surname = "KÖSE",
                             TcKimlik = 0L
+                        });
+                });
+
+            modelBuilder.Entity("Entities.Models.Poliklinik", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Aciklama")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("DoktorNo")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GunlukMaksRandevuSayisi")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("KatNo")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MaxRandevuSuresi")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("OdaNo")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("OnlineRandevuAktif")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("PolNo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PolUzKod")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Telefon")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("isActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PolNo")
+                        .IsUnique();
+
+                    b.ToTable("Poliklinikler", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Aciklama = "İÇ Hastalıkları pol öğleden önce",
+                            DoktorNo = 1,
+                            GunlukMaksRandevuSayisi = 30,
+                            KatNo = 1,
+                            MaxRandevuSuresi = 10,
+                            Name = "İÇ HASTALIKLARI HÜSEYİN AĞAC",
+                            OdaNo = "Birinci kat",
+                            OnlineRandevuAktif = true,
+                            PolNo = 1,
+                            PolUzKod = 1000,
+                            Telefon = "1650",
+                            isActive = true
                         });
                 });
 #pragma warning restore 612, 618

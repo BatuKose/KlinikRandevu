@@ -13,5 +13,6 @@ namespace Services.Contracts
         Task<CreatePatientDto> CreatePatientAsync(CreatePatientDto dto);
         Task<List<GetPatientDTO>> getPatientAsync(string aramaMetni);
         Task<Patient>UpdatePatient(UpdatePatientDTO hasta, int protokol);
+        Task<Patient> DeletePatient(int protokol);
     }
 }

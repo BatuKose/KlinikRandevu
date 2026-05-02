@@ -33,11 +33,17 @@ namespace Presentation.Controllers
             var result= await _ServiceManager.PatientService.getPatientAsync(arama);
             return result;
         }
-        [HttpPatch("hastakayithastagüncelle")]
+        [HttpPut("hastakayithastagüncelle")]
         public async Task<IActionResult> UpdatePatientAsync([FromBody] UpdatePatientDTO patient,[FromQuery]int protokol)
         {
             var result= await _ServiceManager.PatientService.UpdatePatient(patient,protokol);
             return Ok(result);
+        }
+        [HttpPatch("hastakayithastasil")]
+        public async Task<IActionResult> DeletePatientAsync([FromQuery] int protkol)
+        {
+            await _ServiceManager.PatientService.DeletePatient(protkol);
+            return NoContent();
         }
     }
 }

@@ -69,6 +69,24 @@ namespace Services
 
         }
 
+        public async Task<Patient> DeletePatient(int protokol)
+        {
+            // eğer pol kaydı varsa hastayı pasife alınmaması iş kuralı koyulcak
+            var patient= await _repositoryManager.Patient.GetPatientByProtokolASycn(protokol);
+            if (patient == null) throw new NotFoundException("Hasta bulunamadı");
+            if(patient.IsActive==true)
+            {
+                patient.IsActive = false;
+            }
+            else
+            {
+                patient.IsActive=true;
+            }
+            await _repositoryManager.saveAsyc();
+            return patient;
+          
+        }
+
         public async Task<List<GetPatientDTO>> getPatientAsync(string aramaMetni)
         {
             if (aramaMetni is null) throw new BadRequestException("Arama kriterlerini giriniz");
@@ -106,10 +124,6 @@ namespace Services
                 phone = hasta.Phone.TrimStart('0');
                 if (!phone.Any(char.IsDigit))
                     throw new BadRequestException("Telefon numarası karakter içeremez");
-
-                bool phoneExists = await _repositoryManager.Patient.PhoneExists(phone);
-                if (phoneExists)
-                    throw new BadRequestException("Telefon numarası sistemde kayıtlıdır");
             }
 
             if (hasta.TcKimlik.HasValue)
@@ -119,10 +133,6 @@ namespace Services
                     throw new BadRequestException("TC kimlik numarası karakter içeremez");
                 if (tcKontrol.Length < 11)
                     throw new BadRequestException("TC kimlik numarası 11 haneden küçük olamaz");
-
-                bool tcExists = await _repositoryManager.Patient.TcExists(hasta.TcKimlik.Value);
-                if (tcExists)
-                    throw new BadRequestException("TC numarası sistemde kayıtlıdır");
             }
 
             if (hasta.Name != null) güncellenecekHasta.Name = hasta.Name;

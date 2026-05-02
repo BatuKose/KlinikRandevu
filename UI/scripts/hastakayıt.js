@@ -87,7 +87,7 @@ document.getElementById("kInsert").addEventListener("click", async () => {
         const istekupdate = await fetch(
             `https://localhost:1000/api/Patient/hastakayithastagüncelle?protokol=${protokol}`,
             {
-                method: "PATCH",
+                method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     name: kName,
@@ -150,6 +150,43 @@ document.getElementById("hastaAra").addEventListener("click",async()=>
   {
     const ara = document.getElementById("ara").value="";
   }
-
-
 });
+document.getElementById("kIptal").addEventListener("click",async()=>
+{
+    try
+    {
+        const protokol=document.getElementById("hastProtokol").value;
+
+    const istek = await fetch(`https://localhost:1000/api/Patient/hastakayithastasil?protkol=${protokol}`,
+        {
+            method:"PATCH"
+        }      
+    )
+    if(istek.ok)
+    {
+        alert("İşlem başarılı")
+    }
+    else
+    {
+        const data= await istek.json()
+        throw new Error(data.message ||"Bilinmeyen hata")
+    }
+    }
+    catch(err)
+    {
+        alert(err.message)
+    }
+    finally
+    {
+        document.getElementById("kName").value = "";
+        document.getElementById("kSurname").value = "";
+        document.getElementById("kTC").value = "";
+        document.getElementById("kAddress").value = "";
+        document.getElementById("kPhone").value = "";
+        document.getElementById("kBirthDate").value = "";
+        document.getElementById("kGender").value = "-1";
+        document.getElementById("kBloodType").value = "-1";
+        document.getElementById("hastProtokol").value = "";
+        
+    }
+})

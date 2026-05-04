@@ -17,6 +17,10 @@ namespace Repositories.EFCore
 
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Poliklinik>Polikliniks { get; set; }
+        public DbSet<Doctor> Doctors { get; set; }
+        public DbSet<DoktorCalismaPlani>DoktorCalismaPlanis { get; set; }
+        public DbSet<MuayeneKaydi> MuayeneKaydis {  get; set; }
+        public DbSet<Randevu>Randevus { get; set; } 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

@@ -9,6 +9,6 @@ namespace Services.Contracts
     public interface IServiceManager
     {
         IPatientService PatientService { get; }
-        IPoliklinikService PoliklinikService { get; }
+        IMuayeneService MuayeneService { get; }
     }
 }

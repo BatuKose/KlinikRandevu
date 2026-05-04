@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Repositories.Contracts
 {
-    public interface IPoliklinikRepository
+    public interface IMuayeneRepository
     {
 
     }

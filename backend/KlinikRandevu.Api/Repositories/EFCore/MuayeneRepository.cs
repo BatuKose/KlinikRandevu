@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Repositories.EFCore
 {
-    public class PoliklinikRepository:IPoliklinikRepository
+    public class MuayeneRepository:IMuayeneRepository
     {
         private readonly RepositoryContext _repositoryContext;
 
-        public PoliklinikRepository(RepositoryContext repositoryContext)
+        public MuayeneRepository(RepositoryContext repositoryContext)
         {
             _repositoryContext=repositoryContext;
         }

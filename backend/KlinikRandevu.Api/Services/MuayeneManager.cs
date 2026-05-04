@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public class PoliklinikManager:IPoliklinikService
+    public class MuayeneManager:IMuayeneService
     {
         private readonly IRepositoryManager _repositoryManager;
 
-        public PoliklinikManager(IRepositoryManager repositoryManager)
+        public MuayeneManager(IRepositoryManager repositoryManager)
         {
             _repositoryManager=repositoryManager;
         }

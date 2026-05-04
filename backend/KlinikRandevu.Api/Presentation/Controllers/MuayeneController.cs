@@ -9,7 +9,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/Poliklinik")]
-    public class PoliklinikController:ControllerBase
+    public class MuayeneController:ControllerBase
     {
 
     }

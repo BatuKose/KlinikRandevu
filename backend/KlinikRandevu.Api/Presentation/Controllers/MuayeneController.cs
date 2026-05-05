@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entities.Data_Transfer_Objects.Muayene;
+using Microsoft.AspNetCore.Mvc;
+using Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,17 @@ namespace Presentation.Controllers
     [Route("api/Poliklinik")]
     public class MuayeneController:ControllerBase
     {
+        private readonly IServiceManager _ServiceManager;
 
+        public MuayeneController(IServiceManager ıserviceManager)
+        {
+            _ServiceManager=ıserviceManager;
+        }
+        [HttpPost("calismaplaniolustur")]
+        public async Task<IActionResult> DoktorCalismaPlaniOlustur([FromBody] CalismaPlaniOlusturDTO plan)
+        {
+            var result = await _ServiceManager.MuayeneService.CalismaPlaniOlusturAsync(plan);
+            return Ok(result);
+        }
     }
 }

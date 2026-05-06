@@ -10,5 +10,6 @@ namespace Services.Contracts
     public interface IMuayeneService
     {
         Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan);
+        Task<RandevuOlusturDTO> RandevuOlusturAsync(RandevuOlusturDTO plan);
     }
 }

@@ -25,5 +25,11 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.CalismaPlaniOlusturAsync(plan);
             return Ok(result);
         }
+        [HttpPost("randevuolustur")]
+        public async Task<IActionResult> RandevuOlusturAsync([FromBody] RandevuOlusturDTO plan)
+        {
+            var result = await _ServiceManager.MuayeneService.RandevuOlusturAsync(plan);
+            return Ok(result);
+        }
     }
 }

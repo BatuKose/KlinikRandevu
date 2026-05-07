@@ -23,5 +23,8 @@ namespace Repositories.Contracts
         Task<bool> HastaAyniGunRandevusuVarMi(long hastaTc, int doktorNo, DateTime tarih);
         Task<DoktorCalismaPlani?> CalismaPlaniGetirAsync(int doktorNo, int polNo, DayOfWeek gun,
         TimeSpan baslangic, TimeSpan bitis);
+        public void MuayeneKaydiOlustur(MuayeneKaydi muayene);
+        Task<Randevu?> HastanınRanevusunuGetir(long hastaTc, int doktorNo, DateTime tarih);
+        Task<bool> AyniGünMuayenesiVarmi(int pol, int protokol, DateTime muayenetarihi);
     }
 }

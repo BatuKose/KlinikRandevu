@@ -11,5 +11,6 @@ namespace Services.Contracts
     {
         Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan);
         Task<RandevuOlusturDTO> RandevuOlusturAsync(RandevuOlusturDTO plan);
+        Task<MuayeneKayitiOlusturDTO> MuayeneKayitiOlustur(MuayeneKayitiOlusturDTO muayene);
     }
 }

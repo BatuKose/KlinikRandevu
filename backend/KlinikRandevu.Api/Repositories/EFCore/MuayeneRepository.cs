@@ -116,6 +116,14 @@ namespace Repositories.EFCore
                 r.RandevuTarihi >= gunBaslangic &&
                 r.RandevuTarihi < gunBitis);
         }
+        public async Task<Randevu?> HastanınRanevusunuGetir(long hastaTc, int doktorNo, DateTime tarih)
+        {
+            return await _repositoryContext.Randevus
+                .FirstOrDefaultAsync(r =>
+                    r.HastaTc == hastaTc &&
+                    r.DoktorNo == doktorNo &&
+                    r.RandevuTarihi == tarih);
+        }
         public async Task<DoktorCalismaPlani?> CalismaPlaniGetirAsync( int doktorNo, int polNo, DayOfWeek gun,
         TimeSpan baslangic, TimeSpan bitis)
         {
@@ -128,6 +136,20 @@ namespace Repositories.EFCore
                     r.BaslangicSaati <= baslangic &&
                     r.BitisSaati >= bitis
                 );
+        }
+
+        public  void MuayeneKaydiOlustur(MuayeneKaydi muayene)
+        {
+             _repositoryContext.Add(muayene);
+        }
+
+        public async Task<bool> AyniGünMuayenesiVarmi(int pol, int protokol, DateTime muayenetarihi)
+        {
+            
+            var result = await _repositoryContext.MuayeneKaydis.AnyAsync(
+                 m => m.IsActive== true && m.PolNo==pol && m.ProtocolNo==protokol
+                 && m.MuayeneTarihi==muayenetarihi);
+            return result;
         }
     }
 }

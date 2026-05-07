@@ -6,6 +6,7 @@ using Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,6 +65,66 @@ namespace Services
                 RandevuSuresiDk=CalismaPlani.RandevuSuresiDk
             };
             return result;
+        }
+
+        public async Task<MuayeneKayitiOlusturDTO> MuayeneKayitiOlustur(MuayeneKayitiOlusturDTO muayene)
+        {
+            if (muayene == null) throw new BadRequestException("Muayene bilgilerini kontrol ediniz");
+
+            var doctorExists = await _repositoryManager.Muayene.doktorVarMI(muayene.DoktorNo);
+            if (!doctorExists)
+                throw new NotFoundException("Doktor bilgisi bulunamadı");
+
+            var polExists = await _repositoryManager.Muayene.polVarMI(muayene.PolNo);
+            if (!polExists)
+                throw new NotFoundException("Poliklinik bilgisi bulunamadı");
+
+            var patientExists = await _repositoryManager.Muayene.hastaVarmi(muayene.HastaTc);
+            if (!patientExists)
+                throw new NotFoundException("Hasta bilgisi bulunamadı");
+
+            if (muayene.MuayeneTarihi<DateTime.UtcNow) 
+                throw new BadRequestException("Muayene tarihi geçmiş tarihli olamaz");
+
+            int? randevuid=null;
+            DateTime randevuTarihi = muayene.MuayeneTarihi.Date + muayene.BaslangicSaati;
+            DateTime tarihKontrol = muayene.MuayeneTarihi.Date;
+
+            var aynigünMuayene = await _repositoryManager.Muayene.AyniGünMuayenesiVarmi(muayene.PolNo,muayene.ProtocolNo, tarihKontrol);
+
+            if (aynigünMuayene) throw new BadRequestException("Hastanın aynı gün aynı polikliniğe randevusu bulunmaktadır");
+
+            var mevcutRandevu = await _repositoryManager.Muayene.HastanınRanevusunuGetir(muayene.HastaTc, muayene.DoktorNo, randevuTarihi);
+            if(mevcutRandevu is not null)
+            {
+                if (mevcutRandevu.RandevuTarihi==randevuTarihi)
+                {
+                    randevuid=mevcutRandevu?.Id;
+                }
+            }
+           
+
+            var kayit = new MuayeneKaydi
+            {
+                BaslangicSaati=muayene.BaslangicSaati,
+                ProtocolNo=muayene.ProtocolNo,
+                DoktorNo=muayene.DoktorNo,
+                PolNo= muayene.PolNo,
+                HastaTc=muayene.HastaTc,
+                MuayeneTarihi= muayene.MuayeneTarihi,
+                RandevuId=randevuid
+            };
+             _repositoryManager.Muayene.MuayeneKaydiOlustur(kayit);
+             await _repositoryManager.saveAsyc();
+            return new MuayeneKayitiOlusturDTO
+            {
+                BaslangicSaati=kayit.BaslangicSaati,
+                ProtocolNo=kayit.ProtocolNo,
+                DoktorNo=kayit.DoktorNo,
+                PolNo=kayit.PolNo,
+                HastaTc=kayit.HastaTc,
+                MuayeneTarihi=kayit.MuayeneTarihi
+            };
         }
 
         public async Task<RandevuOlusturDTO> RandevuOlusturAsync(RandevuOlusturDTO plan)

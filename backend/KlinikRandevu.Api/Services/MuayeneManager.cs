@@ -198,6 +198,23 @@ namespace Services
 
             return plan;
         }
+        public async Task<List<HastaRandevulariniGetirDTO>> HastaRandevulariniGetir(DateTime baslangic, DateTime bitis)
+        {
+            if (baslangic < new DateTime(1900, 1, 1) || bitis < new DateTime(1900, 1, 1))
+            {
+                throw new ArgumentException("Geçersiz tarih aralığı.");
+            }
+            if (baslangic > bitis)
+            {
+                throw new ArgumentException("Başlangıç tarihi bitişten büyük olamaz.");
+            }
 
+            var result = await _repositoryManager.Muayene.HastaRandevulariniGetir(baslangic, bitis);
+
+            if (!result.Any())
+                throw new NotFoundException("Seçilen tarih aralığında randevu bulunmamaktadır.");
+
+            return result;
+        }
     }
 }

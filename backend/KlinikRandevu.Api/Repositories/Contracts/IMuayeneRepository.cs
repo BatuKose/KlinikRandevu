@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Entities.Data_Transfer_Objects.Muayene;
+using Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,5 +27,6 @@ namespace Repositories.Contracts
         public void MuayeneKaydiOlustur(MuayeneKaydi muayene);
         Task<Randevu?> HastanınRanevusunuGetir(long hastaTc, int doktorNo, DateTime tarih);
         Task<bool> AyniGünMuayenesiVarmi(int pol, int protokol, DateTime muayenetarihi);
+        Task<List<HastaRandevulariniGetirDTO>> HastaRandevulariniGetir(DateTime baslangic, DateTime bitis);
     }
 }

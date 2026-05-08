@@ -37,5 +37,11 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.MuayeneKayitiOlustur(muayene);
             return Ok(result);
         }
+        [HttpGet("randevularigetir")]
+        public async Task <IActionResult> HastaRandevulariniGetir([FromQuery] DateTime baslangic , DateTime bitis)
+        {
+            var result = await _ServiceManager.MuayeneService.HastaRandevulariniGetir(baslangic , bitis);
+            return Ok(result);
+        }
     }
 }

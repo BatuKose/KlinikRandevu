@@ -1,8 +1,11 @@
-﻿using Entities.Models;
+﻿using Entities.Data_Transfer_Objects.Muayene;
+using Entities.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -150,6 +153,38 @@ namespace Repositories.EFCore
                  m => m.IsActive== true && m.PolNo==pol && m.ProtocolNo==protokol
                  && m.MuayeneTarihi==muayenetarihi);
             return result;
+        }
+        public async Task<List<HastaRandevulariniGetirDTO>> HastaRandevulariniGetir( DateTime baslangic, DateTime bitis)
+        {
+            var sqlParams = new[]
+            {
+                new SqlParameter("@baslangic", SqlDbType.DateTime) { Value = baslangic },
+                new SqlParameter("@bitis", SqlDbType.DateTime) { Value = bitis },
+            };
+
+            return await _repositoryContext.Database
+                .SqlQueryRaw<HastaRandevulariniGetirDTO>(@"
+            SELECT 
+                r.Id AS DosyaId,
+                p.Protocol AS Protokol,
+                p.Name AS Ad,
+                p.Surname AS Soyad,
+                p.TcKimlik AS Tc,
+                pol.Name AS Poliklinik,
+                d.DoktorAd AS Doktor,
+                uz.Ad AS UzmanlikDali,
+                r.RandevuTarihi AS RandevuTarihi
+            FROM Randevular AS r
+            INNER JOIN Patients AS p ON p.Protocol = r.ProtocolNo
+            INNER JOIN Poliklinikler AS pol ON pol.PolNo = r.PolNo
+            INNER JOIN Doktorlar AS d ON d.doktorNo = r.DoktorNo
+            LEFT JOIN UzmanlikDallari AS uz ON uz.Kod = d.doktorUzKod
+            WHERE r.RandevuTarihi IS NOT NULL
+              AND r.RandevuTarihi > '1900-01-01'
+              AND p.IsActive = 1
+              AND pol.IsActive = 1
+              AND r.RandevuTarihi BETWEEN @baslangic AND @bitis
+            ORDER BY r.RandevuTarihi", sqlParams).ToListAsync();
         }
     }
 }

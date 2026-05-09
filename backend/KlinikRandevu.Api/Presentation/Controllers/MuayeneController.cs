@@ -1,5 +1,6 @@
 ﻿using Entities.Data_Transfer_Objects.Muayene;
 using Microsoft.AspNetCore.Mvc;
+using Services;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,18 @@ namespace Presentation.Controllers
         {
             var result = await _ServiceManager.MuayeneService.HastanınRandevulariniGetir(protokol);
             return Ok(result);
+        }
+        [HttpPatch("{doktorId:int}/docpasif")]
+        public async Task<IActionResult> DoktoruPasifeAl([FromRoute] int doktorId)
+        {
+            await _ServiceManager.MuayeneService.DoktoruPasifeAl(doktorId);
+            return NoContent();
+        }
+        [HttpPatch("{polIid:int}/polpasif")]
+        public async Task<IActionResult> PoluPasifeAl([FromRoute] int polIid)
+        {
+            await _ServiceManager.MuayeneService.PoluPasifeAl(polIid);
+            return NoContent();
         }
     }
 }

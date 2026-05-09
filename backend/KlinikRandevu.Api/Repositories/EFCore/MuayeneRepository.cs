@@ -222,5 +222,51 @@ namespace Repositories.EFCore
                AND p.Protocol=@protkol
             ORDER BY r.RandevuTarihi", sqlParams).ToListAsync();
         }
+        public async Task<Doctor>DoktoruGetir(int number)
+        {
+            var doktor = await _repositoryContext.Doctors.SingleOrDefaultAsync(d=>d.doktorNo==number);
+            return doktor;
+        }
+        public async Task<Poliklinik> PolGetir(int number)
+        {
+            var pol = await _repositoryContext.Polikliniks.SingleOrDefaultAsync(d => d.PolNo==number);
+            return pol;
+        }
+        public async Task<int> DoktorIleriRandevuSorgula(int number)
+        {
+            var sqlParams = new[]
+            {
+                new SqlParameter("@doktorno", SqlDbType.Int) { Value = number }
+            };
+
+            return await _repositoryContext.Database
+                .SqlQueryRaw<int>(@"
+            SELECT 
+                COUNT(*) AS Value
+            FROM Randevular AS r
+            INNER JOIN Patients AS p ON p.Protocol = r.ProtocolNo
+            INNER JOIN Poliklinikler AS pol ON pol.PolNo = r.PolNo
+            INNER JOIN Doktorlar AS d ON d.doktorNo = r.DoktorNo
+            WHERE r.DoktorNo = @doktorno
+              AND r.RandevuTarihi >= CAST(GETDATE() AS DATE)", sqlParams).FirstAsync();
+        }
+        public async Task<int> PolIleriRandevuSorgula(int number)
+        {
+            var sqlParams = new[]
+            {
+                new SqlParameter("@polno", SqlDbType.Int) { Value = number }
+            };
+
+            return await _repositoryContext.Database
+                .SqlQueryRaw<int>(@"
+            SELECT 
+                COUNT(*) AS Value
+            FROM Randevular AS r
+            INNER JOIN Patients AS p ON p.Protocol = r.ProtocolNo
+            INNER JOIN Poliklinikler AS pol ON pol.PolNo = r.PolNo
+            INNER JOIN Doktorlar AS d ON d.doktorNo = r.DoktorNo
+            WHERE  pol.PolNo = @polno
+              AND r.RandevuTarihi >= CAST(GETDATE() AS DATE)", sqlParams).FirstAsync();
+        }
     }
 }

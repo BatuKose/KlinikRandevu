@@ -16,5 +16,6 @@ namespace Entities.Models
         public long doktorTc { get; set; }
         public int ServisNo { get; set; }
         public int tescilNO { get; set; }
+        public bool isActive { get; set; }=true;
     }
 }

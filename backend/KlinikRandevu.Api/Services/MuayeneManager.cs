@@ -229,5 +229,45 @@ namespace Services
 
             return result;
         }
+        public async Task<Doctor>DoktoruPasifeAl(int doktor)
+        {
+            var doktorVarMi= await _repositoryManager.Muayene.doktorVarMI(doktor);
+            if (!doktorVarMi) throw new NotFoundException("Doktor bulunamadı");
+            var doktorBul = await _repositoryManager.Muayene.DoktoruGetir(doktor);
+        
+            if(doktorBul.isActive==true)
+            {
+                var kontrol = await _repositoryManager.Muayene.DoktorIleriRandevuSorgula(doktor);
+                if (kontrol!=0) throw new BadRequestException("Doktorun ileriki tarihte randevuları bulunmak önce onları kontrol ediniz");
+                doktorBul.isActive=false;
+            }
+            else
+            {
+                doktorBul.isActive=true;
+            }
+
+                await _repositoryManager.saveAsyc();
+            return doktorBul;
+        }
+        public async Task<Poliklinik> PoluPasifeAl(int polno)
+        {
+            var polVarMi = await _repositoryManager.Muayene.doktorVarMI(polno);
+            if (!polVarMi) throw new NotFoundException("Doktor bulunamadı");
+            var polBul = await _repositoryManager.Muayene.PolGetir(polno);
+
+            if (polBul.isActive==true)
+            {
+                var kontrol = await _repositoryManager.Muayene.PolIleriRandevuSorgula(polno);
+                if (kontrol!=0) throw new BadRequestException("Doktorun ileriki tarihte randevuları bulunmak önce onları kontrol ediniz");
+                polBul.isActive=false;
+            }
+            else
+            {
+                polBul.isActive=true;
+            }
+
+            await _repositoryManager.saveAsyc();
+            return polBul;
+        }
     }
 }

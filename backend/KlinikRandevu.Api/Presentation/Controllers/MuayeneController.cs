@@ -43,5 +43,11 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.HastaRandevulariniGetir(baslangic , bitis);
             return Ok(result);
         }
+        [HttpGet("hastaninrandevusunugetir")]
+        public async Task<IActionResult> HastaninRandevulariniGetir([FromQuery(Name = "protokol")] int protokol)
+        {
+            var result = await _ServiceManager.MuayeneService.HastanınRandevulariniGetir(protokol);
+            return Ok(result);
+        }
     }
 }

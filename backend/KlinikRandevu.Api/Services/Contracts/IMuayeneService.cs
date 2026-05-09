@@ -13,5 +13,6 @@ namespace Services.Contracts
         Task<RandevuOlusturDTO> RandevuOlusturAsync(RandevuOlusturDTO plan);
         Task<MuayeneKayitiOlusturDTO> MuayeneKayitiOlustur(MuayeneKayitiOlusturDTO muayene);
         Task<List<HastaRandevulariniGetirDTO>> HastaRandevulariniGetir(DateTime baslangic, DateTime bitis);
+        Task<List<HastaRandevulariniGetirDTO>> HastanınRandevulariniGetir(int protokol);
     }
 }

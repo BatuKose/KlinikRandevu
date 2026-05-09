@@ -56,6 +56,11 @@ namespace Repositories.EFCore
             var hasta = await _repositoryContext.Patients.AnyAsync(h => h.TcKimlik==number);
             return hasta;
         }
+        public async Task<bool> hastaVarmiProtokol(int number)
+        {
+            var hasta = await _repositoryContext.Patients.AnyAsync(h => h.Protocol==number);
+            return hasta;
+        }
 
         public async Task<int?> PolMaxRanevu(int number)
         {
@@ -184,6 +189,37 @@ namespace Repositories.EFCore
               AND p.IsActive = 1
               AND pol.IsActive = 1
               AND r.RandevuTarihi BETWEEN @baslangic AND @bitis
+            ORDER BY r.RandevuTarihi", sqlParams).ToListAsync();
+        }
+        public async Task<List<HastaRandevulariniGetirDTO>> HastanınRandevulariniGetir(int protokol)
+        {
+            var sqlParams = new[]
+            {
+                new SqlParameter("@protkol", SqlDbType.Int) { Value = protokol }           
+            };
+
+            return await _repositoryContext.Database
+                .SqlQueryRaw<HastaRandevulariniGetirDTO>(@"
+            SELECT 
+                r.Id AS DosyaId,
+                p.Protocol AS Protokol,
+                p.Name AS Ad,
+                p.Surname AS Soyad,
+                p.TcKimlik AS Tc,
+                pol.Name AS Poliklinik,
+                d.DoktorAd AS Doktor,
+                uz.Ad AS UzmanlikDali,
+                r.RandevuTarihi AS RandevuTarihi
+            FROM Randevular AS r
+            INNER JOIN Patients AS p ON p.Protocol = r.ProtocolNo
+            INNER JOIN Poliklinikler AS pol ON pol.PolNo = r.PolNo
+            INNER JOIN Doktorlar AS d ON d.doktorNo = r.DoktorNo
+            LEFT JOIN UzmanlikDallari AS uz ON uz.Kod = d.doktorUzKod
+            WHERE r.RandevuTarihi IS NOT NULL
+              AND r.RandevuTarihi > '1900-01-01'
+              AND p.IsActive = 1
+              AND pol.IsActive = 1
+               AND p.Protocol=@protkol
             ORDER BY r.RandevuTarihi", sqlParams).ToListAsync();
         }
     }

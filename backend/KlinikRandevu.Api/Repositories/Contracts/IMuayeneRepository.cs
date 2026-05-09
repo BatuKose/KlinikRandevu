@@ -28,5 +28,7 @@ namespace Repositories.Contracts
         Task<Randevu?> HastanınRanevusunuGetir(long hastaTc, int doktorNo, DateTime tarih);
         Task<bool> AyniGünMuayenesiVarmi(int pol, int protokol, DateTime muayenetarihi);
         Task<List<HastaRandevulariniGetirDTO>> HastaRandevulariniGetir(DateTime baslangic, DateTime bitis);
+        Task<List<HastaRandevulariniGetirDTO>> HastanınRandevulariniGetir(int protokol);
+        Task<bool> hastaVarmiProtokol(int number);
     }
 }

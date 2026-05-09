@@ -216,5 +216,18 @@ namespace Services
 
             return result;
         }
+        public async Task<List<HastaRandevulariniGetirDTO>> HastanınRandevulariniGetir(int protokol)
+        {
+            if (protokol<=0) throw new BadRequestException("Protokolü sıfırdan büyük olmalıdır");
+            var hasta = await _repositoryManager.Muayene.hastaVarmiProtokol(protokol);
+            if (!hasta) throw new NotFoundException("Hasta bulunamadı");
+
+            var result = await _repositoryManager.Muayene.HastanınRandevulariniGetir(protokol);
+
+            if (!result.Any())
+                throw new NotFoundException("Seçilen hastanın  randevusu bulunmamaktadır.");
+
+            return result;
+        }
     }
 }

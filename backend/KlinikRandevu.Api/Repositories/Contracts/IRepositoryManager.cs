@@ -12,6 +12,7 @@ namespace Repositories.Contracts
         void Save();
         IPatientRepository Patient { get; }
         IMuayeneRepository Muayene { get; }
+        ISistemParametresiRepository SistemParametresi { get; }
 
     }
 }

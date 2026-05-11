@@ -21,6 +21,7 @@ namespace Repositories.EFCore
         public DbSet<DoktorCalismaPlani>DoktorCalismaPlanis { get; set; }
         public DbSet<MuayeneKaydi> MuayeneKaydis {  get; set; }
         public DbSet<Randevu>Randevus { get; set; } 
+        public DbSet<SistemParametresi>parametreler {  get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

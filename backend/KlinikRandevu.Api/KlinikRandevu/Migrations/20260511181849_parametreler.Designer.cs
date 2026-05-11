@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories.EFCore;
 
@@ -11,9 +12,11 @@ using Repositories.EFCore;
 namespace KlinikRandevu.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20260511181849_parametreler")]
+    partial class parametreler
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -354,7 +357,7 @@ namespace KlinikRandevu.Migrations
                             Address = "BURSA, Türkiye",
                             BirthDate = new DateTime(2001, 2, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BloodType = 6,
-                            CreatedAt = new DateTime(2026, 5, 11, 21, 24, 17, 493, DateTimeKind.Local).AddTicks(3801),
+                            CreatedAt = new DateTime(2026, 5, 11, 21, 18, 49, 263, DateTimeKind.Local).AddTicks(7738),
                             Gender = 2,
                             IsActive = true,
                             Name = "BATUHAN",
@@ -537,28 +540,6 @@ namespace KlinikRandevu.Migrations
                         .IsUnique();
 
                     b.ToTable("parametreler");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Aciklama = "D1: Aktif mi (EVET/HAYIR), D2: Hata mesajı",
-                            Aktif = false,
-                            Deger1 = "EVET",
-                            OlusturmaTarihi = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ParametreAdi = "KADIN_DOGUM_ERKEK_YASAKLA"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Aciklama = "D1: Aktif mi, D2: Min yaş, D3: Max yaş",
-                            Aktif = false,
-                            Deger1 = "EVET",
-                            Deger2 = "0",
-                            Deger3 = "16",
-                            OlusturmaTarihi = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ParametreAdi = "PEDIATRI_YAS_LIMITI"
-                        });
                 });
 #pragma warning restore 612, 618
         }

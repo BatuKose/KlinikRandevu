@@ -1,24 +1,24 @@
-﻿using Repositories.Contracts;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Repositories.Contracts;
 using Services.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services
 {
-    public class ServiceManager: IServiceManager
+    public class ServiceManager : IServiceManager
     {
         private readonly Lazy<IPatientService> _patientService;
-        private readonly Lazy<IMuayeneService> _MuayeneService; 
-        public ServiceManager(IRepositoryManager repositoryManager)
-        {
-            _patientService= new Lazy<IPatientService>(()=> new PatientManager(repositoryManager));
-            _MuayeneService= new Lazy<IMuayeneService>(()=> new MuayeneManager(repositoryManager));
-        }
-        public IPatientService PatientService => _patientService.Value;
+        private readonly Lazy<IMuayeneService> _MuayeneService;
+        private readonly Lazy<ISistemParametreService> _sistemParametreService;
 
+        public ServiceManager(IRepositoryManager repositoryManager, IMemoryCache cache)
+        {
+            _patientService = new Lazy<IPatientService>(() => new PatientManager(repositoryManager));
+            _MuayeneService = new Lazy<IMuayeneService>(() => new MuayeneManager(repositoryManager));
+            _sistemParametreService = new Lazy<ISistemParametreService>(() => new SistemParametreServiceManager(repositoryManager, cache));
+        }
+
+        public IPatientService PatientService => _patientService.Value;
         public IMuayeneService MuayeneService => _MuayeneService.Value;
+        public ISistemParametreService SistemParametreService => _sistemParametreService.Value;
     }
 }

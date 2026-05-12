@@ -1,4 +1,5 @@
 ﻿using Entities.Data_Transfer_Objects.Muayene;
+using Entities.Enums;
 using Entities.Models;
 using System;
 using System.Collections.Generic;
@@ -34,5 +35,6 @@ namespace Repositories.Contracts
         Task<Poliklinik> PolGetir(int number);
         Task<int> DoktorIleriRandevuSorgula(int number);
         Task<int> PolIleriRandevuSorgula(int number);
+        Task<PoliklinikEnum.UzmanlikBransi> PolUzmanlikKoduAsync(int polNo);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Entities.Data_Transfer_Objects.Muayene;
+using Entities.Enums;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
 using Repositories.Contracts;
@@ -69,7 +70,25 @@ namespace Services
 
         public async Task<MuayeneKayitiOlusturDTO> MuayeneKayitiOlustur(MuayeneKayitiOlusturDTO muayene)
         {
+
             if (muayene == null) throw new BadRequestException("Muayene bilgilerini kontrol ediniz");
+           
+            var cinsiyetKurali = await _repositoryManager.SistemParametresi.GetirAsync("KADIN_DOGUM_ERKEK_YASAKLA");
+
+            if(cinsiyetKurali != null && cinsiyetKurali.Deger1?.ToUpper()=="EVET")
+            {
+                var uzmanlik= await _repositoryManager.Muayene.PolUzmanlikKoduAsync(muayene.PolNo);
+
+                if(uzmanlik==PoliklinikEnum.UzmanlikBransi.KadinHastaliklariVedogum)
+                {
+                    var hasta = await _repositoryManager.Patient.GetPatientByProtokolASycn(muayene.ProtocolNo);
+                    if (hasta.Gender==GenderEnum.male ||hasta.Gender== GenderEnum.none)
+                    {
+                        throw new BadRequestException("Bu polikliniğe cinsiyeti kadın harici hasta açılmaz");
+                    }
+                }
+                
+            }         
 
             var doctorExists = await _repositoryManager.Muayene.doktorVarMI(muayene.DoktorNo);
             if (!doctorExists)

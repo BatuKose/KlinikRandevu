@@ -1,4 +1,5 @@
 ﻿using Entities.Data_Transfer_Objects.Muayene;
+using Entities.Enums;
 using Entities.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -267,6 +268,14 @@ namespace Repositories.EFCore
             INNER JOIN Doktorlar AS d ON d.doktorNo = r.DoktorNo
             WHERE  pol.PolNo = @polno
               AND r.RandevuTarihi >= CAST(GETDATE() AS DATE)", sqlParams).FirstAsync();
+        }
+        public async Task<PoliklinikEnum.UzmanlikBransi> PolUzmanlikKoduAsync(int polNo)
+        {
+            var uzmanlik = await _repositoryContext.Polikliniks
+                .Where(p => p.PolNo == polNo)
+                .Select(p => p.PolUzKod)
+                .SingleOrDefaultAsync();
+            return uzmanlik;
         }
     }
 }

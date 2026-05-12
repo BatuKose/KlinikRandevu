@@ -4,20 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entities.Models
+namespace Entities.Data_Transfer_Objects.Parametre
 {
-    public class SistemParametresi
+    public class ParametreEkleDTO
     {
-        public int Id { get; set; }
-        public string ParametreAdi { get; set; }    
+        public string ParametreAdi { get; set; }
         public string? Deger1 { get; set; }
         public string? Deger2 { get; set; }
         public string? Deger3 { get; set; }
         public string? Deger4 { get; set; }
         public string? Deger5 { get; set; }
         public string? Aciklama { get; set; }
-        public bool Aktif { get; set; } = true;
-        public DateTime OlusturmaTarihi { get; set; }= DateTime.Now;
-        public DateTime? GuncellemeTarihi { get; set; }
     }
 }

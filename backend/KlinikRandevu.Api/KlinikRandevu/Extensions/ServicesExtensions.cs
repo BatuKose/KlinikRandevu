@@ -24,6 +24,7 @@ namespace KlinikRandevu.Extensions
         }
         public static void ConfigureServiceManager(this IServiceCollection services)
         {
+            services.AddMemoryCache();
             services.AddScoped<IServiceManager, ServiceManager>();
         }
 
@@ -51,5 +52,6 @@ namespace KlinikRandevu.Extensions
             });
             return services;
         }
+
     }
 }

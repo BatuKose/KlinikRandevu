@@ -1,5 +1,6 @@
 ﻿using Entities.Data_Transfer_Objects.Muayene;
 using Entities.Enums;
+using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
 using Repositories.Contracts;
@@ -86,7 +87,7 @@ namespace Services
                         var yas = currdate-hasta.BirthDate.Year;
                         if (yas < int.Parse(pediyatriYasKontrol.Deger2) || yas > int.Parse(pediyatriYasKontrol.Deger3))
                         {
-                            throw new BadRequestException("Pedodonti polikliniğine 0 yaşından küçük " +
+                            throw new ParamException("Pedodonti polikliniğine 0 yaşından küçük " +
                                 "16 yaşından büyük hasta kaydı açamazsınız");
                         }
                     }
@@ -104,7 +105,7 @@ namespace Services
                     var hasta = await _repositoryManager.Patient.GetPatientByProtokolASycn(muayene.ProtocolNo);
                     if (hasta.Gender==GenderEnum.male ||hasta.Gender== GenderEnum.none)
                     {
-                        throw new BadRequestException("Bu polikliniğe cinsiyeti kadın harici hasta açılmaz");
+                        throw new ParamException("Bu polikliniğe cinsiyeti kadın harici hasta açılmaz");
                     }
                 }
                 

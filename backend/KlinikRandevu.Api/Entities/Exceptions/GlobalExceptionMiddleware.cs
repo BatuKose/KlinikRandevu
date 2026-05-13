@@ -1,4 +1,5 @@
-﻿using Entities.Exeptions.CustomExceptions;
+﻿using Entities.Exceptions.CustomExceptions;
+using Entities.Exeptions.CustomExceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -41,6 +42,11 @@ namespace Entities.Exeptions
             else if(ex is NotFoundException)
             {
                 statusCode=(int)HttpStatusCode.NotFound;
+                message=ex.Message;
+            }
+            else if (ex is ParamException)
+            {
+                statusCode=(int)HttpStatusCode.BadRequest;
                 message=ex.Message;
             }
             else

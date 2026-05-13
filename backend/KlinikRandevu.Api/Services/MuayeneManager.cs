@@ -72,6 +72,26 @@ namespace Services
         {
 
             if (muayene == null) throw new BadRequestException("Muayene bilgilerini kontrol ediniz");
+
+            var pediyatriYasKontrol = await _repositoryManager.SistemParametresi.GetirAsync("PEDIATRI_YAS_LIMITI");
+            if(pediyatriYasKontrol!= null && pediyatriYasKontrol.Deger1?.ToUpper()=="EVET")
+            {
+                var uzmanlik = await _repositoryManager.Muayene.PolUzmanlikKoduAsync(muayene.PolNo);
+                if(uzmanlik==PoliklinikEnum.UzmanlikBransi.Pedodonti)
+                {
+                    var hasta =  await _repositoryManager.Patient.GetPatientByProtokolASycn(muayene.ProtocolNo);
+                    if(hasta!=null)
+                    {
+                        var currdate = DateTime.Now.Year;
+                        var yas = currdate-hasta.BirthDate.Year;
+                        if (yas < int.Parse(pediyatriYasKontrol.Deger2) || yas > int.Parse(pediyatriYasKontrol.Deger3))
+                        {
+                            throw new BadRequestException("Pedodonti polikliniğine 0 yaşından küçük " +
+                                "16 yaşından büyük hasta kaydı açamazsınız");
+                        }
+                    }
+                }
+            }
            
             var cinsiyetKurali = await _repositoryManager.SistemParametresi.GetirAsync("KADIN_DOGUM_ERKEK_YASAKLA");
 

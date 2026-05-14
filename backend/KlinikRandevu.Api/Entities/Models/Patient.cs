@@ -21,5 +21,6 @@ namespace Entities.Models
         public DateTime CreatedAt { get; set; }= DateTime.Now;
         public bool IsActive { get; set; }
         public long TcKimlik { get; set; }
+        public string? Email { get; set; }
     }
 }

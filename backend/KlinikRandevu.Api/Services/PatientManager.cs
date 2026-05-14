@@ -51,7 +51,8 @@ namespace Services
                 Name = dto.Name,
                 Phone=phone,
                 Protocol=yeniProtol,
-                TcKimlik=dto.TcKimlik
+                TcKimlik=dto.TcKimlik,
+                Email=dto.Email
             };
             _repositoryManager.Patient.CreatePatient(patientDto);
             await _repositoryManager.saveAsyc();
@@ -64,7 +65,8 @@ namespace Services
                 Surname = patientDto.Surname,
                 Name = patientDto.Name,
                 Phone=patientDto.Phone,
-                TcKimlik=patientDto.TcKimlik
+                TcKimlik=patientDto.TcKimlik,
+                Email = patientDto.Email
             };
 
         }
@@ -143,6 +145,7 @@ namespace Services
             if (hasta.gender.HasValue) güncellenecekHasta.Gender = hasta.gender.Value;
             if (hasta.BloodType.HasValue) güncellenecekHasta.BloodType = hasta.BloodType.Value;
             if (hasta.TcKimlik.HasValue) güncellenecekHasta.TcKimlik = hasta.TcKimlik.Value;
+            
 
             await _repositoryManager.saveAsyc();
             return güncellenecekHasta;

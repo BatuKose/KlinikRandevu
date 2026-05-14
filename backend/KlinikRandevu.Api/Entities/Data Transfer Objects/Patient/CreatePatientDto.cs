@@ -26,5 +26,6 @@ namespace Entities.Data_Transfer_Objects.Patient
         public BloodTypeEnum BloodType { get; set; }
         [Required]
         public long TcKimlik { get; set; }
+        public string? Email { get; set; }
     }
 }

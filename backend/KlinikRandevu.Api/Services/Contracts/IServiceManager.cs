@@ -11,5 +11,6 @@ namespace Services.Contracts
         IPatientService PatientService { get; }
         IMuayeneService MuayeneService { get; }
         ISistemParametreService SistemParametreService { get; }
+        IEmailService EmailService { get; }
     }
 }

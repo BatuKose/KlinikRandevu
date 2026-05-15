@@ -3,6 +3,7 @@ using Entities.Enums;
 using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
+using Microsoft.Extensions.Logging;
 using Repositories.Contracts;
 using Services.Contracts;
 using System;
@@ -17,10 +18,13 @@ namespace Services
     public class MuayeneManager:IMuayeneService
     {
         private readonly IRepositoryManager _repositoryManager;
-
-        public MuayeneManager(IRepositoryManager repositoryManager)
+        private readonly ILogger<MuayeneManager> _logger;
+        private readonly IEmailService _emailService;
+        public MuayeneManager(IRepositoryManager repositoryManager, ILogger<MuayeneManager> logger, IEmailService emailService)
         {
             _repositoryManager=repositoryManager;
+            _logger=logger;
+            _emailService=emailService;
         }
 
         public async Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan)
@@ -235,6 +239,24 @@ namespace Services
 
             _repositoryManager.Muayene.RandevuOlustur(randevuOlustur);
             await _repositoryManager.saveAsyc();
+            //randevu mail
+            var mailHasta = await _repositoryManager.Patient.GetPatientByProtokolASycn(plan.ProtocolNo);
+            var mailDoktor = await _repositoryManager.Muayene.DoktoruGetir(plan.DoktorNo);
+            if(!string.IsNullOrWhiteSpace(mailHasta.Email))
+            {
+                try
+                {
+                    await _emailService.RandevuOnayMailiGonder(mailHasta.Email,
+                        $"{mailHasta.Name} {mailHasta.Surname}",
+                        $"{mailDoktor.DoktorAd}", plan.RandevuTarihi
+                        );
+
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogWarning(ex, "Randevu oluştu fakat mail gönderilemedi", mailHasta.Protocol);
+                }
+            }
 
             return plan;
         }

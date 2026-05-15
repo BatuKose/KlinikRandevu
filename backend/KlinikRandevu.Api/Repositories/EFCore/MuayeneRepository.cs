@@ -277,5 +277,6 @@ namespace Repositories.EFCore
                 .SingleOrDefaultAsync();
             return uzmanlik;
         }
+        
     }
 }

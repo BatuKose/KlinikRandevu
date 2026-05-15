@@ -78,6 +78,17 @@ namespace Services
 
             if (muayene == null) throw new BadRequestException("Muayene bilgilerini kontrol ediniz");
 
+            var randevusuzKayitAcmaParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVUSUZ_KAYIT_ACMA");
+            if(randevusuzKayitAcmaParam!=null && randevusuzKayitAcmaParam.Deger1=="EVET")
+            {
+                if(muayene.PolNo==int.Parse(randevusuzKayitAcmaParam.Deger2))
+                {
+                    bool paramKontrol = await _repositoryManager.Muayene.AyniGünMuayenesiVarmi(muayene.PolNo, muayene.ProtocolNo, muayene.MuayeneTarihi);
+                    if (!paramKontrol) throw new ParamException("Bu polikliniğe Randevusuz kayıt açılamaz");
+                }
+                
+            }
+
             var pediyatriYasKontrol = await _repositoryManager.SistemParametresi.GetirAsync("PEDIATRI_YAS_LIMITI");
             if(pediyatriYasKontrol!= null && pediyatriYasKontrol.Deger1?.ToUpper()=="EVET")
             {

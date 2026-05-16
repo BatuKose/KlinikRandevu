@@ -17,5 +17,6 @@ namespace Services.Contracts
         Task<List<HastaRandevulariniGetirDTO>> HastanınRandevulariniGetir(int protokol);
         Task<Doctor> DoktoruPasifeAl(int doktor);
         Task<Poliklinik> PoluPasifeAl(int polno);
+        Task DoktorGunlukProgramMailiGonderAsync(int doktorNo);
     }
 }

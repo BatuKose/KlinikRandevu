@@ -223,6 +223,30 @@ namespace Repositories.EFCore
                AND p.Protocol=@protkol
             ORDER BY r.RandevuTarihi", sqlParams).ToListAsync();
         }
+        public async Task<List<DoktorRandevuHatirlatmaEmailDTO>>DoktorRandevuHatirlatma(int doktorno)
+        {
+            var sqlParams = new[]
+            {
+                new SqlParameter("@doktorno",SqlDbType.Int){Value = doktorno}
+            };
+            return await _repositoryContext.Database.SqlQueryRaw<DoktorRandevuHatirlatmaEmailDTO>("" +
+                @"SELECT 
+                    d.DoktorAd AS doktorad,
+                    p.Name AS polad,
+                    pa.Name AS hastaad,
+                    pa.Surname AS hastsoyad,
+                    r.RandevuTarihi AS randevutarihi,
+	                d.Email as doktormail
+                FROM Randevular r
+                INNER JOIN Doktorlar d ON r.DoktorNo = d.DoktorNo
+                INNER JOIN Poliklinikler p ON p.PolNo = r.PolNo
+                INNER JOIN Patients pa ON pa.Protocol = r.ProtocolNo
+                WHERE CAST(r.RandevuTarihi AS DATE) = CAST(GETDATE() AS DATE)
+                  AND d.isActive = 1
+                  AND d.Email IS NOT NULL
+                  and r.DoktorNo=@doktorno
+                ORDER BY d.DoktorNo, r.RandevuTarihi;", sqlParams).ToListAsync();
+        }
         public async Task<Doctor>DoktoruGetir(int number)
         {
             var doktor = await _repositoryContext.Doctors.SingleOrDefaultAsync(d=>d.doktorNo==number);

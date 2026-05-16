@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace Services.Contracts
 {
     public interface IEmailService
     {
-        Task RandevuOnayMailiGonder(string aliniciMail,string hastaAdi, string doktorAdi,DateTime randevuTarihi);
+        Task MailGonderAsync(string aliciMail, string konu, string htmlIcerik);
+        Task RandevuOnayMailiGonder(string aliciMail, string hastaAdi, string doktorAdi, DateTime randevuTarihi);
     }
 }

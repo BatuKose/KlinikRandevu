@@ -4,6 +4,7 @@ using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Repositories.Contracts;
 using Services.Contracts;
 using System;
@@ -341,6 +342,54 @@ namespace Services
 
             await _repositoryManager.saveAsyc();
             return polBul;
+        }
+        public async Task DoktorGunlukProgramMailiGonderAsync(int doktorNo)
+        {
+            var randevular = await _repositoryManager.Muayene.DoktorRandevuHatirlatma(doktorNo);
+            if (!randevular.Any()) throw new NotFoundException("Doktorun bugüne ait aktif randevusu bulunmamaktadır");
+
+            var ilkKayit = randevular.First();
+            var doktorAd = ilkKayit.doktorad;
+            var doktorEmail = ilkKayit.doktormail;
+
+            var htmlIcerik = MailIcerikOlustur(doktorAd, randevular);
+            var konu = $"Günlük randevu programınız-{DateTime.Today:dd:MM:yyyy}";
+            try
+            {
+                await _emailService.MailGonderAsync(doktorEmail, konu, htmlIcerik);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogWarning("Email gönderilemedi "+ex.Message);
+            }
+           
+            
+        }
+        private string MailIcerikOlustur(string doktorAd, List<DoktorRandevuHatirlatmaEmailDTO> randevular)
+        {
+            var satirlar = string.Join("", randevular.Select((r, i) => $@"
+            <tr style='background:{(i % 2 == 0 ? "#f9f9f9" : "#ffffff")};'>
+                <td style='padding:10px;border:1px solid #ddd;'>{r.randevutarihi:HH:mm}</td>
+                <td style='padding:10px;border:1px solid #ddd;'>{r.hastaad} {r.hastsoyad}</td>
+                <td style='padding:10px;border:1px solid #ddd;'>{r.polad}</td>
+            </tr>"));
+
+            return $@"
+            <div style='font-family:Arial,sans-serif;max-width:700px;'>
+                <h2>Sayın Dr. {doktorAd}</h2>
+                <p>{DateTime.Today:dd MMMM yyyy} tarihli randevu programınız:</p>
+                <table style='border-collapse:collapse;width:100%;'>
+                    <thead>
+                        <tr style='background:#4a90e2;color:white;'>
+                            <th style='padding:12px;text-align:left;'>Saat</th>
+                            <th style='padding:12px;text-align:left;'>Hasta</th>
+                            <th style='padding:12px;text-align:left;'>Poliklinik</th>
+                        </tr>
+                    </thead>
+                    <tbody>{satirlar}</tbody>
+                </table>
+                <p>Toplam: <strong>{randevular.Count} randevu</strong></p>
+            </div>";
         }
     }
 }

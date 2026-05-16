@@ -62,5 +62,12 @@ namespace Presentation.Controllers
             await _ServiceManager.MuayeneService.PoluPasifeAl(polIid);
             return NoContent();
         }
+        [HttpPost("doktor/{doktorNo}/randevu-hatirlatma-mail")]
+        public async Task<IActionResult> RandevuHatirlatmaMailGonder(int doktorNo)
+        {
+            await _ServiceManager.MuayeneService.DoktorGunlukProgramMailiGonderAsync(doktorNo);
+
+            return Ok(new { mesaj = "Mail başarıyla gönderildi." });
+        }
     }
 }

@@ -17,5 +17,6 @@ namespace Entities.Models
         public int ServisNo { get; set; }
         public int tescilNO { get; set; }
         public bool isActive { get; set; }=true;
+        public string? Email { get; set; }
     }
 }

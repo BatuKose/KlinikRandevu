@@ -252,6 +252,11 @@ namespace Services
             _repositoryManager.Muayene.RandevuOlustur(randevuOlustur);
             await _repositoryManager.saveAsyc();
             //randevu mail
+            var mailParametre = await _repositoryManager.SistemParametresi.GetirAsync("EMAIL_GONDERME");
+            if(mailParametre.Deger1=="EVET" && int.Parse(mailParametre.Deger3)!=plan.PolNo)
+            {
+                return plan;
+            }
             var mailHasta = await _repositoryManager.Patient.GetPatientByProtokolASycn(plan.ProtocolNo);
             var mailDoktor = await _repositoryManager.Muayene.DoktoruGetir(plan.DoktorNo);
             if(!string.IsNullOrWhiteSpace(mailHasta.Email))
@@ -345,6 +350,7 @@ namespace Services
         }
         public async Task DoktorGunlukProgramMailiGonderAsync(int doktorNo)
         {
+         
             var randevular = await _repositoryManager.Muayene.DoktorRandevuHatirlatma(doktorNo);
             if (!randevular.Any()) throw new NotFoundException("Doktorun bugüne ait aktif randevusu bulunmamaktadır");
 
@@ -356,7 +362,13 @@ namespace Services
             var konu = $"Günlük randevu programınız-{DateTime.Today:dd:MM:yyyy}";
             try
             {
-                await _emailService.MailGonderAsync(doktorEmail, konu, htmlIcerik);
+                var mailGondermeParametre = await _repositoryManager.SistemParametresi.GetirAsync("EMAIL_GONDERME");
+                if (mailGondermeParametre.Deger1.ToUpper()=="EVET" && int.Parse(mailGondermeParametre.Deger4)!=doktorNo)
+
+                {
+                    return;
+                }
+                    await _emailService.MailGonderAsync(doktorEmail, konu, htmlIcerik);
             }
             catch(Exception ex)
             {

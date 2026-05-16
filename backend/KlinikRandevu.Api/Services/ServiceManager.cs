@@ -20,7 +20,7 @@ namespace Services
             ILogger<MuayeneManager> muayeneLogger)
         {
             _mailService = new Lazy<IEmailService>(() =>
-                new EmailManager(repositoryManager, configuration));
+                new EmailManager(configuration));
 
             _patientService = new Lazy<IPatientService>(() =>
                 new PatientManager(repositoryManager));

@@ -360,7 +360,7 @@ namespace Services
             }
             catch(Exception ex)
             {
-                _logger.LogWarning("Email gönderilemedi "+ex.Message);
+                _logger.LogWarning(ex, "doktor randevu programı bilgileri mail olarak gönderilemedi", doktorAd +" "+DateTime.Today);
             }
            
             

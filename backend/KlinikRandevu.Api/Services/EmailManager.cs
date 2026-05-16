@@ -9,12 +9,10 @@ namespace Services
 {
     public class EmailManager : IEmailService
     {
-        private readonly IRepositoryManager _repositoryManager;
         private readonly IConfiguration _configuration;
 
-        public EmailManager(IRepositoryManager repositoryManager, IConfiguration configuration)
+        public EmailManager( IConfiguration configuration)
         {
-            _repositoryManager = repositoryManager;
             _configuration = configuration;
         }
 

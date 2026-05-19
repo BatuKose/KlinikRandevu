@@ -1,11 +1,15 @@
 ﻿
 using Entities.Exeptions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using Repositories.EFCore;
 using Serilog;
 using Services;
 using Services.Contracts;
+using System.Net.Http;
+using System.Threading.RateLimiting;
 
 namespace KlinikRandevu.Extensions
 {
@@ -49,6 +53,44 @@ namespace KlinikRandevu.Extensions
                     builder.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader();
+                });
+            });
+            return services;
+        }
+
+        public static IServiceCollection ConfigureRateLimiter(this IServiceCollection services)
+        {
+            //services.AddRateLimiter(options =>
+            //{
+            //    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            //    options.AddFixedWindowLimiter(policyName: "RateLimit", opt =>
+            //    {
+            //        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString()
+            //            ?? "unknown";
+            //        opt.PermitLimit = 100;
+            //        opt.Window = TimeSpan.FromSeconds(30);
+            //        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            //        opt.QueueLimit = 3;
+            //    });
+            //});
+            //return services;
+
+            services.AddRateLimiter(options=>
+            {
+                options.RejectionStatusCode=StatusCodes.Status429TooManyRequests;
+                options.AddPolicy("RateLimit", httpContext =>
+                {
+                    var ipAdress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: ipAdress,
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit=100,
+                            Window=TimeSpan.FromSeconds(30),
+                            QueueProcessingOrder=QueueProcessingOrder.OldestFirst,
+                            QueueLimit=3
+                        }
+                        );
                 });
             });
             return services;

@@ -1,5 +1,6 @@
 ﻿using Entities.Data_Transfer_Objects.Muayene;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Services;
 using Services.Contracts;
 using System;
@@ -12,6 +13,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/Poliklinik")]
+   // [EnableRateLimiting("RateLimit")]
     public class MuayeneController:ControllerBase
     {
         private readonly IServiceManager _ServiceManager;

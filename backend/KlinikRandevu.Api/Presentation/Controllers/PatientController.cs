@@ -11,6 +11,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/Patient")]
+    // [EnableRateLimiting("RateLimit")]
     public class PatientController: ControllerBase
     {
         private readonly IServiceManager _ServiceManager;

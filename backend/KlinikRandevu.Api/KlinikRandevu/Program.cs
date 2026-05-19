@@ -11,18 +11,21 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
+builder.Services.ConfigureRateLimiter();
 builder.AddSerilogLogging();
-var app = builder.Build();
 
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("AllowAll");
 app.UseGlobalExceptionMiddleware();
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
+app.UseRateLimiter();
 app.UseAuthorization();
-app.MapControllers();
+
+app.MapControllers().RequireRateLimiting("RateLimit");// bütün apilere rate limit uygulanacak
 app.Run();

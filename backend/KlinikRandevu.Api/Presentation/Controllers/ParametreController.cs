@@ -12,6 +12,7 @@ namespace Presentation.Controllers
 {
     [Route("SistemParametreleri")]
     [ApiController]
+    // [EnableRateLimiting("RateLimit")]
     public class ParametreController:ControllerBase
     {
         private readonly IServiceManager _ServiceManager;

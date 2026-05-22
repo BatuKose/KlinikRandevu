@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using System;
 using System.Collections.Generic;
@@ -14,12 +15,14 @@ namespace Repositories.EFCore
         private readonly Lazy<IPatientRepository> _patientRepository;
         private readonly Lazy<IMuayeneRepository> _MuayeneRepository;
         private readonly Lazy<ISistemParametresiRepository> _sistemParametresiRepository;
+        private readonly Lazy<IAuthenticationRepository> _authenticationRepository;
         public RepositoryManager(RepositoryContext repositoryContext)
         {
             _repositoryContext = repositoryContext;
             _patientRepository = new Lazy<IPatientRepository>(() => new PatientRepository(_repositoryContext));
             _MuayeneRepository = new Lazy<IMuayeneRepository>(() => new MuayeneRepository(_repositoryContext));
             _sistemParametresiRepository = new Lazy<ISistemParametresiRepository>(() => new SistemParametresiRepository(_repositoryContext));
+            _authenticationRepository= new Lazy<IAuthenticationRepository>(()=>new AuthenticationRepository(_repositoryContext));
         }
 
         public IPatientRepository Patient => _patientRepository.Value;
@@ -35,6 +38,8 @@ namespace Repositories.EFCore
             _repositoryContext.SaveChanges();
         }
         public ISistemParametresiRepository SistemParametresi => _sistemParametresiRepository.Value;
+        public IAuthenticationRepository Authentication => _authenticationRepository.Value;
+
 
     }
 }

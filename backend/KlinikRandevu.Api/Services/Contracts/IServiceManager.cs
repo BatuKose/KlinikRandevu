@@ -12,5 +12,6 @@ namespace Services.Contracts
         IMuayeneService MuayeneService { get; }
         ISistemParametreService SistemParametreService { get; }
         IEmailService EmailService { get; }
+        IAuthService AuthenticationService { get; }
     }
 }

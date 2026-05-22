@@ -13,6 +13,7 @@ namespace Repositories.Contracts
         IPatientRepository Patient { get; }
         IMuayeneRepository Muayene { get; }
         ISistemParametresiRepository SistemParametresi { get; }
+        IAuthenticationRepository Authentication { get; }
 
     }
 }

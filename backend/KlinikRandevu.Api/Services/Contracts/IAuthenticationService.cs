@@ -1,4 +1,5 @@
-﻿using Repositories.Contracts;
+﻿using Entities.Data_Transfer_Objects.Authentication;
+using Repositories.Contracts;
 using Repositories.EFCore;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,6 @@ namespace Services.Contracts
 {
     public interface IAuthService
     {
-      
+      Task<LoginDTO>login(LoginDTO loginDTO);
     }
 }

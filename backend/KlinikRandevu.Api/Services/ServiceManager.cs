@@ -30,7 +30,7 @@ namespace Services
             _sistemParametreService = new Lazy<ISistemParametreService>(() =>
                 new SistemParametreServiceManager(repositoryManager, cache));
             _authenticationService= new Lazy<IAuthService>(()=>
-                new AuthenticationManager(repositoryManager));
+                new AuthenticationManager(repositoryManager, configuration));
         }
 
         public IPatientService PatientService => _patientService.Value;

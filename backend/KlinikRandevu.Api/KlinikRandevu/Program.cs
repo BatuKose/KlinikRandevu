@@ -3,7 +3,7 @@ using KlinikRandevu.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddApplicationPart(typeof(Presentation.Controllers.PatientController).Assembly);
 
-
+builder.Services.ConfigureSwagger();
 builder.Services.AddControllers();
 builder.Services.CorsConfigure();
 builder.Services.AddEndpointsApiExplorer();

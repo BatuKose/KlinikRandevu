@@ -1,14 +1,17 @@
 ﻿
 using Entities.Exeptions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Repositories.Contracts;
 using Repositories.EFCore;
 using Serilog;
 using Services;
 using Services.Contracts;
 using System.Net.Http;
+using System.Text;
 using System.Threading.RateLimiting;
 
 namespace KlinikRandevu.Extensions
@@ -92,6 +95,26 @@ namespace KlinikRandevu.Extensions
                         }
                         );
                 });
+            });
+            return services;
+        }
+
+        public static IServiceCollection ConfigureJWTToken(this IServiceCollection services,IConfiguration configuration)
+        {
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options=>
+            {
+                options.TokenValidationParameters= new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration["jwt:Issuer"],
+                    ValidAudience = configuration["jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(configuration["jwt:Key"])
+            )
+                };
             });
             return services;
         }

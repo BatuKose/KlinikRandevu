@@ -12,6 +12,7 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureRateLimiter();
+builder.Services.ConfigureJWTToken(builder.Configuration);
 builder.AddSerilogLogging();
 
 var app = builder.Build();
@@ -22,10 +23,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseGlobalExceptionMiddleware();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseRateLimiter();
-app.UseAuthorization();
 
 app.MapControllers().RequireRateLimiting("RateLimit");// bütün apilere rate limit uygulanacak
 app.Run();

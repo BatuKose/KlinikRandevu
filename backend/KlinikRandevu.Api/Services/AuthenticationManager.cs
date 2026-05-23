@@ -1,5 +1,7 @@
 ﻿using Entities.Data_Transfer_Objects.Authentication;
+using Entities.Data_Transfer_Objects.UserLog;
 using Entities.Exeptions.CustomExceptions;
+using Entities.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,10 +23,12 @@ namespace Services
     {
         private readonly IRepositoryManager _repositoryManager;
         private readonly IConfiguration _configuration;
-        public AuthenticationManager(IRepositoryManager repositoryManager, IConfiguration configuration)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthenticationManager(IRepositoryManager repositoryManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _repositoryManager=repositoryManager;
             _configuration=configuration;
+            _httpContextAccessor=httpContextAccessor;
         }
 
         public async Task<string> login(LoginDTO loginDTO)
@@ -35,6 +40,20 @@ namespace Services
             if (user is null) throw new NotFoundException("Kullanıcı bilgilerine ulaşılamadı");
             string tokenAd = user.UserName;
             int tokenUserId=user.UserID;
+            var loginLogParametre = await _repositoryManager.SistemParametresi.GetirAsync("LOGIN_LOG_TUTULSUN");
+            if(loginLogParametre != null && loginLogParametre.Deger1?.ToUpper()=="EVET")
+            {
+                var ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString()??"İp adresi bulunamadı";
+                var log = new UserLog
+                {
+                    UserId = user.UserID,
+                    AksiyonTipi="Sisteme giriş",
+                    IpAdresi=ip,
+                    EntityTipi="users"
+                };
+                _repositoryManager.UserLogRepository.LoginLogYaz(log);
+                await _repositoryManager.saveAsyc();
+            }
             return await GenerateToken(tokenAd, tokenUserId);
         }
         public async Task<string> GenerateToken(string username, int userId)

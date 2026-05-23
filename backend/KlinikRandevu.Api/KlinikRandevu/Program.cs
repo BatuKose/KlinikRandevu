@@ -13,6 +13,8 @@ builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureRateLimiter();
 builder.Services.ConfigureJWTToken(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
+
 builder.AddSerilogLogging();
 
 var app = builder.Build();

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Repositories.Contracts;
@@ -18,7 +19,9 @@ namespace Services
             IRepositoryManager repositoryManager,
             IMemoryCache cache,
             IConfiguration configuration,
-            ILogger<MuayeneManager> muayeneLogger)
+            ILogger<MuayeneManager> muayeneLogger,
+            IHttpContextAccessor httpContextAccessor
+            )
         {
             _mailService = new Lazy<IEmailService>(() =>
                 new EmailManager(configuration));
@@ -31,7 +34,7 @@ namespace Services
             _sistemParametreService = new Lazy<ISistemParametreService>(() =>
                 new SistemParametreServiceManager(repositoryManager, cache));
             _authenticationService= new Lazy<IAuthService>(()=>
-                new AuthenticationManager(repositoryManager, configuration));
+                new AuthenticationManager(repositoryManager, configuration, httpContextAccessor));
             _userLogService= new Lazy<IUserLogService>(() => new UserLogManager(repositoryManager));
         }
 

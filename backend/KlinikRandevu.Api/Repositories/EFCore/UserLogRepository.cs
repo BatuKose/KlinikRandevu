@@ -1,4 +1,5 @@
-﻿using Repositories.Contracts;
+﻿using Entities.Models;
+using Repositories.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,11 @@ namespace Repositories.EFCore
         public UserLogRepository(RepositoryContext repositoryContext)
         {
             _repositoryContext=repositoryContext;
+        }
+
+        public void LoginLogYaz(UserLog log)
+        {
+            _repositoryContext.userLogs.Add(log);
         }
     }
 }

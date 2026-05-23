@@ -253,7 +253,7 @@ namespace Services
             await _repositoryManager.saveAsyc();
             //randevu mail
             var mailParametre = await _repositoryManager.SistemParametresi.GetirAsync("EMAIL_GONDERME");
-            if(mailParametre.Deger1=="EVET" && int.Parse(mailParametre.Deger3)!=plan.PolNo)
+            if(mailParametre?.Deger1?.ToUpper()=="EVET" && int.Parse(mailParametre.Deger3)!=plan.PolNo)
             {
                 return plan;
             }

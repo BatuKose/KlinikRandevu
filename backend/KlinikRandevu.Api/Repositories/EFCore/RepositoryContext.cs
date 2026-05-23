@@ -26,7 +26,13 @@ namespace Repositories.EFCore
         public DbSet<UserLog> userLogs { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            foreach (var property in modelBuilder.Model.GetEntityTypes()
+            .SelectMany(e => e.GetProperties())
+            .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?)))
+                {
+                    property.SetColumnType("datetime");
+                }
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }

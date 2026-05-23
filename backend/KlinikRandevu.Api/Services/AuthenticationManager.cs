@@ -37,23 +37,27 @@ namespace Services
             int tokenUserId=user.UserID;
             return await GenerateToken(tokenAd, tokenUserId);
         }
-        public async Task<string>GenerateToken(string username,int userId)
+        public async Task<string> GenerateToken(string username, int userId)
         {
             var key = new SymmetricSecurityKey(
-          Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])
-          );
+                Encoding.UTF8.GetBytes(_configuration["jwt:Key"])
+            );
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var claims= new List<Claim>();
-            new Claim(ClaimTypes.Name, username);
-            new Claim("UserID",userId.ToString());
+
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, username),
+        new Claim("UserID", userId.ToString())
+    };
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims:claims,
-                expires:DateTime.Now.AddHours(5),
+                issuer: _configuration["jwt:Issuer"],
+                audience: _configuration["jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(5),
                 signingCredentials: creds
-                );
+            );
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }

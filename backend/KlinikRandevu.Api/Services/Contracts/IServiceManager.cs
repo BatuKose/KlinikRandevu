@@ -13,5 +13,6 @@ namespace Services.Contracts
         ISistemParametreService SistemParametreService { get; }
         IEmailService EmailService { get; }
         IAuthService AuthenticationService { get; }
+        IUserLogService UserLogService { get; }
     }
 }

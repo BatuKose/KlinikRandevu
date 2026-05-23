@@ -23,6 +23,7 @@ namespace Repositories.EFCore
         public DbSet<Randevu>Randevus { get; set; } 
         public DbSet<SistemParametresi>parametreler {  get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserLog> userLogs { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

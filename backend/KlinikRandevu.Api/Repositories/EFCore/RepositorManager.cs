@@ -16,6 +16,7 @@ namespace Repositories.EFCore
         private readonly Lazy<IMuayeneRepository> _MuayeneRepository;
         private readonly Lazy<ISistemParametresiRepository> _sistemParametresiRepository;
         private readonly Lazy<IAuthenticationRepository> _authenticationRepository;
+        private readonly Lazy<IUserLogRepository> _userLogRepository;
         public RepositoryManager(RepositoryContext repositoryContext)
         {
             _repositoryContext = repositoryContext;
@@ -23,6 +24,7 @@ namespace Repositories.EFCore
             _MuayeneRepository = new Lazy<IMuayeneRepository>(() => new MuayeneRepository(_repositoryContext));
             _sistemParametresiRepository = new Lazy<ISistemParametresiRepository>(() => new SistemParametresiRepository(_repositoryContext));
             _authenticationRepository= new Lazy<IAuthenticationRepository>(()=>new AuthenticationRepository(_repositoryContext));
+            _userLogRepository= new Lazy<IUserLogRepository>(() => new UserLogRepository(_repositoryContext));
         }
 
         public IPatientRepository Patient => _patientRepository.Value;
@@ -40,6 +42,6 @@ namespace Repositories.EFCore
         public ISistemParametresiRepository SistemParametresi => _sistemParametresiRepository.Value;
         public IAuthenticationRepository Authentication => _authenticationRepository.Value;
 
-
+        public IUserLogRepository UserLogRepository=> _userLogRepository.Value;
     }
 }

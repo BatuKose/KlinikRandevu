@@ -14,6 +14,7 @@ namespace Repositories.Contracts
         IMuayeneRepository Muayene { get; }
         ISistemParametresiRepository SistemParametresi { get; }
         IAuthenticationRepository Authentication { get; }
+        IUserLogRepository UserLogRepository { get; }
 
     }
 }

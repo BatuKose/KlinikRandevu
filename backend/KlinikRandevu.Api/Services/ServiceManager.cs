@@ -13,6 +13,7 @@ namespace Services
         private readonly Lazy<ISistemParametreService> _sistemParametreService;
         private readonly Lazy<IEmailService> _mailService;
         private readonly Lazy<IAuthService> _authenticationService;
+        private readonly Lazy<IUserLogService> _userLogService;
         public ServiceManager(
             IRepositoryManager repositoryManager,
             IMemoryCache cache,
@@ -31,6 +32,7 @@ namespace Services
                 new SistemParametreServiceManager(repositoryManager, cache));
             _authenticationService= new Lazy<IAuthService>(()=>
                 new AuthenticationManager(repositoryManager, configuration));
+            _userLogService= new Lazy<IUserLogService>(() => new UserLogManager(repositoryManager));
         }
 
         public IPatientService PatientService => _patientService.Value;
@@ -38,5 +40,6 @@ namespace Services
         public ISistemParametreService SistemParametreService => _sistemParametreService.Value;
         public IEmailService EmailService => _mailService.Value;
         public IAuthService AuthenticationService => _authenticationService.Value;    
+        public IUserLogService UserLogService=> _userLogService.Value;
     }
 }

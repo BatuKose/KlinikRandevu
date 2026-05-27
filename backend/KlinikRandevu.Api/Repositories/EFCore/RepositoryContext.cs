@@ -24,6 +24,8 @@ namespace Repositories.EFCore
         public DbSet<SistemParametresi>parametreler {  get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserLog> userLogs { get; set; }
+        public DbSet<Yetki> Yetkiler { get; set; }
+        public DbSet<UserYetki> UserYetkiler { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var property in modelBuilder.Model.GetEntityTypes()

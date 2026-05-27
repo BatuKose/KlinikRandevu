@@ -15,6 +15,7 @@ namespace Repositories.Contracts
         ISistemParametresiRepository SistemParametresi { get; }
         IAuthenticationRepository Authentication { get; }
         IUserLogRepository UserLogRepository { get; }
+        IUserYetkiRepository UserYetkiRepository { get; } 
 
     }
 }

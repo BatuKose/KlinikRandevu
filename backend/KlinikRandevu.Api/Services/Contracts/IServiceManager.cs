@@ -14,5 +14,6 @@ namespace Services.Contracts
         IEmailService EmailService { get; }
         IAuthService AuthenticationService { get; }
         IUserLogService UserLogService { get; }
+        IUserYetkiService UserYetkiService { get; }
     }
 }

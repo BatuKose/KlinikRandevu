@@ -20,5 +20,25 @@ namespace Services
             _repositoryManager = repositoryManager;
             _cache = memoryCache;
         }
+
+        public async Task<HashSet<int>> GetUserYetkiIds(int userId)
+        {
+            
+            string cacheKey = $"user_yetki_{userId}";
+            if(_cache.TryGetValue(cacheKey,out HashSet<int> yetkiler))
+            {
+                return yetkiler;
+            }
+            yetkiler = await _repositoryManager.UserYetkiRepository.GetUserYetkiId(userId);
+            _cache.Set(cacheKey, yetkiler, TimeSpan.FromMinutes(30));
+            return yetkiler;
+        }
+
+        public void InvalidateUserCache(int userId)
+        {
+            string cacheKey = $"user_yetki_{userId}";
+            _cache.Remove(cacheKey);
+        }
+
     }
 }

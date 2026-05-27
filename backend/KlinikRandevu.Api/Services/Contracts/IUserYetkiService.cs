@@ -8,5 +8,7 @@ namespace Services.Contracts
 {
     public interface IUserYetkiService
     {
+        Task<HashSet<int>> GetUserYetkiIds(int userId);
+        void InvalidateUserCache(int userId);
     }
 }

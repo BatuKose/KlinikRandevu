@@ -1,4 +1,5 @@
-﻿using Repositories.Contracts;
+﻿using Microsoft.EntityFrameworkCore;
+using Repositories.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,13 @@ namespace Repositories.EFCore
         public UserYetkiRepository(RepositoryContext repositoryContext)
         {
             _repositoryContext=repositoryContext;
+        }
+
+        public async Task<HashSet<int>> GetUserYetkiId(int userId)
+        {
+            var yetkiIds = await _repositoryContext.UserYetkiler.Where(uy => uy.UserId==userId)
+                .Select(uy => uy.YetkiId).ToListAsync();
+            return yetkiIds.ToHashSet();
         }
     }
 }

@@ -34,7 +34,8 @@ namespace KlinikRandevu.Extensions
         {
             services.AddMemoryCache();
             services.AddScoped<IServiceManager, ServiceManager>();
-          //  services.AddScoped<IEmailService, EmailManager>();
+            services.AddScoped<IUserYetkiService, UserYetkiManager>();
+            //  services.AddScoped<IEmailService, EmailManager>();
         }
 
         public static void UseGlobalExceptionMiddleware(this IApplicationBuilder app)

@@ -21,12 +21,18 @@ namespace Repositories.EFCore
         public RepositoryManager(RepositoryContext repositoryContext)
         {
             _repositoryContext = repositoryContext;
+
             _patientRepository = new Lazy<IPatientRepository>(() => new PatientRepository(_repositoryContext));
+
             _MuayeneRepository = new Lazy<IMuayeneRepository>(() => new MuayeneRepository(_repositoryContext));
+
             _sistemParametresiRepository = new Lazy<ISistemParametresiRepository>(() => new SistemParametresiRepository(_repositoryContext));
-            _authenticationRepository= new Lazy<IAuthenticationRepository>(()=>new AuthenticationRepository(_repositoryContext));
-            _userLogRepository= new Lazy<IUserLogRepository>(() => new UserLogRepository(_repositoryContext));
-            _userLogRepository= new Lazy<IUserLogRepository>(() => new UserLogRepository(_repositoryContext));
+
+            _authenticationRepository = new Lazy<IAuthenticationRepository>(() => new AuthenticationRepository(_repositoryContext));
+
+            _userLogRepository = new Lazy<IUserLogRepository>(() => new UserLogRepository(_repositoryContext));
+
+            _userYetkiRepository = new Lazy<IUserYetkiRepository>(() => new UserYetkiRepository(_repositoryContext));
         }
 
         public IPatientRepository Patient => _patientRepository.Value;

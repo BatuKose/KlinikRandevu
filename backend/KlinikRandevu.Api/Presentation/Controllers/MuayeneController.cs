@@ -1,6 +1,8 @@
-﻿using Entities.Data_Transfer_Objects.Muayene;
+﻿using Entities.Constants;
+using Entities.Data_Transfer_Objects.Muayene;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Presentation.ActionFilters;
 using Services;
 using Services.Contracts;
 using System;
@@ -11,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Presentation.Controllers
 {
+
     [ApiController]
     [Route("api/Poliklinik")]
    // [EnableRateLimiting("RateLimit")]
@@ -34,6 +37,7 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.RandevuOlusturAsync(plan);
             return Ok(result);
         }
+        [YetkiKontrol(YetkiKodlari.RandevuAcma)]
         [HttpPost("muayeneolustur")]
         public async Task<IActionResult> MuayeneOlusturAsync([FromBody] MuayeneKayitiOlusturDTO muayene)
         {

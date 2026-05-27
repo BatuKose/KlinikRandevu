@@ -9,5 +9,6 @@ namespace Repositories.Contracts
     public interface IUserYetkiRepository
     {
         Task<HashSet<int>>GetUserYetkiId(int userId);
+        Task<Dictionary<string, int>> GetYetkiKodMap();
     }
 }

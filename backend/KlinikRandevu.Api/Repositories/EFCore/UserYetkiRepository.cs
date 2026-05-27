@@ -23,5 +23,10 @@ namespace Repositories.EFCore
                 .Select(uy => uy.YetkiId).ToListAsync();
             return yetkiIds.ToHashSet();
         }
+
+        public async Task<Dictionary<string, int>> GetYetkiKodMap()
+        {
+            return await _repositoryContext.Yetkiler.ToDictionaryAsync(y=>y.Kod,y=>y.Id);
+        }
     }
 }

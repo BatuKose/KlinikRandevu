@@ -13,6 +13,9 @@ namespace Services
 {
     public class UserYetkiManager : IUserYetkiService
     {
+        private const string YetkiKodMapCacheKey = "yetki_kod_map";
+        private static readonly TimeSpan YetkiKodMapSuresi = TimeSpan.FromHours(1);
+
         private readonly IRepositoryManager _repositoryManager;
         private readonly IMemoryCache _cache;
         public UserYetkiManager(IRepositoryManager repositoryManager, IMemoryCache memoryCache)
@@ -34,11 +37,38 @@ namespace Services
             return yetkiler;
         }
 
+
         public void InvalidateUserCache(int userId)
         {
             string cacheKey = $"user_yetki_{userId}";
             _cache.Remove(cacheKey);
         }
 
+        private async Task<Dictionary<string,int>>GetYetkiKontrolMapInternal()
+        {
+            if(_cache.TryGetValue(YetkiKodMapCacheKey,out Dictionary<string,int>map))
+            {
+                return map;
+            }
+            map = await _repositoryManager.UserYetkiRepository.GetYetkiKodMap();
+            _cache.Set(YetkiKodMapCacheKey,map,TimeSpan.FromHours(3));
+            return map;
+        }
+
+        public async Task<int?> GetYetkiIdByKod(string kod)
+        {
+            var map = await GetYetkiKontrolMapInternal();
+            if(map.TryGetValue(kod,out var yetkiid))
+            {
+                return yetkiid;
+            }
+            return null;
+        }
+
+        
+        public void InvalidateYetkiKodMap()
+        {
+            _cache.Remove(YetkiKodMapCacheKey);
+        }
     }
 }

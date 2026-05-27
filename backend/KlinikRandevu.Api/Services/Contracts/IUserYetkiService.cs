@@ -10,5 +10,7 @@ namespace Services.Contracts
     {
         Task<HashSet<int>> GetUserYetkiIds(int userId);
         void InvalidateUserCache(int userId);
+        Task<int?> GetYetkiIdByKod(string kod);
+        void InvalidateYetkiKodMap();
     }
 }

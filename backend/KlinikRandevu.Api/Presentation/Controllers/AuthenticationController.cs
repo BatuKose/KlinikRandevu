@@ -1,6 +1,7 @@
 ﻿using Entities.Data_Transfer_Objects.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
+using Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,8 +25,16 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDTO login)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var token = await _ServiceManager.AuthenticationService.login(login);
-            return Ok(new {token= token});
+            var result = await _ServiceManager.AuthenticationService.login(login);
+            return Ok(result);
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDTO request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var result = await _ServiceManager.AuthenticationService.RefreshTokenAsync(request.RefreshToken);
+            return Ok(result);
         }
     }
 }

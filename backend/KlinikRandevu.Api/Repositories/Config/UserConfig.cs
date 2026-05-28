@@ -37,6 +37,12 @@ namespace Repositories.Config
             builder.Property(x => x.Surname)
                 .IsRequired()
                 .HasMaxLength(50);
+
+            builder.Property(x => x.RefreshToken)
+                .HasMaxLength(256);
+
+            builder.Property(x => x.RefreshTokenExpiry);
+
             builder.HasData(
                 new User
                 {

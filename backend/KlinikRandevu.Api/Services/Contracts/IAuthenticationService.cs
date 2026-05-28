@@ -11,6 +11,7 @@ namespace Services.Contracts
 {
     public interface IAuthService
     {
-      Task<string>login(LoginDTO loginDTO);
+        Task<TokenResponseDTO> login(LoginDTO loginDTO);
+        Task<TokenResponseDTO> RefreshTokenAsync(string refreshToken);
     }
 }

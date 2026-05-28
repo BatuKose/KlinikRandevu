@@ -25,5 +25,19 @@ namespace Repositories.EFCore
             var user = await _repositoryContext.Users.FirstOrDefaultAsync(u => u.UserName==username && u.Password==password);
             return user;
         }
+
+        public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)
+        {
+            return await _repositoryContext.Users
+                .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        }
+
+        public async Task UpdateRefreshTokenAsync(int userId, string refreshToken, DateTime expiry)
+        {
+            var user = await _repositoryContext.Users.FindAsync(userId);
+            if (user is null) return;
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = expiry;
+        }
     }
 }

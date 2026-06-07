@@ -29,7 +29,8 @@ namespace Repositories.Config
                 .IsUnique();
             builder.HasData(
                 new Yetki { Id = 1, Ad = "Randevu Açma", Kod = YetkiKodlari.RandevuAcma },
-                new Yetki { Id = 2, Ad = "Muayene Açma", Kod = YetkiKodlari.MuayeneAcma }
+                new Yetki { Id = 2, Ad = "Muayene Açma", Kod = YetkiKodlari.MuayeneAcma },
+                new Yetki { Id=3, Ad="Redis Atma", Kod=YetkiKodlari.RedisYetki}
             );
         }
     }

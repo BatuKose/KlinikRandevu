@@ -10,5 +10,6 @@ namespace Entities.Constants
     {
         public const string RandevuAcma = "randevu_acma";
         public const string MuayeneAcma = "muayene_acma";
+        public const string RedisYetki = "Redis_atma";
     }
 }

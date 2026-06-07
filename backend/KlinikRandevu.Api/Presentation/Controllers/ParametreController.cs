@@ -1,6 +1,8 @@
-﻿using Entities.Data_Transfer_Objects.Parametre;
+﻿using Entities.Constants;
+using Entities.Data_Transfer_Objects.Parametre;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
+using Presentation.ActionFilters;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
@@ -33,6 +35,7 @@ namespace Presentation.Controllers
             var parametre = await _ServiceManager.SistemParametreService.ParametreGuncelle(param,id);
             return NoContent();
         }
+        [YetkiKontrol(YetkiKodlari.RedisYetki)]
         [HttpPost("cache-temizle")]
         public IActionResult RedisAll()
         {

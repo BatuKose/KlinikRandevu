@@ -49,7 +49,7 @@ namespace Services
                 if(blokAktif)
             {
                 var mevcutSayac = _memoryCache.Get<int?>(blokCache)??0;
-                if (mevcutSayac<MaxDeneme)
+                if (mevcutSayac>=MaxDeneme)
                     throw new BadRequestException($"Çok fazla hatalı giriş. Lütfen {BlokSüre} dk sonra tekrardan deneyiniz");
             }
             var user = await _repositoryManager.Authentication.Login(loginDTO.username, loginDTO.password);

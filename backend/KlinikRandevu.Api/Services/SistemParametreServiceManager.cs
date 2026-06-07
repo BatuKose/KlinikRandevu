@@ -109,5 +109,12 @@ namespace Services
                 Aciklama=parametre.Aciklama
             };
         }
+        public void RedisAll()
+        {
+            if(_cache is MemoryCache memory)
+            {
+                memory.Compact(1.0);
+            }
+        }
     }
 }

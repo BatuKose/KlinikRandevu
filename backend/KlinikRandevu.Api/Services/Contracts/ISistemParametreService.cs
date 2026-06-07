@@ -14,5 +14,6 @@ namespace Services.Contracts
         Task<bool> AktifMi(string parametreAdi);
         Task<ParametreEkleDTO> ParametreEkleAsync(ParametreEkleDTO parametre);
         Task<ParametreEkleDTO> ParametreGuncelle(ParametreEkleDTO parametre, int id);
+        public void RedisAll();
     }
 }

@@ -33,5 +33,11 @@ namespace Presentation.Controllers
             var parametre = await _ServiceManager.SistemParametreService.ParametreGuncelle(param,id);
             return NoContent();
         }
+        [HttpPost("cache-temizle")]
+        public IActionResult RedisAll()
+        {
+            _ServiceManager.SistemParametreService.RedisAll();
+            return NoContent();
+        }
     }
 }

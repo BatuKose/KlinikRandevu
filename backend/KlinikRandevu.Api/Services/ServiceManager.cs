@@ -36,7 +36,7 @@ namespace Services
             _sistemParametreService = new Lazy<ISistemParametreService>(() =>
                 new SistemParametreServiceManager(repositoryManager, cache));
             _authenticationService= new Lazy<IAuthService>(()=>
-                new AuthenticationManager(repositoryManager, configuration, httpContextAccessor));
+                new AuthenticationManager(repositoryManager, configuration, httpContextAccessor,cache));
             _userLogService= new Lazy<IUserLogService>(() => new UserLogManager(repositoryManager));
             _userYetkiService= new Lazy<IUserYetkiService>(()=>new UserYetkiManager(repositoryManager,cache));
         }

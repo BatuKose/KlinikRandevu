@@ -10,5 +10,7 @@ namespace Repositories.Contracts
     public interface ITatilRepository
     {
         void TatilGünleriEkle(Tatil entity);
+        Task<bool> ApiVeriVarmı();
+        Task ApiVerileriniSil();
     }
 }

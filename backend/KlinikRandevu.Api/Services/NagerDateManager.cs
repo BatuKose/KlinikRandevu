@@ -1,6 +1,7 @@
 ﻿using Entities.Data_Transfer_Objects.Nager;
 using Entities.Models;
 using Repositories.Contracts;
+using Repositories.EFCore;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
@@ -30,8 +31,15 @@ namespace Services
 
             var liste = await client.GetFromJsonAsync<List<NagerGetDataDTO>>(
                 $"https://date.nager.at/api/v3/PublicHolidays/{year}/TR");
-            if (liste.Any())
+            if (liste is { Count: > 0 })
             {
+              // Transaction eklenecek
+                bool dataKontrol = await _repositoryManager.TatilRepository.ApiVeriVarmı();
+                if(dataKontrol)
+                {
+                  await   _repositoryManager.TatilRepository.ApiVerileriniSil();
+                
+                }
                 foreach(var item in liste)
                 {
                     var tatil = new Tatil
@@ -45,6 +53,7 @@ namespace Services
 
                 }
                 await _repositoryManager.saveAsyc();
+                // Transaction bitecek
             }
             return liste ?? new();
         }

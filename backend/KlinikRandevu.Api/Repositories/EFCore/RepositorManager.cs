@@ -18,6 +18,7 @@ namespace Repositories.EFCore
         private readonly Lazy<IAuthenticationRepository> _authenticationRepository;
         private readonly Lazy<IUserLogRepository> _userLogRepository;
         private readonly Lazy<IUserYetkiRepository> _userYetkiRepository;
+        private readonly Lazy<ITatilRepository> _tatilRepository;
         public RepositoryManager(RepositoryContext repositoryContext)
         {
             _repositoryContext = repositoryContext;
@@ -33,6 +34,7 @@ namespace Repositories.EFCore
             _userLogRepository = new Lazy<IUserLogRepository>(() => new UserLogRepository(_repositoryContext));
 
             _userYetkiRepository = new Lazy<IUserYetkiRepository>(() => new UserYetkiRepository(_repositoryContext));
+            _tatilRepository = new Lazy<ITatilRepository>(() => new TatilRepository(_repositoryContext));
         }
 
         public IPatientRepository Patient => _patientRepository.Value;
@@ -52,5 +54,6 @@ namespace Repositories.EFCore
 
         public IUserLogRepository UserLogRepository=> _userLogRepository.Value;
         public IUserYetkiRepository UserYetkiRepository=> _userYetkiRepository.Value;
+        public ITatilRepository TatilRepository => _tatilRepository.Value;
     }
 }

@@ -17,12 +17,14 @@ namespace Services
         private readonly Lazy<IAuthService> _authenticationService;
         private readonly Lazy<IUserLogService> _userLogService;
         private readonly Lazy<IUserYetkiService> _userYetkiService;
+        private readonly Lazy<INagerDateService> _nagerDateService;
         public ServiceManager(
             IRepositoryManager repositoryManager,
             IMemoryCache cache,
             IConfiguration configuration,
             ILogger<MuayeneManager> muayeneLogger,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            IHttpClientFactory httpClientFactory
             )
         {
             _mailService = new Lazy<IEmailService>(() =>
@@ -39,6 +41,7 @@ namespace Services
                 new AuthenticationManager(repositoryManager, configuration, httpContextAccessor,cache));
             _userLogService= new Lazy<IUserLogService>(() => new UserLogManager(repositoryManager));
             _userYetkiService= new Lazy<IUserYetkiService>(()=>new UserYetkiManager(repositoryManager,cache));
+            _nagerDateService = new Lazy<INagerDateService>(() =>new NagerDateManager(repositoryManager, httpClientFactory)); 
         }
 
         public IPatientService PatientService => _patientService.Value;
@@ -47,6 +50,9 @@ namespace Services
         public IEmailService EmailService => _mailService.Value;
         public IAuthService AuthenticationService => _authenticationService.Value;    
         public IUserLogService UserLogService=> _userLogService.Value;
-        public IUserYetkiService UserYetkiService=>_userYetkiService.Value;  
+        public IUserYetkiService UserYetkiService=>_userYetkiService.Value;
+        public INagerDateService NagerDateService=>_nagerDateService.Value;
+
+
     }
 }

@@ -15,5 +15,6 @@ namespace Services.Contracts
         IAuthService AuthenticationService { get; }
         IUserLogService UserLogService { get; }
         IUserYetkiService UserYetkiService { get; }
+        INagerDateService NagerDateService { get; }
     }
 }

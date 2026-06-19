@@ -17,6 +17,8 @@ namespace Entities.Models
             public DateTime RandevuTarihi { get; set; }  
             public int SureDakika { get; set; }
             public string? Notlar { get; set; }
+
+            public bool iptal { get; set; }=false;
             public DateTime CreatedAt { get; set; } = DateTime.Now;
         }
 }

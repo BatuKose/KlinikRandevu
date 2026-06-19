@@ -42,5 +42,11 @@ namespace Presentation.Controllers
             _ServiceManager.SistemParametreService.RedisAll();
             return NoContent();
         }
+        [HttpGet("getHolidayfromnagerat")]
+         public async Task<IActionResult>GetHolidayDataFromNager()
+        {
+            var result = await _ServiceManager.NagerDateService.GetHolidaysData();
+            return Ok(result);
+        }
     }
 }

@@ -12,5 +12,6 @@ namespace Repositories.Contracts
         void TatilGünleriEkle(Tatil entity);
         Task<bool> ApiVeriVarmı();
         Task ApiVerileriniSil();
+        Task<List<Tatil>> TatilleriGetirAsync(int year);
     }
 }

@@ -34,5 +34,10 @@ namespace Repositories.EFCore
                 .Where(x => x.ApiMi)
                 .ExecuteDeleteAsync();  
         }
+        public async Task<List<Tatil>>TatilleriGetirAsync(int year)
+        {
+            var tatiller = await _repositoryContext.Tatil.Where(t => t.Tarih.Year==year).AsNoTracking().ToListAsync();
+            return tatiller;
+        }
     }
 }

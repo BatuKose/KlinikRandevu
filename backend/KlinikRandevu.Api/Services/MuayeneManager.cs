@@ -3,6 +3,7 @@ using Entities.Enums;
 using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Repositories.Contracts;
@@ -21,11 +22,13 @@ namespace Services
         private readonly IRepositoryManager _repositoryManager;
         private readonly ILogger<MuayeneManager> _logger;
         private readonly IEmailService _emailService;
-        public MuayeneManager(IRepositoryManager repositoryManager, ILogger<MuayeneManager> logger, IEmailService emailService)
+        private readonly IMemoryCache _cache;
+        public MuayeneManager(IRepositoryManager repositoryManager, ILogger<MuayeneManager> logger, IEmailService emailService, IMemoryCache memoryCache)
         {
             _repositoryManager=repositoryManager;
             _logger=logger;
             _emailService=emailService;
+            _cache=memoryCache;
         }
 
         public async Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan)
@@ -79,6 +82,24 @@ namespace Services
 
             if (muayene == null) throw new BadRequestException("Muayene bilgilerini kontrol ediniz");
 
+            var tatilBlokParam = await _repositoryManager.SistemParametresi.GetirAsync("TATIL_KAYIT_BLOKLA");
+            if (tatilBlokParam != null && tatilBlokParam.Deger1?.ToUpperInvariant() == "EVET")
+            {
+                var yil = muayene.MuayeneTarihi.Year;
+                var key = $"tatiller:{yil}";
+
+                if (!_cache.TryGetValue(key, out HashSet<DateTime> set))
+                {
+                    var tatiller = await _repositoryManager.TatilRepository.TatilleriGetirAsync(yil);
+                    set = tatiller.Select(t => t.Tarih.Date).ToHashSet();
+                    _cache.Set(key, set, TimeSpan.FromDays(1));  
+                }
+
+                if (set.Contains(muayene.MuayeneTarihi.Date))      
+                {
+                    throw new ParamException("Resmi tatil günlerinde muayene kaydı oluşturamazsınız");
+                }
+            }
             var randevusuzKayitAcmaParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVUSUZ_KAYIT_ACMA");
             if(randevusuzKayitAcmaParam!=null && randevusuzKayitAcmaParam.Deger1=="EVET")
             {
@@ -185,6 +206,25 @@ namespace Services
 
         public async Task<RandevuOlusturDTO> RandevuOlusturAsync(RandevuOlusturDTO plan)
         {
+
+            var tatilBlokParam = await _repositoryManager.SistemParametresi.GetirAsync("TATIL_KAYIT_BLOKLA");
+            if (tatilBlokParam != null && tatilBlokParam.Deger1?.ToUpperInvariant() == "EVET")
+            {
+                var yil = plan.RandevuTarihi.Year;
+                var key = $"tatiller:{yil}";
+
+                if (!_cache.TryGetValue(key, out HashSet<DateTime> set))
+                {
+                    var tatiller = await _repositoryManager.TatilRepository.TatilleriGetirAsync(yil);
+                    set = tatiller.Select(t => t.Tarih.Date).ToHashSet();
+                    _cache.Set(key, set, TimeSpan.FromDays(1));
+                }
+
+                if (set.Contains(plan.RandevuTarihi.Date))
+                {
+                    throw new ParamException("Resmi tatil günlerinde randevu kaydı oluşturamazsınız");
+                }
+            }
             if (plan == null)
                 throw new BadRequestException("Randevu bilgilerini kontrol ediniz");
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,11 @@ namespace Services
     public class TwilioSmsManager: ITwilioSmsManager
     {
         private readonly IConfiguration _configuration;
-
-        public TwilioSmsManager(IConfiguration configuration)
+        private readonly ILogger _logger;
+        public TwilioSmsManager(IConfiguration configuration, ILogger logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<bool> SmsGonderAsync(string telefonNumarası, string gonderilcekMesaj)
@@ -50,7 +52,9 @@ namespace Services
             }
             catch (Twilio.Exceptions.ApiException ex)
             {
-                
+
+                _logger.LogError($"TWILIO Api hata-----> Kodu: {ex.Code}, Mesaj: {ex.Message}, Detay: {ex.MoreInfo}");
+
                 throw new Exception($"TWILIO Api hata Kodu: {ex.Code}, Mesaj: {ex.Message}, Detay: {ex.MoreInfo}");
             }
 

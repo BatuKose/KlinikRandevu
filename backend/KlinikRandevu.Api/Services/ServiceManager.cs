@@ -25,7 +25,8 @@ namespace Services
             IConfiguration configuration,
             ILogger<MuayeneManager> muayeneLogger,
             IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory
+            IHttpClientFactory httpClientFactory,
+            ILogger<TwilioSmsManager>TwilioLogger
             )
         {
             _mailService = new Lazy<IEmailService>(() =>
@@ -43,7 +44,7 @@ namespace Services
             _userLogService= new Lazy<IUserLogService>(() => new UserLogManager(repositoryManager));
             _userYetkiService= new Lazy<IUserYetkiService>(()=>new UserYetkiManager(repositoryManager,cache));
             _nagerDateService = new Lazy<INagerDateService>(() =>new NagerDateManager(repositoryManager, httpClientFactory));
-            _twilioSmsManager= new Lazy<ITwilioSmsManager>(()=>new TwilioSmsManager(configuration));
+            _twilioSmsManager= new Lazy<ITwilioSmsManager>(()=>new TwilioSmsManager(configuration, TwilioLogger));
         }
 
         public IPatientService PatientService => _patientService.Value;

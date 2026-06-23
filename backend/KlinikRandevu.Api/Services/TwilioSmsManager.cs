@@ -21,28 +21,29 @@ namespace Services
 
         public async Task<bool> SmsGonderAsync(string telefonNumarası, string gonderilcekMesaj)
         {
-            var accountSid = _configuration["Twilio:AccountSid"];
+            string twilioCepStandart;
+            if(telefonNumarası.StartsWith("0"))
+            {
+                twilioCepStandart = "+90" + telefonNumarası.Substring(1);
+            }
+            else if(telefonNumarası.StartsWith("5"))
+            {
+                twilioCepStandart = "+90" + telefonNumarası;
+            }
+            else
+            {
+                twilioCepStandart = telefonNumarası;
+            }
+                var accountSid = _configuration["Twilio:AccountSid"];
             var authToken = _configuration["Twilio:AuthToken"];
             var fromNumber = _configuration["Twilio:FromNumber"];
-            //if (string.IsNullOrEmpty(accountSid) || string.IsNullOrEmpty(authToken))
-            //    throw new Exception($"Twilio config boş! SID null mu: {accountSid is null}, Token null mu: {authToken is null}");
-            //TwilioClient.Init(accountSid, authToken);
-
-            //var mesaj = await MessageResource.CreateAsync(
-            //    body: gonderilcekMesaj,
-            //    from: new Twilio.Types.PhoneNumber(fromNumber),
-            //    to: new Twilio.Types.PhoneNumber(telefonNumarası)
-            //    );
-            //return mesaj.Status!=MessageResource.StatusEnum.Failed;
-           
-
             try
             {
                 TwilioClient.Init(accountSid, authToken);
                 var mesaj = await MessageResource.CreateAsync(
                     body: gonderilcekMesaj,
                     from: new Twilio.Types.PhoneNumber(fromNumber),
-                    to: new Twilio.Types.PhoneNumber(telefonNumarası)
+                    to: new Twilio.Types.PhoneNumber(twilioCepStandart)
                 );
 
                 return mesaj.Status != MessageResource.StatusEnum.Failed;
@@ -50,7 +51,7 @@ namespace Services
             catch (Twilio.Exceptions.ApiException ex)
             {
                 
-                throw new Exception($"TWILIO HATASI → Kod: {ex.Code}, Mesaj: {ex.Message}, Detay: {ex.MoreInfo}");
+                throw new Exception($"TWILIO Api hata Kodu: {ex.Code}, Mesaj: {ex.Message}, Detay: {ex.MoreInfo}");
             }
 
         }

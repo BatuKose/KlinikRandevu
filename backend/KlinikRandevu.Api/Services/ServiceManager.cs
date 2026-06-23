@@ -18,6 +18,7 @@ namespace Services
         private readonly Lazy<IUserLogService> _userLogService;
         private readonly Lazy<IUserYetkiService> _userYetkiService;
         private readonly Lazy<INagerDateService> _nagerDateService;
+        private readonly Lazy<ITwilioSmsManager> _twilioSmsManager;
         public ServiceManager(
             IRepositoryManager repositoryManager,
             IMemoryCache cache,
@@ -33,7 +34,7 @@ namespace Services
             _patientService = new Lazy<IPatientService>(() =>
                 new PatientManager(repositoryManager));
             _MuayeneService = new Lazy<IMuayeneService>(() =>
-                new MuayeneManager(repositoryManager, muayeneLogger, _mailService.Value, cache));
+                new MuayeneManager(repositoryManager, muayeneLogger, _mailService.Value, cache, _twilioSmsManager.Value));
 
             _sistemParametreService = new Lazy<ISistemParametreService>(() =>
                 new SistemParametreServiceManager(repositoryManager, cache));
@@ -41,7 +42,8 @@ namespace Services
                 new AuthenticationManager(repositoryManager, configuration, httpContextAccessor,cache));
             _userLogService= new Lazy<IUserLogService>(() => new UserLogManager(repositoryManager));
             _userYetkiService= new Lazy<IUserYetkiService>(()=>new UserYetkiManager(repositoryManager,cache));
-            _nagerDateService = new Lazy<INagerDateService>(() =>new NagerDateManager(repositoryManager, httpClientFactory)); 
+            _nagerDateService = new Lazy<INagerDateService>(() =>new NagerDateManager(repositoryManager, httpClientFactory));
+            _twilioSmsManager= new Lazy<ITwilioSmsManager>(()=>new TwilioSmsManager(configuration));
         }
 
         public IPatientService PatientService => _patientService.Value;
@@ -52,6 +54,7 @@ namespace Services
         public IUserLogService UserLogService=> _userLogService.Value;
         public IUserYetkiService UserYetkiService=>_userYetkiService.Value;
         public INagerDateService NagerDateService=>_nagerDateService.Value;
+        public ITwilioSmsManager TwilioSmsManager => _twilioSmsManager.Value;
 
 
     }

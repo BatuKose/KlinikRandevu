@@ -62,7 +62,19 @@ namespace Repositories.EFCore
             var hasta = await _repositoryContext.Patients.AnyAsync(h => h.Protocol==number);
             return hasta;
         }
-
+        public async Task<bool> hastaTelNoVarmi(int number)
+        {
+            var hasta = await _repositoryContext.Patients.Where(h=> h.Protocol==number && h.Phone !=null).AnyAsync();
+            return hasta;
+        }
+        public async Task<string> HastaCepTelefonGetir(int protokol)
+        {
+            var cepTel = await _repositoryContext.Patients
+                .Where(p => p.Protocol == protokol)  
+                .Select(p => p.Phone)                    
+                .FirstOrDefaultAsync();                  
+            return cepTel;
+        }
         public async Task<int?> PolMaxRanevu(int number)
         {
            var süre=await _repositoryContext.Polikliniks.Where(p=>p.PolNo==number).Select(p=>p.GunlukMaksRandevuSayisi)

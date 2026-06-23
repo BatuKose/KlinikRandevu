@@ -37,5 +37,7 @@ namespace Repositories.Contracts
         Task<int> PolIleriRandevuSorgula(int number);
         Task<PoliklinikEnum.UzmanlikBransi> PolUzmanlikKoduAsync(int polNo);
         Task<List<DoktorRandevuHatirlatmaEmailDTO>> DoktorRandevuHatirlatma(int doktorno);
+        Task<bool> hastaTelNoVarmi(int number);
+        Task<string> HastaCepTelefonGetir(int protokol);
     }
 }

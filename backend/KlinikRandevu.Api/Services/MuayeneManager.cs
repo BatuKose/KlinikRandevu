@@ -23,12 +23,15 @@ namespace Services
         private readonly ILogger<MuayeneManager> _logger;
         private readonly IEmailService _emailService;
         private readonly IMemoryCache _cache;
-        public MuayeneManager(IRepositoryManager repositoryManager, ILogger<MuayeneManager> logger, IEmailService emailService, IMemoryCache memoryCache)
+        private readonly ITwilioSmsManager _twilioSms;
+        public MuayeneManager(IRepositoryManager repositoryManager, ILogger<MuayeneManager> logger, IEmailService emailService, IMemoryCache memoryCache
+            , ITwilioSmsManager twilioSms)
         {
             _repositoryManager=repositoryManager;
             _logger=logger;
             _emailService=emailService;
             _cache=memoryCache;
+            _twilioSms=twilioSms;
         }
 
         public async Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan)
@@ -312,6 +315,20 @@ namespace Services
                 catch(Exception ex)
                 {
                     _logger.LogWarning(ex, "Randevu oluştu fakat mail gönderilemedi", mailHasta.Protocol);
+                }
+            }
+            var smsRandevuParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVU_SMS_BILGISI");
+            if(smsRandevuParam != null && smsRandevuParam.Deger1?.ToUpper()=="EVET")
+            {
+                var hastaCepTelVarmi = await _repositoryManager.Muayene.hastaTelNoVarmi(plan.ProtocolNo);
+                if(hastaCepTelVarmi)
+                {
+                    var mesaj = $"sayın hastamız {plan.RandevuTarihi} tarihine başarılı şekilde randevunuz alınmıştır.";
+                    var cepNo = await _repositoryManager.Muayene.HastaCepTelefonGetir(plan.ProtocolNo);
+                    if(cepNo!=null)
+                    {
+                        await _twilioSms.SmsGonderAsync(cepNo, mesaj);
+                    }
                 }
             }
 

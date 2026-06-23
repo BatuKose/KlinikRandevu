@@ -16,5 +16,6 @@ namespace Services.Contracts
         IUserLogService UserLogService { get; }
         IUserYetkiService UserYetkiService { get; }
         INagerDateService NagerDateService { get; }
+        ITwilioSmsManager TwilioSmsManager { get; }
     }
 }

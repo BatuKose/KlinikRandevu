@@ -327,7 +327,15 @@ namespace Services
                     var cepNo = await _repositoryManager.Muayene.HastaCepTelefonGetir(plan.ProtocolNo);
                     if(cepNo!=null)
                     {
-                        await _twilioSms.SmsGonderAsync(cepNo, mesaj);
+                        try
+                        {
+                            await _twilioSms.SmsGonderAsync(cepNo, mesaj);
+                        }
+                        catch(Exception ex)
+                        {
+                            _logger.LogInformation(ex, "Randevu oluştu fakat SMS gönderilemedi. Protokol: {Protokol}", plan.ProtocolNo);
+                        }
+                        
                     }
                 }
             }

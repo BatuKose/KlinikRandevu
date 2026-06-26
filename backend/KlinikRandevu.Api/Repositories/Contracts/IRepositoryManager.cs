@@ -17,6 +17,7 @@ namespace Repositories.Contracts
         IUserLogRepository UserLogRepository { get; }
         IUserYetkiRepository UserYetkiRepository { get; } 
         ITatilRepository TatilRepository { get; }
+        IIcdApiRepository IcdApiRepository { get; }
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories.EFCore;
 
@@ -11,9 +12,11 @@ using Repositories.EFCore;
 namespace KlinikRandevu.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20260626224520_IcdApiEntegrasyon")]
+    partial class IcdApiEntegrasyon
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,30 +253,6 @@ namespace KlinikRandevu.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Entities.Models.IcdApiEntegrasyon", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("GecerlilikSüresi")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TokenType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("IcdApiEntegrasyon");
-                });
-
             modelBuilder.Entity("Entities.Models.MuayeneKaydi", b =>
                 {
                     b.Property<int>("Id")
@@ -384,7 +363,7 @@ namespace KlinikRandevu.Migrations
                             Address = "BURSA, Türkiye",
                             BirthDate = new DateTime(2001, 2, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BloodType = 6,
-                            CreatedAt = new DateTime(2026, 6, 27, 1, 46, 48, 867, DateTimeKind.Local).AddTicks(7056),
+                            CreatedAt = new DateTime(2026, 6, 27, 1, 45, 19, 770, DateTimeKind.Local).AddTicks(456),
                             Gender = 2,
                             IsActive = true,
                             Name = "BATUHAN",
@@ -578,7 +557,7 @@ namespace KlinikRandevu.Migrations
                             Aciklama = "D1: Aktif mi (EVET/HAYIR), D2: Hata mesajı",
                             Aktif = true,
                             Deger1 = "EVET",
-                            OlusturmaTarihi = new DateTime(2026, 6, 27, 1, 46, 48, 869, DateTimeKind.Local).AddTicks(1892),
+                            OlusturmaTarihi = new DateTime(2026, 6, 27, 1, 45, 19, 771, DateTimeKind.Local).AddTicks(8251),
                             ParametreAdi = "KADIN_DOGUM_ERKEK_YASAKLA"
                         },
                         new
@@ -589,7 +568,7 @@ namespace KlinikRandevu.Migrations
                             Deger1 = "EVET",
                             Deger2 = "0",
                             Deger3 = "16",
-                            OlusturmaTarihi = new DateTime(2026, 6, 27, 1, 46, 48, 869, DateTimeKind.Local).AddTicks(1911),
+                            OlusturmaTarihi = new DateTime(2026, 6, 27, 1, 45, 19, 771, DateTimeKind.Local).AddTicks(8285),
                             ParametreAdi = "PEDIATRI_YAS_LIMITI"
                         });
                 });

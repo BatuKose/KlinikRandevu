@@ -75,5 +75,6 @@ namespace Presentation.Controllers
 
             return Ok(new { mesaj = "Mail başarıyla gönderildi." });
         }
+       
     }
 }

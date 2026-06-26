@@ -48,5 +48,11 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.NagerDateService.GetHolidaysData();
             return Ok(result);
         }
+        [HttpPost("icdTokenAl")]
+        public async Task<IActionResult> IcdApiTokenAl()
+        {
+            var result = await _ServiceManager.IcdApiManager.IcdApiTokenAl();
+            return Ok(result);
+        }
     }
 }

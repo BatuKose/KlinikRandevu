@@ -27,6 +27,7 @@ namespace Repositories.EFCore
         public DbSet<Yetki> Yetkiler { get; set; }
         public DbSet<UserYetki> UserYetkiler { get; set; }
         public DbSet<Tatil> Tatil { get; set; }
+        public DbSet<IcdApiEntegrasyon> IcdApiEntegrasyon { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var property in modelBuilder.Model.GetEntityTypes()

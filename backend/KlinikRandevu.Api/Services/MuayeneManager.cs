@@ -1,4 +1,5 @@
-﻿using Entities.Data_Transfer_Objects.Muayene;
+﻿using Entities.Data_Transfer_Objects.IcdApi;
+using Entities.Data_Transfer_Objects.Muayene;
 using Entities.Enums;
 using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Twilio.Rest.Numbers.V1;
 
 namespace Services
 {
@@ -24,14 +26,16 @@ namespace Services
         private readonly IEmailService _emailService;
         private readonly IMemoryCache _cache;
         private readonly ITwilioSmsManager _twilioSms;
+        private readonly IIcdApiManager _cdApiManager;
         public MuayeneManager(IRepositoryManager repositoryManager, ILogger<MuayeneManager> logger, IEmailService emailService, IMemoryCache memoryCache
-            , ITwilioSmsManager twilioSms)
+            , ITwilioSmsManager twilioSms, IIcdApiManager cdApiManager)
         {
             _repositoryManager=repositoryManager;
             _logger=logger;
             _emailService=emailService;
             _cache=memoryCache;
             _twilioSms=twilioSms;
+            _cdApiManager=cdApiManager;
         }
 
         public async Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan)
@@ -468,5 +472,6 @@ namespace Services
                 <p>Toplam: <strong>{randevular.Count} randevu</strong></p>
             </div>";
         }
+
     }
 }

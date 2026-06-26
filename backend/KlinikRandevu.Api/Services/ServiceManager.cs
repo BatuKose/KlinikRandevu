@@ -19,6 +19,7 @@ namespace Services
         private readonly Lazy<IUserYetkiService> _userYetkiService;
         private readonly Lazy<INagerDateService> _nagerDateService;
         private readonly Lazy<ITwilioSmsManager> _twilioSmsManager;
+        private readonly Lazy<IIcdApiManager> _IcdApiManager;
         public ServiceManager(
             IRepositoryManager repositoryManager,
             IMemoryCache cache,
@@ -26,7 +27,8 @@ namespace Services
             ILogger<MuayeneManager> muayeneLogger,
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            ILogger<TwilioSmsManager>TwilioLogger
+            ILogger<TwilioSmsManager>TwilioLogger,
+            ILogger<IcdApiManager>IcdApiLogger
             )
         {
             _mailService = new Lazy<IEmailService>(() =>
@@ -35,7 +37,7 @@ namespace Services
             _patientService = new Lazy<IPatientService>(() =>
                 new PatientManager(repositoryManager));
             _MuayeneService = new Lazy<IMuayeneService>(() =>
-                new MuayeneManager(repositoryManager, muayeneLogger, _mailService.Value, cache, _twilioSmsManager.Value));
+                new MuayeneManager(repositoryManager, muayeneLogger, _mailService.Value, cache, _twilioSmsManager.Value, _IcdApiManager.Value));
 
             _sistemParametreService = new Lazy<ISistemParametreService>(() =>
                 new SistemParametreServiceManager(repositoryManager, cache));
@@ -45,6 +47,7 @@ namespace Services
             _userYetkiService= new Lazy<IUserYetkiService>(()=>new UserYetkiManager(repositoryManager,cache));
             _nagerDateService = new Lazy<INagerDateService>(() =>new NagerDateManager(repositoryManager, httpClientFactory));
             _twilioSmsManager= new Lazy<ITwilioSmsManager>(()=>new TwilioSmsManager(configuration, TwilioLogger));
+            _IcdApiManager=new Lazy<IIcdApiManager>(()=>new IcdApiManager(configuration, httpClientFactory, IcdApiLogger, repositoryManager));
         }
 
         public IPatientService PatientService => _patientService.Value;
@@ -56,6 +59,7 @@ namespace Services
         public IUserYetkiService UserYetkiService=>_userYetkiService.Value;
         public INagerDateService NagerDateService=>_nagerDateService.Value;
         public ITwilioSmsManager TwilioSmsManager => _twilioSmsManager.Value;
+        public IIcdApiManager IcdApiManager=>_IcdApiManager.Value;  
 
 
     }

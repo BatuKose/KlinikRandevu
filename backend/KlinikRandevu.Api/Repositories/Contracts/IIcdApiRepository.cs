@@ -10,5 +10,6 @@ namespace Repositories.Contracts
     public interface IIcdApiRepository
     {
         public void TokenKayet(IcdApiEntegrasyon ıcdApiEntegrasyon);
-    }
+        public Task<IcdApiEntegrasyon> DbApiTokenGetir();
+    };
 }

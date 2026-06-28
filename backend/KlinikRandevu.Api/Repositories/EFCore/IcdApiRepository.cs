@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,13 @@ namespace Repositories.EFCore
         public IcdApiRepository(RepositoryContext repositoryContext)
         {
             _repositoryContext=repositoryContext;
+        }
+
+        public Task<IcdApiEntegrasyon> DbApiTokenGetir()
+        {
+           
+            var result = _repositoryContext.IcdApiEntegrasyon.SingleOrDefaultAsync(t=>t.Id!=null);
+            return result;
         }
 
         public void TokenKayet(IcdApiEntegrasyon ıcdApiEntegrasyon)

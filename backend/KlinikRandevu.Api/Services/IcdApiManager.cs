@@ -66,13 +66,24 @@ namespace Services
                 }
 
                 _logger.LogInformation("ICD token başarıyla alındı.");
-                var Dbyekaydet = new IcdApiEntegrasyon
+                var tokenVarmi = await _repositoryManager.IcdApiRepository.DbApiTokenGetir();
+                if(tokenVarmi is null)
                 {
-                    TokenType=response.TokenType,
-                    Token=response.AccessToken,
-                    GecerlilikSüresi=DateTime.UtcNow.AddSeconds(response.ExpiresIn)
-                };
-                _repositoryManager.IcdApiRepository.TokenKayet(Dbyekaydet);
+                    var Dbyekaydet = new IcdApiEntegrasyon
+                    {
+                        TokenType=response.TokenType,
+                        Token=response.AccessToken,
+                        GecerlilikSüresi=DateTime.UtcNow.AddSeconds(response.ExpiresIn)
+                    };
+                    _repositoryManager.IcdApiRepository.TokenKayet(Dbyekaydet);
+                   
+                }
+                else
+                {
+                    tokenVarmi.Token= response.AccessToken;
+                    tokenVarmi.TokenType= response.TokenType;
+                    tokenVarmi.GecerlilikSüresi=DateTime.UtcNow.AddSeconds(response.ExpiresIn);
+                }
                 await _repositoryManager.saveAsyc();
                 return response?.AccessToken;
             }

@@ -1,4 +1,5 @@
 ﻿using Entities.Data_Transfer_Objects.IcdApi;
+using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
@@ -92,6 +94,44 @@ namespace Services
                 _logger.LogWarning("ICD token alınırken beklenmeyen bir hata oluştu.");
                 return null;
             }
+        }
+        public async Task<List<TaniDto>> TaniAraAsync(string aranan)
+        {
+            string token = "";
+            var tokenGetir = await _repositoryManager.IcdApiRepository.DbApiTokenGetir();
+            if (tokenGetir is null) throw new BadRequestException("Token bulunamadı");
+            if(tokenGetir.GecerlilikSüresi>DateTime.UtcNow.AddMinutes(1))
+            { 
+              token= tokenGetir.Token;
+            }
+            else
+            {
+                var tokenAl = await IcdApiTokenAl();
+                token=tokenAl;
+            }
+            var client = _httpClientFactory.CreateClient();
+            var url= $"https://id.who.int/icd/release/11/2025-01/mms/search" +
+              $"?q={Uri.EscapeDataString(aranan)}" +
+              $"&flatResults=true" +
+              $"&highlightingEnabled=false" +
+              $"&medicalCodingMode=true";
+
+            var istek = new HttpRequestMessage(HttpMethod.Get, url);
+            istek.Headers.Authorization= new AuthenticationHeaderValue("Bearer",token);
+            istek.Headers.Add("API-Version", "v2");
+            istek.Headers.Add("Accept-Language", "tr");
+            istek.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var cevap= await client.SendAsync(istek);
+
+            if(!cevap.IsSuccessStatusCode)
+            {
+                _logger.LogWarning($"ICD kodu bulunamadı{cevap.StatusCode}, aranan {aranan}");
+                return new List<TaniDto>();
+            }
+            var data = await cevap.Content.ReadFromJsonAsync<IcdAramaCevabiDto>();
+            return data?.DestinationEntities??new List<TaniDto>();
+
         }
     }
 }

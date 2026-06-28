@@ -75,6 +75,12 @@ namespace Presentation.Controllers
 
             return Ok(new { mesaj = "Mail başarıyla gönderildi." });
         }
-       
+        [HttpPost("icdara")]
+        public async Task<IActionResult> ICDBul([FromBody] string icd)
+        {
+            var result = await _ServiceManager.IcdApiManager.TaniAraAsync(icd);
+
+            return Ok(result);
+        }
     }
 }

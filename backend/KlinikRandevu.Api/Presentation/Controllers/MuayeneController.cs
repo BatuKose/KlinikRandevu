@@ -82,5 +82,11 @@ namespace Presentation.Controllers
 
             return Ok(result);
         }
+        [HttpPatch("randevuiptalet")]
+        public async Task<IActionResult> RandevuIptalEt([FromQuery] int id)
+        {
+            var result = await _ServiceManager.MuayeneService.RandevuIptalAsync(id);
+            return Ok("Randevu iptal edilmiştir");
+        }
     }
 }

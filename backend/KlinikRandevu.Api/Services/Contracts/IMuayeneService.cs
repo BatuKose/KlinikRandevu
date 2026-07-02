@@ -18,5 +18,6 @@ namespace Services.Contracts
         Task<Doctor> DoktoruPasifeAl(int doktor);
         Task<Poliklinik> PoluPasifeAl(int polno);
         Task DoktorGunlukProgramMailiGonderAsync(int doktorNo);
+        Task<Randevu> RandevuIptalAsync(int randevuId);
     }
 }

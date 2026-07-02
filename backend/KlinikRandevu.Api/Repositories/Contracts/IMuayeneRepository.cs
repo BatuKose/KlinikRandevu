@@ -39,5 +39,6 @@ namespace Repositories.Contracts
         Task<List<DoktorRandevuHatirlatmaEmailDTO>> DoktorRandevuHatirlatma(int doktorno);
         Task<bool> hastaTelNoVarmi(int number);
         Task<string> HastaCepTelefonGetir(int protokol);
+        Task<Randevu> GetRandevuById(int id);
     }
 }

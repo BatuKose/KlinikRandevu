@@ -472,6 +472,14 @@ namespace Services
                 <p>Toplam: <strong>{randevular.Count} randevu</strong></p>
             </div>";
         }
-
+        public async Task<Randevu>RandevuIptalAsync(int randevuId)
+        {
+            var randevu= await _repositoryManager.Muayene.GetRandevuById(randevuId);
+            if (randevu == null) throw new NotFoundException("Ranevu bilgileri bulunamadı");
+            if (randevu.RandevuTarihi<DateTime.Now.Date) throw new BadRequestException("Randevu tarihi geçmiş olan randevu iptal edilemez");
+             randevu.iptal=true;
+            await _repositoryManager.saveAsyc();
+            return randevu;
+        }
     }
 }

@@ -313,6 +313,12 @@ namespace Repositories.EFCore
                 .SingleOrDefaultAsync();
             return uzmanlik;
         }
+        public async Task<Randevu>GetRandevuById(int id)
+        {
+            var randevu = await _repositoryContext.Randevus.SingleOrDefaultAsync(x=>x.Id== id && x.iptal==false);
+            return randevu;
+
+        }
         
     }
 }

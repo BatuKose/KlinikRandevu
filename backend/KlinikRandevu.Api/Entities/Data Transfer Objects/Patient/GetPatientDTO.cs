@@ -18,5 +18,6 @@ namespace Entities.Data_Transfer_Objects.Patient
         public GenderEnum Gender { get; set; }
         public BloodTypeEnum BloodType { get; set; }
         public long TcKimlik { get; set; }
+        public string email { get; set; }
     }
 }

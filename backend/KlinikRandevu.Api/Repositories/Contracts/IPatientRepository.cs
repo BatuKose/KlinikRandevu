@@ -16,5 +16,6 @@ namespace Repositories.Contracts
         Task<bool> TcExists(long number);
         Task<List<GetPatientDTO>>getPatientAsync(string aramaMetni);
         Task<Patient> GetPatientByProtokolASycn(int protokol);
+     
     }
 }

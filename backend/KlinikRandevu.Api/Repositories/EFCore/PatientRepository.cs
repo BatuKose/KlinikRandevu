@@ -42,7 +42,7 @@ namespace Repositories.EFCore
 
             return await _repositoryContext.Patients.FromSqlRaw(@"
                     SELECT TOP 1
-                    Name, Surname, Protocol, Address, Phone, BirthDate, Gender, BloodType, TcKimlik
+                    Name, Surname, Protocol, Address, Phone, BirthDate, Gender, BloodType, TcKimlik,Email
                 FROM Patients
                 WHERE IsActive = 1
                   AND (
@@ -61,7 +61,8 @@ namespace Repositories.EFCore
                 BirthDate = p.BirthDate,
                 Gender = p.Gender,
                 BloodType = p.BloodType,
-                TcKimlik = p.TcKimlik
+                TcKimlik = p.TcKimlik,
+                email=p.Email
             }).ToListAsync();
         }
 

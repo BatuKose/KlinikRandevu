@@ -1,5 +1,6 @@
 ﻿using Entities.Data_Transfer_Objects.IcdApi;
 using Entities.Data_Transfer_Objects.Muayene;
+using Entities.Data_Transfer_Objects.Patient;
 using Entities.Enums;
 using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
@@ -479,6 +480,25 @@ namespace Services
             if (randevu.RandevuTarihi<DateTime.Now.Date) throw new BadRequestException("Randevu tarihi geçmiş olan randevu iptal edilemez");
              randevu.iptal=true;
             await _repositoryManager.saveAsyc();
+            var randevuIptalMailParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVU_IPTAL_MAILI_GONDER");
+            if(randevuIptalMailParam != null && randevuIptalMailParam.Deger1?.ToUpper()=="EVET")
+            {
+                var hasta = await _repositoryManager.Patient.GetPatientByProtokolASycn(randevu.ProtocolNo);
+                string mesaj = $"Sayın hastamız{hasta.Name} {hasta.Surname} {randevu.RandevuTarihi} tarihli randevunuz iptal edilmiştir. Sağlıklı günler dileriz ";
+                string konu = "Randevu iptali";
+                if(!string.IsNullOrWhiteSpace(hasta.Email))
+                {
+                    try
+                    {
+                        await _emailService.MailGonderAsync(hasta.Email, konu, mesaj);
+                    }
+                    catch
+                    {
+                        _logger.LogWarning("Randevu iptal edildi mail gönderilemedi");
+                    }
+                }
+
+            }
             return randevu;
         }
     }

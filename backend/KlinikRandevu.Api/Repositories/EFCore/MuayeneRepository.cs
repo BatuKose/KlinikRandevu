@@ -32,7 +32,9 @@ namespace Repositories.EFCore
                   r.DoktorNo == doktorNo &&
                   r.HastaTc != null &&
                   r.RandevuTarihi >= gunBaslingc &&
-                  r.RandevuTarihi < günBitis)
+                  r.RandevuTarihi < günBitis
+                  && r.iptal==false
+                  )
               .Select(r => new { r.RandevuTarihi, r.SureDakika })
               .ToListAsync();
 
@@ -135,7 +137,9 @@ namespace Repositories.EFCore
                 r.HastaTc == hastaTc &&
                 r.DoktorNo == doktorNo &&
                 r.RandevuTarihi >= gunBaslangic &&
-                r.RandevuTarihi < gunBitis);
+                r.RandevuTarihi < gunBitis
+                && r.iptal==false
+                );
         }
         public async Task<Randevu?> HastanınRanevusunuGetir(long hastaTc, int doktorNo, DateTime tarih)
         {

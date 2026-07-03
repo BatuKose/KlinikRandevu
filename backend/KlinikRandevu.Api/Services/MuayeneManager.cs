@@ -499,6 +499,23 @@ namespace Services
                 }
 
             }
+            var randevuIptalSmsParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVU_IPTAL_SMS");
+            if(randevuIptalSmsParam != null && randevuIptalSmsParam.Deger1?.ToUpper()=="EVET")
+            {
+                var hasta = await _repositoryManager.Patient.GetPatientByProtokolASycn(randevu.ProtocolNo);
+                if(!string.IsNullOrWhiteSpace(hasta.Phone))
+                {
+                    try
+                    {
+                        string mesaj = $"Sayın hastamız{hasta.Name} {hasta.Surname} {randevu.RandevuTarihi} tarihli randevunuz iptal edilmiştir. Sağlıklı günler dileriz ";
+                        await _twilioSms.SmsGonderAsync(hasta.Phone, mesaj);
+                    }
+                    catch
+                    {
+                        _logger.LogWarning("Randevu iptal edildi sms gönderilemedi");
+                    }
+                }
+            }
             return randevu;
         }
     }

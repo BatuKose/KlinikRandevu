@@ -31,14 +31,14 @@ namespace Repositories.Contracts
         Task<List<HastaRandevulariniGetirDTO>> HastaRandevulariniGetir(DateTime baslangic, DateTime bitis);
         Task<List<HastaRandevulariniGetirDTO>> HastanınRandevulariniGetir(int protokol);
         Task<bool> hastaVarmiProtokol(int number);
-        Task<Doctor> DoktoruGetir(int number);
-        Task<Poliklinik> PolGetir(int number);
+        Task<Doctor?> DoktoruGetir(int number);
+        Task<Poliklinik?> PolGetir(int number);
         Task<int> DoktorIleriRandevuSorgula(int number);
         Task<int> PolIleriRandevuSorgula(int number);
         Task<PoliklinikEnum.UzmanlikBransi> PolUzmanlikKoduAsync(int polNo);
         Task<List<DoktorRandevuHatirlatmaEmailDTO>> DoktorRandevuHatirlatma(int doktorno);
         Task<bool> hastaTelNoVarmi(int number);
-        Task<string> HastaCepTelefonGetir(int protokol);
-        Task<Randevu> GetRandevuById(int id);
+        Task<string?> HastaCepTelefonGetir(int protokol);
+        Task<Randevu?> GetRandevuById(int id);
     }
 }

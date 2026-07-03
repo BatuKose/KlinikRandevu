@@ -35,12 +35,12 @@ namespace Repositories.EFCore
         {
             _repositoryContext.parametreler.Add(entity);
         }
-        public async Task<SistemParametresi>Mevcut(string name)
+        public async Task<SistemParametresi?>Mevcut(string name)
         {
             var param= await _repositoryContext.parametreler.FirstOrDefaultAsync(p=>p.ParametreAdi==name);
             return param;
         }
-        public async Task<SistemParametresi> MevcutById(int id)
+        public async Task<SistemParametresi?> MevcutById(int id)
         {
             var param = await _repositoryContext.parametreler.FirstOrDefaultAsync(p => p.Id==id);
             return param;

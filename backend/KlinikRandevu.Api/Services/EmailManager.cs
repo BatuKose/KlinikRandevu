@@ -20,7 +20,7 @@ namespace Services
         {
             var emailSettings = _configuration.GetSection("EmailSettings");
             var smtpServer = emailSettings["SmtpServer"];
-            var port = int.Parse(emailSettings["Port"]);
+            var port = int.Parse(emailSettings["Port"] ?? throw new InvalidOperationException("SmtpServer ayarı bulunamadı"));
             var senderEmail = emailSettings["SenderEmail"];
             var senderName = emailSettings["SenderName"];
             var password = emailSettings["Password"];

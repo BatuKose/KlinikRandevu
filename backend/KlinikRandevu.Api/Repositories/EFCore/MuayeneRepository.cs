@@ -30,7 +30,7 @@ namespace Repositories.EFCore
            var ayniGunRandevular = await _repositoryContext.Randevus
               .Where(r =>
                   r.DoktorNo == doktorNo &&
-                  r.HastaTc != null &&
+                  r.HastaTc > 0 &&
                   r.RandevuTarihi >= gunBaslingc &&
                   r.RandevuTarihi < günBitis
                   && r.iptal==false
@@ -69,7 +69,7 @@ namespace Repositories.EFCore
             var hasta = await _repositoryContext.Patients.Where(h=> h.Protocol==number && h.Phone !=null).AnyAsync();
             return hasta;
         }
-        public async Task<string> HastaCepTelefonGetir(int protokol)
+        public async Task<string?> HastaCepTelefonGetir(int protokol)
         {
             var cepTel = await _repositoryContext.Patients
                 .Where(p => p.Protocol == protokol)  
@@ -263,12 +263,12 @@ namespace Repositories.EFCore
                   and r.DoktorNo=@doktorno
                 ORDER BY d.DoktorNo, r.RandevuTarihi;", sqlParams).ToListAsync();
         }
-        public async Task<Doctor>DoktoruGetir(int number)
+        public async Task<Doctor?>DoktoruGetir(int number)
         {
             var doktor = await _repositoryContext.Doctors.SingleOrDefaultAsync(d=>d.doktorNo==number);
             return doktor;
         }
-        public async Task<Poliklinik> PolGetir(int number)
+        public async Task<Poliklinik?> PolGetir(int number)
         {
             var pol = await _repositoryContext.Polikliniks.SingleOrDefaultAsync(d => d.PolNo==number);
             return pol;
@@ -317,7 +317,7 @@ namespace Repositories.EFCore
                 .SingleOrDefaultAsync();
             return uzmanlik;
         }
-        public async Task<Randevu>GetRandevuById(int id)
+        public async Task<Randevu?>GetRandevuById(int id)
         {
             var randevu = await _repositoryContext.Randevus.SingleOrDefaultAsync(x=>x.Id== id && x.iptal==false);
             return randevu;

@@ -96,7 +96,7 @@ namespace Services
                 var yil = muayene.MuayeneTarihi.Year;
                 var key = $"tatiller:{yil}";
 
-                if (!_cache.TryGetValue(key, out HashSet<DateTime> set))
+                if (!_cache.TryGetValue(key, out HashSet<DateTime>? set))
                 {
                     var tatiller = await _repositoryManager.TatilRepository.TatilleriGetirAsync(yil);
                     set = tatiller.Select(t => t.Tarih.Date).ToHashSet();
@@ -111,7 +111,7 @@ namespace Services
             var randevusuzKayitAcmaParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVUSUZ_KAYIT_ACMA");
             if(randevusuzKayitAcmaParam!=null && randevusuzKayitAcmaParam.Deger1=="EVET")
             {
-                if(muayene.PolNo==int.Parse(randevusuzKayitAcmaParam.Deger2))
+                if (int.TryParse(randevusuzKayitAcmaParam.Deger2, out var hedefPolNo)&& muayene.PolNo == hedefPolNo)
                 {
                     bool paramKontrol = await _repositoryManager.Muayene.AyniGünMuayenesiVarmi(muayene.PolNo, muayene.ProtocolNo, muayene.MuayeneTarihi);
                     if (!paramKontrol) throw new ParamException("Bu polikliniğe Randevusuz kayıt açılamaz");
@@ -306,11 +306,14 @@ namespace Services
                 return plan;
             }
             var mailHasta = await _repositoryManager.Patient.GetPatientByProtokolASycn(plan.ProtocolNo);
-            var mailDoktor = await _repositoryManager.Muayene.DoktoruGetir(plan.DoktorNo);
-            if(!string.IsNullOrWhiteSpace(mailHasta.Email))
+            if (mailHasta is null) throw new NotFoundException("Hastanın mailini bulunamadı");
+            var mailDoktor = await _repositoryManager.Muayene.DoktoruGetir(plan.DoktorNo); 
+            if (mailDoktor is null) throw new NotFoundException("doktora ait mail bulunamadı");
+            if(!string.IsNullOrWhiteSpace(mailHasta.Email) && !string.IsNullOrWhiteSpace(mailDoktor.DoktorAd))
             {
                 try
                 {
+                 
                     await _emailService.RandevuOnayMailiGonder(mailHasta.Email,
                         $"{mailHasta.Name} {mailHasta.Surname}",
                         $"{mailDoktor.DoktorAd}", plan.RandevuTarihi
@@ -319,7 +322,7 @@ namespace Services
                 }
                 catch(Exception ex)
                 {
-                    _logger.LogWarning(ex, "Randevu oluştu fakat mail gönderilemedi", mailHasta.Protocol);
+                    _logger.LogWarning(ex, "Randevu oluştu fakat mail gönderilemedi. ProtokolNo: {ProtokolNo}", mailHasta.Protocol);
                 }
             }
             var smsRandevuParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVU_SMS_BILGISI");
@@ -382,8 +385,8 @@ namespace Services
         {
             var doktorVarMi= await _repositoryManager.Muayene.doktorVarMI(doktor);
             if (!doktorVarMi) throw new NotFoundException("Doktor bulunamadı");
-            var doktorBul = await _repositoryManager.Muayene.DoktoruGetir(doktor);
-        
+            var doktorBul = await _repositoryManager.Muayene.DoktoruGetir(doktor) ?? throw new NotFoundException("Doktor bilgisi bulunamadı");
+            
             if(doktorBul.isActive==true)
             {
                 var kontrol = await _repositoryManager.Muayene.DoktorIleriRandevuSorgula(doktor);
@@ -433,7 +436,10 @@ namespace Services
             try
             {
                 var mailGondermeParametre = await _repositoryManager.SistemParametresi.GetirAsync("EMAIL_GONDERME");
-                if (mailGondermeParametre.Deger1.ToUpper()=="EVET" && int.Parse(mailGondermeParametre.Deger4)!=doktorNo)
+                if (mailGondermeParametre != null
+                    && mailGondermeParametre.Deger1?.ToUpper() == "EVET"
+                    && int.TryParse(mailGondermeParametre.Deger4, out var hedefDoktorNo)
+                    && hedefDoktorNo != doktorNo)
 
                 {
                     return;
@@ -442,7 +448,7 @@ namespace Services
             }
             catch(Exception ex)
             {
-                _logger.LogWarning(ex, "doktor randevu programı bilgileri mail olarak gönderilemedi", doktorAd +" "+DateTime.Today);
+                _logger.LogWarning($"doktor randevu programı bilgileri mail olarak gönderilemedi \n {ex} "+DateTime.Now);
             }
            
             

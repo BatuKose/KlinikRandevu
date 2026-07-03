@@ -41,8 +41,8 @@ namespace Services
 
             if (blokAktif)
             {
-                int.TryParse(LoginEngelliParam.Deger2, out MaxDeneme);
-                int.TryParse(LoginEngelliParam.Deger3, out  BlokSüre);
+                int.TryParse(LoginEngelliParam?.Deger2, out MaxDeneme);
+                int.TryParse(LoginEngelliParam?.Deger3, out  BlokSüre);
 
             }
             var blokCache = $"hatali_login_{loginDTO.username.Trim().ToLower()}";

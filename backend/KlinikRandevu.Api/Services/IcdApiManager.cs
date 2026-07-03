@@ -31,11 +31,11 @@ namespace Services
             _logger = logger;
             _repositoryManager=manager;
         }
-        public async Task<string> IcdApiTokenAl()
+        public async Task<string?> IcdApiTokenAl()
         {
             var client = _httpClientFactory.CreateClient();
-            var clientId = _configuration["Icd:ClientId"];
-            var clientSecret = _configuration["Icd:ClientSecret"];
+            var clientId = _configuration["Icd:ClientId"] ?? throw new InvalidOperationException("icd entegrasyon ayarı bulunamadı");
+            var clientSecret = _configuration["Icd:ClientSecret"] ?? throw new InvalidOperationException("icd entegrasyon ayarı bulunamadı");
 
             var postDetay= new Dictionary<string, string>
             {
@@ -49,16 +49,16 @@ namespace Services
 
              try
             {
-                var istek = await client.PostAsync(
-                "https://icdaccessmanagement.who.int/connect/token", body);
-                if (!istek.IsSuccessStatusCode)
-                {
-                    _logger.LogWarning(
-                       "ICD token alınamadı. Status: {Status}",
-                       istek.StatusCode);
-                    return null;
+                    var istek = await client.PostAsync(
+                    "https://icdaccessmanagement.who.int/connect/token", body);
+                    if (!istek.IsSuccessStatusCode)
+                    {
+                        _logger.LogWarning(
+                           "ICD token alınamadı. Status: {Status}",
+                           istek.StatusCode);
+                        return null;
 
-                }
+                    }
 
                 var response = await istek.Content.ReadFromJsonAsync<IcdTokenCevabiDto>();
                 if (string.IsNullOrEmpty(response?.AccessToken))
@@ -91,7 +91,7 @@ namespace Services
             }
             catch(Exception ex)
             {
-                _logger.LogWarning("ICD token alınırken beklenmeyen bir hata oluştu.");
+                _logger.LogWarning($"ICD token alınırken beklenmeyen bir hata oluştu. \n {ex}",DateTime.Now);
                 return null;
             }
         }
@@ -107,6 +107,7 @@ namespace Services
             else
             {
                 var tokenAl = await IcdApiTokenAl();
+                if (tokenAl is null) throw new BadRequestException("Token alınırken hata oluştu");
                 token=tokenAl;
             }
             var client = _httpClientFactory.CreateClient();

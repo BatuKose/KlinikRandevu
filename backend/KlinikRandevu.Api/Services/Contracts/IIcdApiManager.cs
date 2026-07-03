@@ -9,7 +9,7 @@ namespace Services.Contracts
 {
     public interface IIcdApiManager
     {
-        Task<string> IcdApiTokenAl();
+        Task<string?> IcdApiTokenAl();
         Task<List<TaniDto>> TaniAraAsync(string aranan);
     }
 }

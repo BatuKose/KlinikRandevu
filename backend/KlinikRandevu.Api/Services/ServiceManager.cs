@@ -37,7 +37,7 @@ namespace Services
             _patientService = new Lazy<IPatientService>(() =>
                 new PatientManager(repositoryManager));
             _MuayeneService = new Lazy<IMuayeneService>(() =>
-                new MuayeneManager(repositoryManager, muayeneLogger, _mailService.Value, cache, _twilioSmsManager.Value, _IcdApiManager.Value));
+                new MuayeneManager(repositoryManager, muayeneLogger, _mailService.Value, cache, _twilioSmsManager.Value, _IcdApiManager.Value, httpContextAccessor));
 
             _sistemParametreService = new Lazy<ISistemParametreService>(() =>
                 new SistemParametreServiceManager(repositoryManager, cache));

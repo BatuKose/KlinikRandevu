@@ -5,9 +5,11 @@ using Entities.Enums;
 using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Bcpg;
 using Repositories.Contracts;
 using Services.Contracts;
 using System;
@@ -17,6 +19,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Twilio.Rest.Numbers.V1;
+
 
 namespace Services
 {
@@ -28,8 +31,9 @@ namespace Services
         private readonly IMemoryCache _cache;
         private readonly ITwilioSmsManager _twilioSms;
         private readonly IIcdApiManager _cdApiManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public MuayeneManager(IRepositoryManager repositoryManager, ILogger<MuayeneManager> logger, IEmailService emailService, IMemoryCache memoryCache
-            , ITwilioSmsManager twilioSms, IIcdApiManager cdApiManager)
+            , ITwilioSmsManager twilioSms, IIcdApiManager cdApiManager, IHttpContextAccessor httpContextAccessor )
         {
             _repositoryManager=repositoryManager;
             _logger=logger;
@@ -37,6 +41,7 @@ namespace Services
             _cache=memoryCache;
             _twilioSms=twilioSms;
             _cdApiManager=cdApiManager;
+            _httpContextAccessor=httpContextAccessor;
         }
 
         public async Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan)
@@ -201,6 +206,11 @@ namespace Services
             };
              _repositoryManager.Muayene.MuayeneKaydiOlustur(kayit);
              await _repositoryManager.saveAsyc();
+            string aksiyonTipi = $"muayene oluşturma {kayit.HastaTc} tcli hastaya {kayit.MuayeneTarihi} tarihli " +
+                $"{kayit.PolNo} numaralı pole muayene oluşturuldu";
+            string EntityTipi = "MuayeneKayitlari";
+            int entityId = kayit.ProtocolNo;
+            logYaz(aksiyonTipi, entityId, EntityTipi);
             return new MuayeneKayitiOlusturDTO
             {
                 BaslangicSaati=kayit.BaslangicSaati,
@@ -347,8 +357,27 @@ namespace Services
                     }
                 }
             }
-
+            string aksiyonTipi = $"Randevu oluşturma {plan.HastaTc} tcli hastaya {plan.RandevuTarihi} tarihli randevu oluşturuldu";
+            string EntityTipi = "randevular";
+            int entityId = plan.ProtocolNo;
+            logYaz(aksiyonTipi, entityId, EntityTipi);
             return plan;
+        }
+        private async void logYaz(string aksiyonTipi, int entityid,string entitytipi)
+        {
+            var ipAdress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "İp adresi bulunamadı";
+            var userStringId = _httpContextAccessor.HttpContext?.User?.FindFirst("UserID")?.Value;
+            int? userId = int.TryParse(userStringId, out int parsedId) ? parsedId : null;
+            var LoguYaz = new UserLog()
+            {
+                AksiyonTipi = aksiyonTipi,
+                EntityTipi = entitytipi,
+                UserId= userId,
+                IpAdresi=ipAdress,
+                EntityId=entityid
+            };
+            _repositoryManager.UserLogRepository.LoginLogYaz(LoguYaz);
+            await _repositoryManager.saveAsyc();
         }
         public async Task<List<HastaRandevulariniGetirDTO>> HastaRandevulariniGetir(DateTime baslangic, DateTime bitis)
         {

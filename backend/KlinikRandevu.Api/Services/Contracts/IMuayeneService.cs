@@ -19,5 +19,7 @@ namespace Services.Contracts
         Task<Poliklinik> PoluPasifeAl(int polno);
         Task DoktorGunlukProgramMailiGonderAsync(int doktorNo);
         Task<Randevu> RandevuIptalAsync(int randevuId);
+        Task<List<RandevuluHastalarinBilgilerDTO>> RandevuluHastaBilgileriniGetir(
+            DateTime basla, DateTime bitis, bool muayeneOldumu);
     }
 }

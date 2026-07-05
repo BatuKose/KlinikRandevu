@@ -88,5 +88,13 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.RandevuIptalAsync(id);
             return Ok("Randevu iptal edilmiştir");
         }
+        [HttpPost("randevuluHastalarinBilgileri")]
+        public async Task<IActionResult> RandevuluHastalarinBilgileriGetir([FromBody] RandevuluHastaFiltreDto filtre)
+        {
+            var result = await _ServiceManager.MuayeneService.RandevuluHastaBilgileriniGetir(
+                filtre.Basla, filtre.Bitis, filtre.MuayeneOldumu);
+
+            return Ok(result);
+        }
     }
 }

@@ -553,5 +553,24 @@ namespace Services
             }
             return randevu;
         }
+        public async Task<List<RandevuluHastalarinBilgilerDTO>> RandevuluHastaBilgileriniGetir(
+            DateTime basla, DateTime bitis, bool muayeneOldumu)
+        {
+            if (basla == default || bitis == default)
+                throw new BadRequestException("Başlangıç ve bitiş tarihi zorunludur.");
+
+            if (bitis < basla)
+                throw new BadRequestException("Bitiş tarihi başlangıç tarihinden küçük olamaz.");
+
+            if ((bitis - basla).TotalDays > 366)
+                throw new BadRequestException("Tarih aralığı en fazla 1 yıl olabilir.");
+
+            var list = await _repositoryManager.Muayene.RandevuluHastaBilgileri(basla, bitis, muayeneOldumu);
+
+            if (list == null || !list.Any())
+                throw new NotFoundException("Randevulu hasta bilgileri bulunamadı.");
+
+            return list;
+        }
     }
 }

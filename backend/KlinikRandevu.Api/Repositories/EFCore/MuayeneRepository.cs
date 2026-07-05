@@ -208,6 +208,46 @@ namespace Repositories.EFCore
               AND r.RandevuTarihi BETWEEN @baslangic AND @bitis
             ORDER BY r.RandevuTarihi", sqlParams).ToListAsync();
         }
+        public async Task<List<RandevuluHastalarinBilgilerDTO>>RandevuluHastaBilgileri( DateTime baslangic, DateTime bitis,bool muayeneOlduMu)
+        {
+            var sqlParams = new[]
+            {
+                new SqlParameter("@baslangic",SqlDbType.DateTime) {Value = baslangic},
+                new SqlParameter("@bitis",SqlDbType.DateTime) {Value=bitis}
+            };
+            var muayneSarti = muayeneOlduMu ? " " : "and m.Id is  not null";
+            var sql = $@"
+            select r.RandevuTarihi as randevutarihi, d.DoktorAd,
+                   pol.Name as poladi, u.Ad as uzmanlik,
+                   CONCAT(p.Name, ' ', p.Surname) as hasta,
+                   CASE p.Gender
+                        WHEN 1 THEN 'Kadın'
+                        WHEN 2 THEN 'Erkek'
+                        ELSE 'Belirtilmedi'
+                   END AS cinsiyet,
+                   p.Address as adres
+            from Randevular r
+            left join MuayeneKayitlari m on r.Id = m.RandevuId
+            inner join Doktorlar d on d.doktorNo = r.DoktorNo
+            inner join Patients p on p.Protocol = r.ProtocolNo
+            inner join Poliklinikler pol on pol.PolNo = r.PolNo
+            inner join UzmanlikDallari u on u.Kod = pol.PolUzKod
+            where r.iptal = 0 and d.isActive = 1 and p.IsActive = 1
+              and r.RandevuTarihi between @baslangic and @bitis
+              {muayneSarti}
+            ORDER BY r.RandevuTarihi";
+            try
+            {
+                return await _repositoryContext.Database
+                    .SqlQueryRaw<RandevuluHastalarinBilgilerDTO>(sql, sqlParams)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+        }
         public async Task<List<HastaRandevulariniGetirDTO>> HastanınRandevulariniGetir(int protokol)
         {
             var sqlParams = new[]

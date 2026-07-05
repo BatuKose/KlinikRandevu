@@ -40,5 +40,6 @@ namespace Repositories.Contracts
         Task<bool> hastaTelNoVarmi(int number);
         Task<string?> HastaCepTelefonGetir(int protokol);
         Task<Randevu?> GetRandevuById(int id);
+        Task<List<RandevuluHastalarinBilgilerDTO>> RandevuluHastaBilgileri(DateTime baslangic, DateTime bitis, bool muayeneOlduMu);
     }
 }

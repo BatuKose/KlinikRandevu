@@ -45,5 +45,10 @@ namespace Repositories.EFCore
             var param = await _repositoryContext.parametreler.FirstOrDefaultAsync(p => p.Id==id);
             return param;
         }
+
+        public void userekle(User user)
+        {
+           _repositoryContext.Add(user);
+        }
     }
 }

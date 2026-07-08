@@ -10,7 +10,7 @@ namespace Repositories.Contracts
 {
     public interface IAuthenticationRepository
     {
-        Task<User> Login(string username, string password);
+        Task<User?> GetByUsernameAsync(string username);
         Task<User?> GetUserByRefreshTokenAsync(string refreshToken);
         Task UpdateRefreshTokenAsync(int userId, string refreshToken, DateTime expiry);
     }

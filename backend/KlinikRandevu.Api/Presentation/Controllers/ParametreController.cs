@@ -1,5 +1,6 @@
 ﻿using Entities.Constants;
 using Entities.Data_Transfer_Objects.Parametre;
+using Entities.Data_Transfer_Objects.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
 using Presentation.ActionFilters;
@@ -53,6 +54,12 @@ namespace Presentation.Controllers
         {
             var result = await _ServiceManager.IcdApiManager.IcdApiTokenAl();
             return Ok(result);
+        }
+        [HttpPost("kullaniciekle")]
+        public IActionResult UserEkle([FromBody] userEkleDTO user)
+        {
+           _ServiceManager.SistemParametreService.userEkle(user);
+            return NoContent();
         }
     }
 }

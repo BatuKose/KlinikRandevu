@@ -1,4 +1,5 @@
-﻿using Entities.Data_Transfer_Objects.Authentication;
+﻿using BCrypt.Net;
+using Entities.Data_Transfer_Objects.Authentication;
 using Entities.Data_Transfer_Objects.UserLog;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
@@ -29,44 +30,74 @@ namespace Services
             _memoryCache= memoryCache;
         }
 
-        public async Task<TokenResponseDTO> login(LoginDTO loginDTO)
+        public async Task<TokenResponseDTO> Login(LoginDTO loginDTO)
         {
-            if (loginDTO == null) throw new BadRequestException("Kullanıcı bilgileri dolu olmak zorundadır");
+              
+            if (loginDTO is null
+                || string.IsNullOrWhiteSpace(loginDTO.username)
+                || string.IsNullOrWhiteSpace(loginDTO.password))
+                throw new BadRequestException("Kullanıcı adı ve şifre boş olamaz");
+
             if (loginDTO.username.Trim().Length <= 1 || loginDTO.password.Trim().Length <= 1)
                 throw new BadRequestException("Kullanıcı adı ya da şifre bir karakterden büyük olmalıdır");
-            var LoginEngelliParam = await _repositoryManager.SistemParametresi.GetirAsync("HATALI_LOGIN_BLOK");
-            bool blokAktif = LoginEngelliParam != null && LoginEngelliParam.Deger1?.ToUpper()=="EVET";
-            int MaxDeneme = 4;
-            int BlokSüre = 5;
+
+            var loginEngelliParam = await _repositoryManager.SistemParametresi.GetirAsync("HATALI_LOGIN_BLOK");
+            bool blokAktif = loginEngelliParam != null && loginEngelliParam.Deger1?.ToUpper() == "EVET";
+
+            int maxDeneme = 4;
+            int blokSure = 5;
+            if (blokAktif)
+            {
+                if (int.TryParse(loginEngelliParam?.Deger2, out var parsedMax)) maxDeneme = parsedMax;
+                if (int.TryParse(loginEngelliParam?.Deger3, out var parsedSure)) blokSure  = parsedSure;
+            }
+
+            var blokCache = $"hatali_login_{loginDTO.username.Trim().ToLowerInvariant()}";
 
             if (blokAktif)
             {
-                int.TryParse(LoginEngelliParam?.Deger2, out MaxDeneme);
-                int.TryParse(LoginEngelliParam?.Deger3, out  BlokSüre);
+                var mevcutSayac = _memoryCache.Get<int?>(blokCache) ?? 0;
+                if (mevcutSayac >= maxDeneme)
+                    throw new BadRequestException($"Çok fazla hatalı giriş. Lütfen {blokSure} dk sonra tekrardan deneyiniz");
+            }
 
-            }
-            var blokCache = $"hatali_login_{loginDTO.username.Trim().ToLower()}";
-                if(blokAktif)
-            {
-                var mevcutSayac = _memoryCache.Get<int?>(blokCache)??0;
-                if (mevcutSayac>=MaxDeneme)
-                    throw new BadRequestException($"Çok fazla hatalı giriş. Lütfen {BlokSüre} dk sonra tekrardan deneyiniz");
-            }
-            var user = await _repositoryManager.Authentication.Login(loginDTO.username, loginDTO.password);
+            var user = await _repositoryManager.Authentication.GetByUsernameAsync(loginDTO.username.Trim());
+
+            bool girisBasarisiz;
             if (user is null)
             {
-                if(blokAktif)
+                girisBasarisiz = true;
+            }
+            else
+            {
+                try
                 {
-                    var sayac = (_memoryCache.Get<int?>(blokCache)??0)+1;
+                   
+                    girisBasarisiz = !BCrypt.Net.BCrypt.Verify(loginDTO.password, user.Password);
+                }
+                catch (SaltParseException ex)
+                {
+                  
+                    Console.WriteLine( $" {ex} Bozuk hash formatı. Kullanıcı: {user.UserName}", user.UserName);
+                    girisBasarisiz = true;
+                }
+            }
+
+            if (girisBasarisiz)
+            {
+                if (blokAktif)
+                {
+                    var sayac = (_memoryCache.Get<int?>(blokCache) ?? 0) + 1;
                     _memoryCache.Set(blokCache, sayac, new MemoryCacheEntryOptions
                     {
-                        AbsoluteExpirationRelativeToNow=TimeSpan.FromMinutes(BlokSüre)
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(blokSure)
                     });
-
                 }
-                throw new NotFoundException("Kullanıcı bilgilerine ulaşılamadı");
+                throw new BadRequestException("Kullanıcı adı veya şifre hatalı");
             }
-            if(blokAktif) _memoryCache.Remove(blokCache);
+
+            if (blokAktif) _memoryCache.Remove(blokCache);
+
             var loginLogParametre = await _repositoryManager.SistemParametresi.GetirAsync("LOGIN_LOG_TUTULSUN");
             if (loginLogParametre != null && loginLogParametre.Deger1?.ToUpper() == "EVET")
             {
@@ -78,7 +109,7 @@ namespace Services
                     IpAdresi = ip,
                     EntityTipi = "users"
                 };
-                _repositoryManager.UserLogRepository.LoginLogYaz(log);
+                 _repositoryManager.UserLogRepository.LoginLogYaz(log);  
             }
 
             return await GenerateTokenResponseAsync(user);

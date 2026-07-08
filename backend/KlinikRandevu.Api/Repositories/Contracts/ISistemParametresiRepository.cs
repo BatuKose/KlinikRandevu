@@ -14,5 +14,6 @@ namespace Repositories.Contracts
         void Ekle(SistemParametresi entity);
         Task<SistemParametresi?> Mevcut(string name);
         Task<SistemParametresi?> MevcutById(int id);
+        void userekle(User user);
     }
 }

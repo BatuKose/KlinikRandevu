@@ -1,4 +1,5 @@
 ﻿using Entities.Data_Transfer_Objects.Parametre;
+using Entities.Data_Transfer_Objects.User;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
 using Microsoft.Extensions.Caching.Memory;
@@ -115,6 +116,24 @@ namespace Services
             {
                 memory.Compact(1.0);
             }
+        }
+
+        public void userEkle(userEkleDTO user)
+        {
+            if (userEkle == null) throw new BadRequestException("Kullanıcı bilgileri boş olamaz");
+            if (!user.email.Contains("@")) throw new BadRequestException("e posta girişi hatalı");
+            if(user.username.Length<3 || user.password.Length<=3) throw new BadRequestException("kullanıcı adı veya şifresi 3 haneden büyük olmalıdır");
+
+            var userAdd = new User
+            {
+                UserName=user.username,
+                Email=user.email,
+                Name=user.name,
+                Surname=user.surname,
+                Password= BCrypt.Net.BCrypt.HashPassword(user.password)
+            };
+            _repositoryManager.SistemParametresi.userekle(userAdd);
+            _repositoryManager.Save();
         }
     }
 }

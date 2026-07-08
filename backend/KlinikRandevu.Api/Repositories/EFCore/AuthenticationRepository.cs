@@ -20,10 +20,10 @@ namespace Repositories.EFCore
             _repositoryContext=repositoryContext;
         }
 
-        public async Task<User> Login(string username, string password)
+        public async Task<User?> GetByUsernameAsync(string username)
         {
-            var user = await _repositoryContext.Users.FirstOrDefaultAsync(u => u.UserName==username && u.Password==password);
-            return user;
+            return await _repositoryContext.Users
+                .FirstOrDefaultAsync(u => u.UserName == username);
         }
 
         public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)

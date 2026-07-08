@@ -123,7 +123,8 @@ namespace Services
             if (userEkle == null) throw new BadRequestException("Kullanıcı bilgileri boş olamaz");
             if (!user.email.Contains("@")) throw new BadRequestException("e posta girişi hatalı");
             if(user.username.Length<3 || user.password.Length<=3) throw new BadRequestException("kullanıcı adı veya şifresi 3 haneden büyük olmalıdır");
-
+            var userExixts = _repositoryManager.SistemParametresi.aynıUsernameVarmi(user.username);
+            if(userExixts) throw new BadRequestException("Aynı kullanıcı adı mevcut farklı kullanıcı adı alınız");
             var userAdd = new User
             {
                 UserName=user.username,

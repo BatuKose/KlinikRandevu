@@ -50,5 +50,10 @@ namespace Repositories.EFCore
         {
            _repositoryContext.Add(user);
         }
+        public bool aynıUsernameVarmi(string username)
+        {
+            bool userVarmi = _repositoryContext.Users.Any(u=>u.UserName==username);
+            return userVarmi;
+        }
     }
 }

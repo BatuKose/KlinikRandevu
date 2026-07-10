@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Repositories.Contracts;
 using Services.Contracts;
+using System.Net.Mail;
 using System.Reflection.Emit;
 
 namespace Services
@@ -120,15 +121,27 @@ namespace Services
 
         public void userEkle(userEkleDTO user)
         {
-            if (userEkle == null) throw new BadRequestException("Kullanıcı bilgileri boş olamaz");
-            if (!user.email.Contains("@")) throw new BadRequestException("e posta girişi hatalı");
-            if(user.username.Length<3 || user.password.Length<=3) throw new BadRequestException("kullanıcı adı veya şifresi 3 haneden büyük olmalıdır");
+            if (user == null) throw new BadRequestException("Kullanıcı bilgileri boş olamaz");
+            if(string.IsNullOrWhiteSpace(user.username) || string.IsNullOrWhiteSpace(user.password))
+                throw new BadRequestException("Kullanıcı adı veya şifrenin doldurulması gerekiyor.");
+            string? gelenEmail = null;
+            if (!string.IsNullOrWhiteSpace(user.email))
+            {
+                if (!MailAddress.TryCreate(user.email, out _))
+                    throw new BadRequestException("e-posta girişi hatalı");
+                var mailExi = _repositoryManager.SistemParametresi.ayniEpostaVarmi(user.email);
+                if (mailExi)
+                    throw new BadRequestException("Bu eposta sistemde mevcut farklı e posta yazınız");
+                gelenEmail = user.email;
+            }
+            if (user.username.Length<3 || user.password.Length<=3) throw new BadRequestException("kullanıcı adı veya şifresi 3 haneden büyük olmalıdır");
             var userExixts = _repositoryManager.SistemParametresi.aynıUsernameVarmi(user.username);
             if(userExixts) throw new BadRequestException("Aynı kullanıcı adı mevcut farklı kullanıcı adı alınız");
+          
             var userAdd = new User
             {
                 UserName=user.username,
-                Email=user.email,
+                Email=gelenEmail,
                 Name=user.name,
                 Surname=user.surname,
                 Password= BCrypt.Net.BCrypt.HashPassword(user.password)

@@ -23,7 +23,7 @@ namespace Repositories.EFCore
         public async Task<User?> GetByUsernameAsync(string username)
         {
             return await _repositoryContext.Users
-                .FirstOrDefaultAsync(u => u.UserName == username);
+                .FirstOrDefaultAsync(u => u.UserName == username || u.Email==username);
         }
 
         public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)

@@ -16,5 +16,6 @@ namespace Repositories.Contracts
         Task<SistemParametresi?> MevcutById(int id);
         void userekle(User user);
         bool aynıUsernameVarmi(string username);
+        bool ayniEpostaVarmi(string eposta);
     }
 }

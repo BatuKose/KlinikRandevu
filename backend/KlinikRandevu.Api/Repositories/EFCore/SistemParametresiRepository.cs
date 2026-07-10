@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using System;
@@ -54,6 +55,12 @@ namespace Repositories.EFCore
         {
             bool userVarmi = _repositoryContext.Users.Any(u=>u.UserName==username);
             return userVarmi;
+        }
+
+        public bool ayniEpostaVarmi(string eposta)
+        {
+            bool epostaVarmi = _repositoryContext.Users.Any(e => e.Email==eposta);
+            return epostaVarmi;
         }
     }
 }

@@ -13,8 +13,7 @@ namespace Entities.Data_Transfer_Objects.User
         public string username { get; set; }
         [Required]
         public string password { get; set; }
-        [Required]
-        public string email { get; set; }
+        public string? email { get; set; }
         [Required]
         public string name { get; set; }
         [Required]

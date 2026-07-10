@@ -1,6 +1,7 @@
 ﻿using BCrypt.Net;
 using Entities.Data_Transfer_Objects.Authentication;
 using Entities.Data_Transfer_Objects.UserLog;
+using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
@@ -62,7 +63,25 @@ namespace Services
             }
 
             var user = await _repositoryManager.Authentication.GetByUsernameAsync(loginDTO.username.Trim());
+            var mailleGirisYasakla = await _repositoryManager.SistemParametresi.GetirAsync("MAIL_LOGIN_YASAKLA");
+            var mailYasakDegeri = mailleGirisYasakla?.Deger1?.ToUpper() ?? "HAYIR";
+            if(mailYasakDegeri=="EVET")
+            {
+                if (user is not null)
+                {
+                    if (!string.IsNullOrWhiteSpace(user.Email))
+                    {
+                        string girisYapanUser = loginDTO.username;
+                        string mevcutEposta = user.Email;
+                        if(girisYapanUser==mevcutEposta)
+                        {
+                            throw new ParamException("E posta ile giriş yapılması kapatılmıştır ");
+                        }
+                    }
+                    
+                }
 
+            }
             bool girisBasarisiz;
             if (user is null)
             {

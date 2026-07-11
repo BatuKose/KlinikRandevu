@@ -73,9 +73,12 @@ namespace Services
 
         public async Task<Patient> DeletePatient(int protokol)
         {
-            // eğer pol kaydı varsa hastayı pasife alınmaması iş kuralı koyulcak
             var patient= await _repositoryManager.Patient.GetPatientByProtokolASycn(protokol);
             if (patient == null) throw new NotFoundException("Hasta bulunamadı");
+            var Randevukontrol = await _repositoryManager.Muayene.ileriTarihliRandevuVarmi(protokol);
+            if (Randevukontrol>0) throw new BadRequestException("Hastanın ileri tarihli randevusu bulunmaktadır. Hasta iptal edilemez");
+            var muayeneKontrol = await _repositoryManager.Muayene.HastaninHicAktifMuayenesiOlduMU(protokol);
+            if (muayeneKontrol>0) throw new BadRequestException("Muayene kaydı açılmış hasta iptal edilemez");
             if(patient.IsActive==true)
             {
                 patient.IsActive = false;

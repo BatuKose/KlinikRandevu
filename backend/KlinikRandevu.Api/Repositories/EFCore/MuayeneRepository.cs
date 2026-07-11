@@ -208,6 +208,42 @@ namespace Repositories.EFCore
               AND r.RandevuTarihi BETWEEN @baslangic AND @bitis
             ORDER BY r.RandevuTarihi", sqlParams).ToListAsync();
         }
+        public async Task<int>ileriTarihliRandevuVarmi(int protokol)
+        {
+
+            try
+            {
+                return await _repositoryContext.Database
+                    .SqlQueryRaw<int>(@"
+            SELECT COUNT(*) AS Value
+            FROM Randevular r
+            WHERE r.ProtocolNo = @protokol
+              AND r.iptal = 0
+              AND r.RandevuTarihi >= CAST(GETDATE() AS DATE);
+        ", new SqlParameter("@protokol", protokol))
+                    .FirstAsync();
+            }
+            catch (Exception ex)
+            {
+                // en dipteki gerçek sebep genelde InnerException'da olur
+                Console.WriteLine(ex.InnerException?.Message ?? ex.Message);
+                throw;
+            }
+            ;
+        }
+        public async Task<int>HastaninHicAktifMuayenesiOlduMU(int protokol)
+        {
+            var sqlParams = new[]
+            {
+                new SqlParameter("@protokol",SqlDbType.BigInt) { Value = protokol }
+
+            };
+            return await _repositoryContext.Database.SqlQueryRaw<int>(@"
+                SELECT COUNT(*) AS Value
+                FROM MuayeneKayitlari m
+                WHERE m.ProtocolNo = @protokol AND m.IsActive = 1;
+                ", sqlParams).FirstAsync();
+        }
         public async Task<List<RandevuluHastalarinBilgilerDTO>>RandevuluHastaBilgileri( DateTime baslangic, DateTime bitis,bool muayeneOlduMu)
         {
             var sqlParams = new[]

@@ -219,7 +219,7 @@ namespace Repositories.EFCore
             FROM Randevular r
             WHERE r.ProtocolNo = @protokol
               AND r.iptal = 0
-              AND r.RandevuTarihi >= CAST(GETDATE() AS DATE);
+              AND r.RandevuTarihi >= CAST(GETDATE() AS DATE)
         ", new SqlParameter("@protokol", protokol))
                     .FirstAsync();
             }
@@ -241,7 +241,7 @@ namespace Repositories.EFCore
             return await _repositoryContext.Database.SqlQueryRaw<int>(@"
                 SELECT COUNT(*) AS Value
                 FROM MuayeneKayitlari m
-                WHERE m.ProtocolNo = @protokol AND m.IsActive = 1;
+                WHERE m.ProtocolNo = @protokol AND m.IsActive = 1
                 ", sqlParams).FirstAsync();
         }
         public async Task<List<RandevuluHastalarinBilgilerDTO>>RandevuluHastaBilgileri( DateTime baslangic, DateTime bitis,bool muayeneOlduMu)

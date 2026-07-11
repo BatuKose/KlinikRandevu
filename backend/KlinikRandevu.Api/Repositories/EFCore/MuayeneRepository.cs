@@ -225,7 +225,6 @@ namespace Repositories.EFCore
             }
             catch (Exception ex)
             {
-                // en dipteki gerçek sebep genelde InnerException'da olur
                 Console.WriteLine(ex.InnerException?.Message ?? ex.Message);
                 throw;
             }

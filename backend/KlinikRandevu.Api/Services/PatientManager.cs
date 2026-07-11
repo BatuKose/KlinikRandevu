@@ -77,8 +77,14 @@ namespace Services
             if (patient == null) throw new NotFoundException("Hasta bulunamadı");
             var Randevukontrol = await _repositoryManager.Muayene.ileriTarihliRandevuVarmi(protokol);
             if (Randevukontrol>0) throw new BadRequestException("Hastanın ileri tarihli randevusu bulunmaktadır. Hasta iptal edilemez");
-            var muayeneKontrol = await _repositoryManager.Muayene.HastaninHicAktifMuayenesiOlduMU(protokol);
-            if (muayeneKontrol>0) throw new BadRequestException("Muayene kaydı açılmış hasta iptal edilemez");
+            var muayeneKontrolParam = await _repositoryManager.SistemParametresi.GetirAsync("HASTA_SIL_MUAYENE_KONTROL_ZORUNLU_OLMASIN");
+            var muayeneKontrolParamDeger = muayeneKontrolParam?.Deger1?.ToUpper() ?? "EVET";
+            if(muayeneKontrolParamDeger=="HAYIR")
+            {
+             var muayeneKontrol = await _repositoryManager.Muayene.HastaninHicAktifMuayenesiOlduMU(protokol);
+             if (muayeneKontrol>0) throw new BadRequestException("Muayene kaydı açılmış hasta iptal edilemez");
+            }
+           
             if(patient.IsActive==true)
             {
                 patient.IsActive = false;

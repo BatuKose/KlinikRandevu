@@ -416,5 +416,10 @@ namespace Repositories.EFCore
                 return null;
             }
         }
+        public async Task<bool>MuayenedeAyniTeshisdenVarmi(int sira,string tcode)
+        {
+            bool result = await _repositoryContext.Teshisler.AllAsync(m => m.Id==sira && m.teshisKod==tcode);
+            return result;
+        }
     }
 }

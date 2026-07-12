@@ -584,9 +584,14 @@ namespace Services
         {
             var muayene = await _repositoryManager.Muayene.GetMuayeneById(muayeneId);
             if (muayene == null) throw new NotFoundException("Muayene kaydı bulunmadı");
+            if (muayene.BitisSaati is not null) throw new BadRequestException("Muayene onay verilmiştir teşhis eklenemez");
             var muayeneTeshis= await _icdApiManager.TaniAraAsync(teshis);
             if (muayeneTeshis == null || muayeneTeshis.Count == 0) throw new NotFoundException("Teşhis bulunamadı");
             var ilkTeshis = muayeneTeshis.First();
+            bool teshisDahaOnceEklenmisMi = await _repositoryManager.Muayene.MuayenedeAyniTeshisdenVarmi(muayeneId, ilkTeshis.TheCode);
+            if (!teshisDahaOnceEklenmisMi) throw new BadRequestException($"{ilkTeshis.TheCode} {ilkTeshis.Title} bu teşhis hastanın " +
+                $"{muayeneId} numaralı sıra  kaydında mevcut.");
+
             var muayeneTeshisEkle = new teshisler()
             {
                 muayeneId=muayene.Id,

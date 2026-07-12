@@ -21,8 +21,8 @@ namespace Repositories.Config
             builder.Property(x => x.HastaTc).IsRequired();
             builder.Property(x => x.MuayeneTarihi).IsRequired();
             builder.Property(x => x.BaslangicSaati).IsRequired();
-            builder.Property(x => x.BitisSaati).IsRequired();
-            builder.Property(x => x.RandevuId).IsRequired();
+            builder.Property(x => x.BitisSaati).IsRequired(false);
+            builder.Property(x => x.RandevuId).IsRequired(false);
             builder.Property(x => x.CreatedAt).IsRequired();
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
         }

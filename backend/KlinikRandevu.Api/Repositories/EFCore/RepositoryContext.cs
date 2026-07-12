@@ -16,7 +16,7 @@ namespace Repositories.EFCore
         public RepositoryContext(DbContextOptions options) : base(options){ }
 
         public DbSet<Patient> Patients { get; set; }
-        public DbSet<Poliklinik>Polikliniks { get; set; }
+        public DbSet<Poliklinik>Polikliniks { get; set; } 
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<DoktorCalismaPlani>DoktorCalismaPlanis { get; set; }
         public DbSet<MuayeneKaydi> MuayeneKaydis {  get; set; }
@@ -28,6 +28,7 @@ namespace Repositories.EFCore
         public DbSet<UserYetki> UserYetkiler { get; set; }
         public DbSet<Tatil> Tatil { get; set; }
         public DbSet<IcdApiEntegrasyon> IcdApiEntegrasyon { get; set; }
+        public DbSet<teshisler>Teshisler { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var property in modelBuilder.Model.GetEntityTypes()

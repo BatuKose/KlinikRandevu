@@ -21,5 +21,6 @@ namespace Services.Contracts
         Task<Randevu> RandevuIptalAsync(int randevuId);
         Task<List<RandevuluHastalarinBilgilerDTO>> RandevuluHastaBilgileriniGetir(
             DateTime basla, DateTime bitis, bool muayeneOldumu);
+        Task<teshisler> TeshisEkle(int muayeneId, string teshis);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Entities.Constants;
 using Entities.Data_Transfer_Objects.Muayene;
+using Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Presentation.ActionFilters;
@@ -95,6 +96,12 @@ namespace Presentation.Controllers
                 filtre.Basla, filtre.Bitis, filtre.MuayeneOldumu);
 
             return Ok(result);
+        }
+        [HttpPost("{muayeneid}/teshisekle")]
+        public async Task<IActionResult> MuayeneTeshisEkle([FromRoute] int muayeneid, [FromBody] string teshis)
+        {
+            var result= await _ServiceManager.MuayeneService.TeshisEkle(muayeneid, teshis);
+            return NoContent();
         }
     }
 }

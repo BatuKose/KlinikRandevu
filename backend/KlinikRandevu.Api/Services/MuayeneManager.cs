@@ -6,9 +6,11 @@ using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using MimeKit.Cryptography;
 using Org.BouncyCastle.Bcpg;
 using Repositories.Contracts;
 using Services.Contracts;
@@ -30,18 +32,24 @@ namespace Services
         private readonly IEmailService _emailService;
         private readonly IMemoryCache _cache;
         private readonly ITwilioSmsManager _twilioSms;
-        private readonly IIcdApiManager _cdApiManager;
+        private readonly IIcdApiManager _icdApiManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public MuayeneManager(IRepositoryManager repositoryManager, ILogger<MuayeneManager> logger, IEmailService emailService, IMemoryCache memoryCache
-            , ITwilioSmsManager twilioSms, IIcdApiManager cdApiManager, IHttpContextAccessor httpContextAccessor )
+        public MuayeneManager(
+      IRepositoryManager repositoryManager,
+      ILogger<MuayeneManager> logger,
+      IEmailService emailService,
+      IMemoryCache memoryCache,
+      ITwilioSmsManager twilioSms,
+      IIcdApiManager icdApiManager,
+      IHttpContextAccessor httpContextAccessor)
         {
-            _repositoryManager=repositoryManager;
-            _logger=logger;
-            _emailService=emailService;
-            _cache=memoryCache;
-            _twilioSms=twilioSms;
-            _cdApiManager=cdApiManager;
-            _httpContextAccessor=httpContextAccessor;
+            _repositoryManager = repositoryManager;
+            _logger = logger;
+            _emailService = emailService;
+            _cache = memoryCache;
+            _twilioSms = twilioSms;
+            _icdApiManager = icdApiManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan)
@@ -571,6 +579,23 @@ namespace Services
                 throw new NotFoundException("Randevulu hasta bilgileri bulunamadı.");
 
             return list;
+        }
+        public async Task<teshisler>TeshisEkle(int muayeneId,string teshis)
+        {
+            var muayene = await _repositoryManager.Muayene.GetMuayeneById(muayeneId);
+            if (muayene == null) throw new NotFoundException("Muayene kaydı bulunmadı");
+            var muayeneTeshis= await _icdApiManager.TaniAraAsync(teshis);
+            if (muayeneTeshis == null || muayeneTeshis.Count == 0) throw new NotFoundException("Teşhis bulunamadı");
+            var ilkTeshis = muayeneTeshis.First();
+            var muayeneTeshisEkle = new teshisler()
+            {
+                muayeneId=muayene.Id,
+                teshisAd=ilkTeshis.Title,
+                teshisKod=ilkTeshis.TheCode
+            };
+            _repositoryManager.Muayene.teshisEkle(muayeneTeshisEkle);
+            await _repositoryManager.saveAsyc();
+            return muayeneTeshisEkle;
         }
     }
 }

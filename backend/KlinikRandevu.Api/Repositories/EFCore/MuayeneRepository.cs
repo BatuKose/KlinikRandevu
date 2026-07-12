@@ -398,6 +398,23 @@ namespace Repositories.EFCore
             return randevu;
 
         }
-        
+        public void teshisEkle(teshisler teshisler)
+        {
+            _repositoryContext.Add(teshisler);
+        }
+        public async Task<MuayeneKaydi?>GetMuayeneById(int id)
+        {
+            try
+            {
+                var muayene = await _repositoryContext.MuayeneKaydis.SingleOrDefaultAsync(i => i.Id== id && i.IsActive==true);
+                return muayene;
+
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+        }
     }
 }

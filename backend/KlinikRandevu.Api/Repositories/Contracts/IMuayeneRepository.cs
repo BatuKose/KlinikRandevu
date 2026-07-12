@@ -43,5 +43,7 @@ namespace Repositories.Contracts
         Task<List<RandevuluHastalarinBilgilerDTO>> RandevuluHastaBilgileri(DateTime baslangic, DateTime bitis, bool muayeneOlduMu);
         Task<int> ileriTarihliRandevuVarmi(int protokol);
         Task<int> HastaninHicAktifMuayenesiOlduMU(int protokol);
+        void teshisEkle(teshisler teshisler);
+        Task<MuayeneKaydi?> GetMuayeneById(int id);
     }
 }

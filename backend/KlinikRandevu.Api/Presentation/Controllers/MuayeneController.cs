@@ -103,5 +103,11 @@ namespace Presentation.Controllers
             var result= await _ServiceManager.MuayeneService.TeshisEkle(muayeneid, teshis);
             return NoContent();
         }
+        [HttpPatch("muayenebitis")]
+        public async Task<IActionResult> MuayeneKapat([FromQuery] int id)
+        {
+            var muayene = await _ServiceManager.MuayeneService.MuayeneKapat(id);
+            return NoContent();
+        }
     }
 }

@@ -22,5 +22,6 @@ namespace Services.Contracts
         Task<List<RandevuluHastalarinBilgilerDTO>> RandevuluHastaBilgileriniGetir(
             DateTime basla, DateTime bitis, bool muayeneOldumu);
         Task<teshisler> TeshisEkle(int muayeneId, string teshis);
+        Task<int> MuayeneKapat(int id);
     }
 }

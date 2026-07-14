@@ -16,6 +16,7 @@ using Repositories.Contracts;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -601,6 +602,25 @@ namespace Services
             _repositoryManager.Muayene.teshisEkle(muayeneTeshisEkle);
             await _repositoryManager.saveAsyc();
             return muayeneTeshisEkle;
+        }
+        public async Task<int>MuayeneKapat(int id)
+        {
+            if (id<=0) throw new BadRequestException("Muayene başlık id'si giriniz");
+            var muayene = await _repositoryManager.Muayene.GetMuayeneById(id);
+            if (muayene == null) throw new BadRequestException("Muayene Kaydı bulunamadı");
+            if(muayene.BitisSaati is null)
+            {
+                var now = DateTime.Now;
+                TimeSpan bitisSaati = new TimeSpan(now.Hour, now.Minute, now.Second);
+                muayene.BitisSaati= bitisSaati;
+            }
+            else
+            {
+                muayene.BitisSaati=null;
+            }
+
+                await _repositoryManager.saveAsyc();
+            return id;
         }
     }
 }

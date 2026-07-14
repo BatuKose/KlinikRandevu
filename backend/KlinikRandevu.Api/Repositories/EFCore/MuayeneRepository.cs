@@ -421,5 +421,10 @@ namespace Repositories.EFCore
             bool result = await _repositoryContext.Teshisler.AllAsync(m => m.Id==sira && m.teshisKod==tcode);
             return result;
         }
+        public async Task<bool>MuayenedeTeshisVarMı(int muayeneid)
+        {
+            bool result = await _repositoryContext.Teshisler.AnyAsync(t => t.muayeneId==muayeneid);
+            return result;
+        }
     }
 }

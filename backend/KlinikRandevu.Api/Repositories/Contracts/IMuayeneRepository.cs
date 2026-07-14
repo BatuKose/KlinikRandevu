@@ -46,5 +46,6 @@ namespace Repositories.Contracts
         void teshisEkle(teshisler teshisler);
         Task<MuayeneKaydi?> GetMuayeneById(int id);
         Task<bool> MuayenedeAyniTeshisdenVarmi(int sira, string tcode);
+        Task<bool> MuayenedeTeshisVarMı(int muayeneid);
     }
 }

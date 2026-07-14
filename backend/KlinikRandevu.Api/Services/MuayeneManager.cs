@@ -605,11 +605,21 @@ namespace Services
         }
         public async Task<int>MuayeneKapat(int id)
         {
+            var teshisZorunluParam = await _repositoryManager.SistemParametresi.GetirAsync("TESHIS_OLMADAN_MUAYENE_KAPATMA");
+            var teshisParamDeger = teshisZorunluParam?.Deger1?.ToUpper() ?? "HAYIR";
             if (id<=0) throw new BadRequestException("Muayene başlık id'si giriniz");
             var muayene = await _repositoryManager.Muayene.GetMuayeneById(id);
             if (muayene == null) throw new BadRequestException("Muayene Kaydı bulunamadı");
             if(muayene.BitisSaati is null)
             {
+                if(teshisParamDeger=="EVET")
+                {
+                    bool teshishVarmı =  await _repositoryManager.Muayene.MuayenedeTeshisVarMı(muayene.Id);
+                    if(!teshishVarmı==true)
+                    {
+                        throw new BadRequestException("Muayene'ye teşhis eklemeden sonlandıramazsınız");
+                    }
+                }
                 var now = DateTime.Now;
                 TimeSpan bitisSaati = new TimeSpan(now.Hour, now.Minute, now.Second);
                 muayene.BitisSaati= bitisSaati;
@@ -619,8 +629,8 @@ namespace Services
                 muayene.BitisSaati=null;
             }
 
-                await _repositoryManager.saveAsyc();
-            return id;
+              await _repositoryManager.saveAsyc();
+             return id;
         }
     }
 }

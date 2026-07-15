@@ -15,7 +15,7 @@ namespace Services
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
-        public TwilioSmsManager(IConfiguration configuration, ILogger logger)
+        public TwilioSmsManager(IConfiguration configuration, ILogger<TwilioSmsManager> logger)
         {
             _configuration = configuration;
             _logger = logger;

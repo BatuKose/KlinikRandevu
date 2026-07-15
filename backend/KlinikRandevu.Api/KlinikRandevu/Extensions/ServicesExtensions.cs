@@ -14,6 +14,7 @@ using Services.Contracts;
 using System.Net.Http;
 using System.Text;
 using System.Threading.RateLimiting;
+using Hangfire;
 
 namespace KlinikRandevu.Extensions
 {
@@ -35,7 +36,9 @@ namespace KlinikRandevu.Extensions
             services.AddMemoryCache();
             services.AddScoped<IServiceManager, ServiceManager>();
             services.AddScoped<IUserYetkiService, UserYetkiManager>();
-            //  services.AddScoped<IEmailService, EmailManager>();
+            services.AddScoped<IEmailService, EmailManager>();
+            services.AddScoped<ITwilioSmsManager, TwilioSmsManager>(); 
+            services.AddScoped<IJobService, JobManger>();
             services.AddHttpClient();
         }
 
@@ -150,6 +153,18 @@ namespace KlinikRandevu.Extensions
             }
         });
             });
+
+            return services;
+        }
+        public static IServiceCollection ConfigureHangfire(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHangfire(config => config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(configuration.GetConnectionString("sqlConnection")));
+
+            services.AddHangfireServer();
 
             return services;
         }

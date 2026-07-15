@@ -27,7 +27,7 @@ namespace Services
 
         public async Task HatirlatmalariGonderAsync()
         {
-            var ozellikAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("JOB_HATIRLATMA_MAIL_GONDER");
+            var ozellikAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("JOB_HATIRLATMA_MAIL_SMS_GONDER");
             var paramdeger = ozellikAcikMi?.Deger1?.ToUpper() ??"HAYIR";
             if(paramdeger !="EVET")
             {
@@ -47,7 +47,17 @@ namespace Services
                 {
                     var mesaj = $"{randevu.randevutarihi} tarihininde {randevu.poliklinik} {randevu.doktorad} adlı polinkliniğe randevunuz bulunmaktadır.";
                     var konu = "Yaklaşan Randevunuz";
-                    await _emailManager.MailGonderAsync(randevu.email, konu, mesaj);
+                    var mailJobDeger = ozellikAcikMi?.Deger3?.ToUpper() ?? "HAYIR";
+                    if(mailJobDeger=="EVET")
+                    {
+
+                        await _emailManager.MailGonderAsync(randevu.email, konu, mesaj);
+                    }
+                    var smsJobDeger = ozellikAcikMi?.Deger2?.ToUpper() ?? "HAYIR";
+                    if(smsJobDeger=="EVET")
+                    {
+                        await _twilioSmsManager.SmsGonderAsync(randevu.numara,mesaj);
+                    }
                     basariliIdler.Add(randevu.randevuId);
                 }
                 catch(Exception ex)

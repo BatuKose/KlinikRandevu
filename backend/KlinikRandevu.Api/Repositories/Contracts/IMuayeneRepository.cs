@@ -49,5 +49,6 @@ namespace Repositories.Contracts
         Task<bool> MuayenedeTeshisVarMı(int muayeneid);
         Task<List<JobHatirlatmaSorguDTO>> JobYarininRandevuluHastalari(DateTime basla, DateTime bitis);
         Task HatirlatmaMilUpte(IEnumerable<int> randevuIdler);
+        Task<List<int>> DoktorIdleriniGetir();
     }
 }

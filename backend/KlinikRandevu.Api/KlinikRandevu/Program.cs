@@ -27,6 +27,10 @@ RecurringJob.AddOrUpdate<IJobService>(
     "randevu-hatirlatma-mail",
     job => job.HatirlatmalariGonderAsync(),
     "0 6 * * *");
+RecurringJob.AddOrUpdate<IJobService>(
+    "doktor-calisma-plani"
+    ,job=>job.DoktorGunlukProgramHatirlatmaGonderAsync(),
+    "0 6 * * *");
 
 if (app.Environment.IsDevelopment())
 {

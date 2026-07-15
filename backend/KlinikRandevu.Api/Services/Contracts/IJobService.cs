@@ -9,5 +9,6 @@ namespace Services.Contracts
     public interface IJobService
     {
         Task HatirlatmalariGonderAsync();
+        Task DoktorGunlukProgramHatirlatmaGonderAsync();
     }
 }

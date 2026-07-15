@@ -463,6 +463,13 @@ namespace Repositories.EFCore
             await _repositoryContext.Database.ExecuteSqlRawAsync(
            $"UPDATE Randevular SET hatirlatmaMailiGonderildi = 1 WHERE Id IN ({idListesi})");
         }
+        public async Task<List<int>> DoktorIdleriniGetir()
+        {
+            return await _repositoryContext.Doctors
+                .Where(d => d.isActive==true)
+                .Select(d => d.Id)
+                .ToListAsync();
+        }
     }
 
 }

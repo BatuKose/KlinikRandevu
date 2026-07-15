@@ -10,6 +10,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Repositories.EFCore
@@ -426,5 +427,42 @@ namespace Repositories.EFCore
             bool result = await _repositoryContext.Teshisler.AnyAsync(t => t.muayeneId==muayeneid);
             return result;
         }
+        public async Task<List<JobHatirlatmaSorguDTO>> JobYarininRandevuluHastalari(DateTime basla, DateTime bitis)
+        {
+            var sqlParams = new[]
+            {
+        new SqlParameter("@baslangic", basla),  
+        new SqlParameter("@bitis", bitis)
+    };
+
+            return await _repositoryContext.Database
+                .SqlQueryRaw<JobHatirlatmaSorguDTO>(@"
+            select 
+                r.RandevuTarihi as RandevuTarihi,
+                pol.Name        as Poliklinik,
+                p.Email         as Email,
+                p.Phone as numara,
+                d.DoktorAd      as DoktorAd,
+                r.hatirlatmaMailiGonderildi as randevuMailGonderildimi,
+                r.Id as randevuId
+            from Randevular r
+            INNER JOIN Patients p    on p.Protocol = r.ProtocolNo
+            INNER JOIN Poliklinikler pol on pol.PolNo = r.PolNo
+            INNER JOIN Doktorlar d    on d.doktorNo = r.DoktorNo
+            where r.RandevuTarihi between @baslangic and @bitis
+              and r.hatirlatmaMailiGonderildi = 0
+        ", sqlParams).ToListAsync();
+        }
+        public async Task HatirlatmaMilUpte(IEnumerable<int> randevuIdler)
+        {
+            if(!randevuIdler.Any())
+            {
+                return;
+            }
+            var idListesi = string.Join(",", randevuIdler);
+            await _repositoryContext.Database.ExecuteSqlRawAsync(
+           $"UPDATE Randevular SET hatirlatmaMailiGonderildi = 1 WHERE Id IN ({idListesi})");
+        }
     }
+
 }

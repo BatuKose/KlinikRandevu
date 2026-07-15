@@ -20,6 +20,7 @@ namespace Entities.Models
 
             public bool iptal { get; set; }=false;
             public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public bool hatirlatmaMailiGonderildi { get; set; } = false;
         }
 }
 

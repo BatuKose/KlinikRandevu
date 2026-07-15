@@ -18,5 +18,6 @@ namespace Services.Contracts
         INagerDateService NagerDateService { get; }
         ITwilioSmsManager TwilioSmsManager { get; }
         IIcdApiManager IcdApiManager { get; }
+        IJobService jobService { get; }
     }
 }

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Repositories.Contracts;
 using Services.Contracts;
-
 namespace Services
 {
     public class ServiceManager : IServiceManager
@@ -20,6 +19,7 @@ namespace Services
         private readonly Lazy<INagerDateService> _nagerDateService;
         private readonly Lazy<ITwilioSmsManager> _twilioSmsManager;
         private readonly Lazy<IIcdApiManager> _IcdApiManager;
+        private readonly Lazy<IJobService> _jobService;
         public ServiceManager(
             IRepositoryManager repositoryManager,
             IMemoryCache cache,
@@ -27,40 +27,39 @@ namespace Services
             ILogger<MuayeneManager> muayeneLogger,
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            ILogger<TwilioSmsManager>TwilioLogger,
-            ILogger<IcdApiManager>IcdApiLogger
+            ILogger<TwilioSmsManager> TwilioLogger,
+            ILogger<IcdApiManager> IcdApiLogger,
+            ILogger<JobManger> jobLogger         
             )
         {
             _mailService = new Lazy<IEmailService>(() =>
                 new EmailManager(configuration));
-
             _patientService = new Lazy<IPatientService>(() =>
                 new PatientManager(repositoryManager));
             _MuayeneService = new Lazy<IMuayeneService>(() =>
                 new MuayeneManager(repositoryManager, muayeneLogger, _mailService.Value, cache, _twilioSmsManager.Value, _IcdApiManager.Value, httpContextAccessor));
-
             _sistemParametreService = new Lazy<ISistemParametreService>(() =>
                 new SistemParametreServiceManager(repositoryManager, cache));
-            _authenticationService= new Lazy<IAuthService>(()=>
-                new AuthenticationManager(repositoryManager, configuration, httpContextAccessor,cache));
+            _authenticationService= new Lazy<IAuthService>(() =>
+                new AuthenticationManager(repositoryManager, configuration, httpContextAccessor, cache));
             _userLogService= new Lazy<IUserLogService>(() => new UserLogManager(repositoryManager));
-            _userYetkiService= new Lazy<IUserYetkiService>(()=>new UserYetkiManager(repositoryManager,cache));
-            _nagerDateService = new Lazy<INagerDateService>(() =>new NagerDateManager(repositoryManager, httpClientFactory));
-            _twilioSmsManager= new Lazy<ITwilioSmsManager>(()=>new TwilioSmsManager(configuration, TwilioLogger));
-            _IcdApiManager=new Lazy<IIcdApiManager>(()=>new IcdApiManager(configuration, httpClientFactory, IcdApiLogger, repositoryManager));
+            _userYetkiService= new Lazy<IUserYetkiService>(() => new UserYetkiManager(repositoryManager, cache));
+            _nagerDateService = new Lazy<INagerDateService>(() => new NagerDateManager(repositoryManager, httpClientFactory));
+            _twilioSmsManager= new Lazy<ITwilioSmsManager>(() => new TwilioSmsManager(configuration, TwilioLogger));
+            _IcdApiManager=new Lazy<IIcdApiManager>(() => new IcdApiManager(configuration, httpClientFactory, IcdApiLogger, repositoryManager));
+            _jobService = new Lazy<IJobService>(() =>
+                new JobManger(repositoryManager, _mailService.Value, _twilioSmsManager.Value, jobLogger));   
         }
-
         public IPatientService PatientService => _patientService.Value;
         public IMuayeneService MuayeneService => _MuayeneService.Value;
         public ISistemParametreService SistemParametreService => _sistemParametreService.Value;
         public IEmailService EmailService => _mailService.Value;
-        public IAuthService AuthenticationService => _authenticationService.Value;    
-        public IUserLogService UserLogService=> _userLogService.Value;
-        public IUserYetkiService UserYetkiService=>_userYetkiService.Value;
-        public INagerDateService NagerDateService=>_nagerDateService.Value;
+        public IAuthService AuthenticationService => _authenticationService.Value;
+        public IUserLogService UserLogService => _userLogService.Value;
+        public IUserYetkiService UserYetkiService => _userYetkiService.Value;
+        public INagerDateService NagerDateService => _nagerDateService.Value;
         public ITwilioSmsManager TwilioSmsManager => _twilioSmsManager.Value;
-        public IIcdApiManager IcdApiManager=>_IcdApiManager.Value;  
-
-
+        public IIcdApiManager IcdApiManager => _IcdApiManager.Value;
+        public IJobService jobService => _jobService.Value;     
     }
 }

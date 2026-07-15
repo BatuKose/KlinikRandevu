@@ -213,13 +213,15 @@ namespace Services
                 MuayeneTarihi= muayene.MuayeneTarihi,
                 RandevuId=randevuid
             };
-             _repositoryManager.Muayene.MuayeneKaydiOlustur(kayit);
-             await _repositoryManager.saveAsyc();
             string aksiyonTipi = $"muayene oluşturma {kayit.HastaTc} tcli hastaya {kayit.MuayeneTarihi} tarihli " +
                 $"{kayit.PolNo} numaralı pole muayene oluşturuldu";
             string EntityTipi = "MuayeneKayitlari";
             int entityId = kayit.ProtocolNo;
             logYaz(aksiyonTipi, entityId, EntityTipi);
+            _repositoryManager.Muayene.MuayeneKaydiOlustur(kayit);
+             await _repositoryManager.saveAsyc();
+            
+           
             return new MuayeneKayitiOlusturDTO
             {
                 BaslangicSaati=kayit.BaslangicSaati,
@@ -317,6 +319,10 @@ namespace Services
             };
 
             _repositoryManager.Muayene.RandevuOlustur(randevuOlustur);
+            string aksiyonTipi = $"Randevu oluşturma {plan.HastaTc} tcli hastaya {plan.RandevuTarihi} tarihli randevu oluşturuldu";
+            string EntityTipi = "randevular";
+            int entityId = plan.ProtocolNo;
+            logYaz(aksiyonTipi, entityId, EntityTipi);
             await _repositoryManager.saveAsyc();
             //randevu mail
             var mailParametre = await _repositoryManager.SistemParametresi.GetirAsync("EMAIL_GONDERME");
@@ -366,10 +372,6 @@ namespace Services
                     }
                 }
             }
-            string aksiyonTipi = $"Randevu oluşturma {plan.HastaTc} tcli hastaya {plan.RandevuTarihi} tarihli randevu oluşturuldu";
-            string EntityTipi = "randevular";
-            int entityId = plan.ProtocolNo;
-            logYaz(aksiyonTipi, entityId, EntityTipi);
             return plan;
         }
         private async void logYaz(string aksiyonTipi, int entityid,string entitytipi)
@@ -386,7 +388,6 @@ namespace Services
                 EntityId=entityid
             };
             _repositoryManager.UserLogRepository.LoginLogYaz(LoguYaz);
-            await _repositoryManager.saveAsyc();
         }
         public async Task<List<HastaRandevulariniGetirDTO>> HastaRandevulariniGetir(DateTime baslangic, DateTime bitis)
         {
@@ -599,7 +600,9 @@ namespace Services
                 teshisAd=ilkTeshis.Title,
                 teshisKod=ilkTeshis.TheCode
             };
+            
             _repositoryManager.Muayene.teshisEkle(muayeneTeshisEkle);
+            logYaz("TeshisEkleme", muayeneId, "Teşhis");
             await _repositoryManager.saveAsyc();
             return muayeneTeshisEkle;
         }
@@ -623,6 +626,7 @@ namespace Services
                 var now = DateTime.Now;
                 TimeSpan bitisSaati = new TimeSpan(now.Hour, now.Minute, now.Second);
                 muayene.BitisSaati= bitisSaati;
+                logYaz($"muayeneOnay bitis Saati: {bitisSaati}", muayene.Id, "muayene");
             }
             else
             {

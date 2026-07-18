@@ -470,6 +470,22 @@ namespace Repositories.EFCore
                 .Select(d => d.Id)
                 .ToListAsync();
         }
+
+        public async Task<List<(int id,TimeSpan baslangicSaati)>> MuayenesiKapanmamisMuayeneIdleriniGetir()
+        {
+            return await _repositoryContext.MuayeneKaydis
+             .Where(m => m.MuayeneTarihi == DateTime.Today && m.BitisSaati == null)
+             .Select(m => new ValueTuple<int, TimeSpan>(m.Id, m.BaslangicSaati))
+             .ToListAsync();
+        }
+        public async Task<int> MuayeneKapatmaUpdate(TimeSpan sure)
+        {
+            return await _repositoryContext.Database.ExecuteSqlRawAsync(
+                "UPDATE MuayeneKayitlari " +
+                "SET BitisSaati = DATEADD(MINUTE, @dk, BaslangicSaati) " +
+                "WHERE MuayeneTarihi = CAST(GETDATE() AS date) AND BitisSaati IS NULL",
+                new SqlParameter("@dk", (int)sure.TotalMinutes));
+        }
     }
 
 }

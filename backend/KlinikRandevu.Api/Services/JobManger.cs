@@ -134,5 +134,19 @@ namespace Services
                 <p>Toplam: <strong>{randevular.Count} randevu</strong></p>
             </div>";
         }
+
+        public async Task MuayeneOnayiVerilmemisKayitlariKapat()
+        {
+            var özellikAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("JOB_OTOMATİK_MUAYENE_KAPAT");
+            var özekkikD1 = özellikAcikMi?.Deger1?.ToUpper() ?? "HAYIR";
+            var özellikD2 = özellikAcikMi?.Deger2;
+            if (!int.TryParse(özellikD2, out var dakika))
+                dakika = 15;
+
+            var etkilenen = await _repositoryManager.Muayene
+                .MuayeneKapatmaUpdate(TimeSpan.FromMinutes(dakika));
+
+           Console.WriteLine("{Adet} muayene otomatik kapatıldı.", etkilenen);
+        }
     }
 }

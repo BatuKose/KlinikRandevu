@@ -10,5 +10,6 @@ namespace Services.Contracts
     {
         Task HatirlatmalariGonderAsync();
         Task DoktorGunlukProgramHatirlatmaGonderAsync();
+        Task MuayeneOnayiVerilmemisKayitlariKapat();
     }
 }

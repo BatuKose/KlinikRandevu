@@ -50,5 +50,7 @@ namespace Repositories.Contracts
         Task<List<JobHatirlatmaSorguDTO>> JobYarininRandevuluHastalari(DateTime basla, DateTime bitis);
         Task HatirlatmaMilUpte(IEnumerable<int> randevuIdler);
         Task<List<int>> DoktorIdleriniGetir();
+        Task<List<(int id, TimeSpan baslangicSaati)>> MuayenesiKapanmamisMuayeneIdleriniGetir();
+        Task<int> MuayeneKapatmaUpdate(TimeSpan sure);
     }
 }

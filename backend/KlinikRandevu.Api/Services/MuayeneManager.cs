@@ -480,6 +480,7 @@ namespace Services
             var polVarMi = await _repositoryManager.Muayene.doktorVarMI(polno);
             if (!polVarMi) throw new NotFoundException("Doktor bulunamadı");
             var polBul = await _repositoryManager.Muayene.PolGetir(polno);
+            if (polBul is null) throw new NotFoundException("Poliklinik bulunamadı");
 
             if (polBul.isActive==true)
             {

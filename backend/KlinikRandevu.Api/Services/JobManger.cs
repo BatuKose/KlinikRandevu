@@ -1,5 +1,6 @@
 ﻿using Entities.Data_Transfer_Objects.Muayene;
 using Entities.Exeptions.CustomExceptions;
+using Entities.Models;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 using Repositories.Contracts;
@@ -30,6 +31,11 @@ namespace Services
         public async Task HatirlatmalariGonderAsync()
         {
             var ozellikAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("JOB_HATIRLATMA_MAIL_SMS_GONDER");
+            if(ozellikAcikMi == null )
+            {
+                string paramName = "JOB_HATIRLATMA_MAIL_SMS_GONDER";
+                parametreEke(paramName);
+            }
             var paramdeger = ozellikAcikMi?.Deger1?.ToUpper() ??"HAYIR";
             if(paramdeger !="EVET")
             {
@@ -72,6 +78,11 @@ namespace Services
         public async Task DoktorGunlukProgramHatirlatmaGonderAsync()
         {
             var ozellikAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("JOB_DOKTOR_HATIRLATMA_GONDER");
+            if(ozellikAcikMi is null)
+            {
+                string paramName = "JOB_DOKTOR_HATIRLATMA_GONDER";
+                parametreEke(paramName);
+            }
             var paramdeger = ozellikAcikMi?.Deger1?.ToUpper() ??"HAYIR";
             if (paramdeger !="EVET")
             {
@@ -138,6 +149,11 @@ namespace Services
         public async Task MuayeneOnayiVerilmemisKayitlariKapat()
         {
             var özellikAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("JOB_OTOMATİK_MUAYENE_KAPAT");
+            if(özellikAcikMi is null)
+            {
+                string paramName = "JOB_OTOMATİK_MUAYENE_KAPAT";
+                parametreEke(paramName);
+            }
             var özekkikD1 = özellikAcikMi?.Deger1?.ToUpper() ?? "HAYIR";
             var özellikD2 = özellikAcikMi?.Deger2;
             if (!int.TryParse(özellikD2, out var dakika))
@@ -146,7 +162,22 @@ namespace Services
             var etkilenen = await _repositoryManager.Muayene
                 .MuayeneKapatmaUpdate(TimeSpan.FromMinutes(dakika));
 
-           Console.WriteLine("{Adet} muayene otomatik kapatıldı.", etkilenen);
+         //  Console.WriteLine("{Adet} muayene otomatik kapatıldı.", etkilenen); 
+        }
+        private void parametreEke(string paramName)
+        {
+            var paramEkle = new SistemParametresi()
+            {
+                ParametreAdi=paramName,
+                Deger1="HAYIR",
+                Deger2=null,
+                Deger3=null,
+                Deger4=null,
+                Deger5= null,
+                Aktif=true
+            };
+            _repositoryManager.SistemParametresi.Ekle(paramEkle);
+            _repositoryManager.Save();
         }
     }
 }

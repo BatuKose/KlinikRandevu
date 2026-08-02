@@ -43,6 +43,11 @@ namespace Services
                 throw new BadRequestException("Kullanıcı adı ya da şifre bir karakterden büyük olmalıdır");
 
             var loginEngelliParam = await _repositoryManager.SistemParametresi.GetirAsync("HATALI_LOGIN_BLOK");
+              if(loginEngelliParam is null)
+            {
+                string paramName = "HATALI_LOGIN_BLOK";
+                parametreEke(paramName);
+            }
             bool blokAktif = loginEngelliParam != null && loginEngelliParam.Deger1?.ToUpper() == "EVET";
 
             int maxDeneme = 4;
@@ -64,6 +69,11 @@ namespace Services
 
             var user = await _repositoryManager.Authentication.GetByUsernameAsync(loginDTO.username.Trim());
             var mailleGirisYasakla = await _repositoryManager.SistemParametresi.GetirAsync("MAIL_LOGIN_YASAKLA");
+            if(mailleGirisYasakla is null)
+            {
+                string paramName = "MAIL_LOGIN_YASAKLA";
+                parametreEke(paramName);
+            };
             var mailYasakDegeri = mailleGirisYasakla?.Deger1?.ToUpper() ?? "HAYIR";
             if(mailYasakDegeri=="EVET")
             {
@@ -118,6 +128,11 @@ namespace Services
             if (blokAktif) _memoryCache.Remove(blokCache);
 
             var loginLogParametre = await _repositoryManager.SistemParametresi.GetirAsync("LOGIN_LOG_TUTULSUN");
+            if(loginLogParametre is null)
+            {
+                string paramName = "LOGIN_LOG_TUTULSUN";
+                parametreEke(paramName);
+            }
             if (loginLogParametre != null && loginLogParametre.Deger1?.ToUpper() == "EVET")
             {
                 var ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "İp adresi bulunamadı";
@@ -186,6 +201,21 @@ namespace Services
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(bytes);
             return Convert.ToBase64String(bytes);
+        }
+        private void parametreEke(string paramName)
+        {
+            var paramEkle = new SistemParametresi()
+            {
+                ParametreAdi=paramName,
+                Deger1="HAYIR",
+                Deger2=null,
+                Deger3=null,
+                Deger4=null,
+                Deger5= null,
+                Aktif=true
+            };
+            _repositoryManager.SistemParametresi.Ekle(paramEkle);
+            _repositoryManager.Save();
         }
     }
 }

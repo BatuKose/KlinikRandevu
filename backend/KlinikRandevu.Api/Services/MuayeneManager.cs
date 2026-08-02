@@ -105,6 +105,11 @@ namespace Services
             if (muayene == null) throw new BadRequestException("Muayene bilgilerini kontrol ediniz");
 
             var tatilBlokParam = await _repositoryManager.SistemParametresi.GetirAsync("TATIL_KAYIT_BLOKLA");
+            if(tatilBlokParam is null)
+            {
+                string paramName = "TATIL_KAYIT_BLOKLA";
+                parametreEke(paramName);
+            }
             if (tatilBlokParam != null && tatilBlokParam.Deger1?.ToUpperInvariant() == "EVET")
             {
                 var yil = muayene.MuayeneTarihi.Year;
@@ -123,6 +128,11 @@ namespace Services
                 }
             }
             var randevusuzKayitAcmaParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVUSUZ_KAYIT_ACMA");
+            if(randevusuzKayitAcmaParam is null)
+            {
+                string paramName = "RANDEVUSUZ_KAYIT_ACMA";
+                parametreEke(paramName);
+            }
             if(randevusuzKayitAcmaParam!=null && randevusuzKayitAcmaParam.Deger1=="EVET")
             {
                 if (int.TryParse(randevusuzKayitAcmaParam.Deger2, out var hedefPolNo)&& muayene.PolNo == hedefPolNo)
@@ -134,6 +144,11 @@ namespace Services
             }
 
             var pediyatriYasKontrol = await _repositoryManager.SistemParametresi.GetirAsync("PEDIATRI_YAS_LIMITI");
+            if(pediyatriYasKontrol is null)
+            {
+                string paramName = "PEDIATRI_YAS_LIMITI";
+                parametreEke(paramName);
+            }
             if(pediyatriYasKontrol!= null && pediyatriYasKontrol.Deger1?.ToUpper()=="EVET")
             {
                 var uzmanlik = await _repositoryManager.Muayene.PolUzmanlikKoduAsync(muayene.PolNo);
@@ -154,6 +169,11 @@ namespace Services
             }
            
             var cinsiyetKurali = await _repositoryManager.SistemParametresi.GetirAsync("KADIN_DOGUM_ERKEK_YASAKLA");
+            if(cinsiyetKurali is null)
+            {
+                string paramName = "KADIN_DOGUM_ERKEK_YASAKLA";
+                parametreEke(paramName);
+            }
 
             if(cinsiyetKurali != null && cinsiyetKurali.Deger1?.ToUpper()=="EVET")
             {
@@ -237,6 +257,11 @@ namespace Services
         {
 
             var tatilBlokParam = await _repositoryManager.SistemParametresi.GetirAsync("TATIL_KAYIT_BLOKLA");
+            if(tatilBlokParam is null)
+            {
+                string paramName = "TATIL_KAYIT_BLOKLA";
+                parametreEke(paramName);
+            }
             if (tatilBlokParam != null && tatilBlokParam.Deger1?.ToUpperInvariant() == "EVET")
             {
                 var yil = plan.RandevuTarihi.Year;
@@ -326,6 +351,11 @@ namespace Services
             await _repositoryManager.saveAsyc();
             //randevu mail
             var mailParametre = await _repositoryManager.SistemParametresi.GetirAsync("EMAIL_GONDERME");
+            if(mailParametre is null)
+            {
+                string paramName = "EMAIL_GONDERME";
+                parametreEke(paramName);
+            }
             if(mailParametre?.Deger1?.ToUpper()=="EVET" && int.Parse(mailParametre.Deger3)!=plan.PolNo)
             {
                 return plan;
@@ -351,6 +381,11 @@ namespace Services
                 }
             }
             var smsRandevuParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVU_SMS_BILGISI");
+            if(smsRandevuParam is null)
+            {
+                string paramName = "RANDEVU_SMS_BILGISI";
+                parametreEke(paramName);
+            }
             if(smsRandevuParam != null && smsRandevuParam.Deger1?.ToUpper()=="EVET")
             {
                 var hastaCepTelVarmi = await _repositoryManager.Muayene.hastaTelNoVarmi(plan.ProtocolNo);
@@ -475,6 +510,11 @@ namespace Services
             try
             {
                 var mailGondermeParametre = await _repositoryManager.SistemParametresi.GetirAsync("EMAIL_GONDERME");
+                if(mailGondermeParametre is null)
+                {
+                    string paramName = "EMAIL_GONDERME";
+                    parametreEke(paramName);
+                }
                 if (mailGondermeParametre != null
                     && mailGondermeParametre.Deger1?.ToUpper() == "EVET"
                     && int.TryParse(mailGondermeParametre.Deger4, out var hedefDoktorNo)
@@ -526,6 +566,11 @@ namespace Services
              randevu.iptal=true;
             await _repositoryManager.saveAsyc();
             var randevuIptalMailParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVU_IPTAL_MAILI_GONDER");
+            if(randevuIptalMailParam is null)
+            {
+                string paramName = "RANDEVU_IPTAL_MAILI_GONDER";
+                parametreEke(paramName);
+            }
             if(randevuIptalMailParam != null && randevuIptalMailParam.Deger1?.ToUpper()=="EVET")
             {
                 var hasta = await _repositoryManager.Patient.GetPatientByProtokolASycn(randevu.ProtocolNo);
@@ -609,6 +654,11 @@ namespace Services
         public async Task<int>MuayeneKapat(int id)
         {
             var teshisZorunluParam = await _repositoryManager.SistemParametresi.GetirAsync("TESHIS_OLMADAN_MUAYENE_KAPATMA");
+            if(teshisZorunluParam is null)
+            {
+                string paramName = "TESHIS_OLMADAN_MUAYENE_KAPATMA";
+                parametreEke(paramName);
+            }
             var teshisParamDeger = teshisZorunluParam?.Deger1?.ToUpper() ?? "HAYIR";
             if (id<=0) throw new BadRequestException("Muayene başlık id'si giriniz");
             var muayene = await _repositoryManager.Muayene.GetMuayeneById(id);
@@ -635,6 +685,21 @@ namespace Services
 
               await _repositoryManager.saveAsyc();
              return id;
+        }
+        private void parametreEke(string paramName)
+        {
+            var paramEkle = new SistemParametresi()
+            {
+                ParametreAdi=paramName,
+                Deger1="HAYIR",
+                Deger2=null,
+                Deger3=null,
+                Deger4=null,
+                Deger5= null,
+                Aktif=true
+            };
+            _repositoryManager.SistemParametresi.Ekle(paramEkle);
+            _repositoryManager.Save();
         }
     }
 }

@@ -70,7 +70,7 @@ namespace Services
             };
 
         }
-
+    
         public async Task<Patient> DeletePatient(int protokol)
         {
             var patient= await _repositoryManager.Patient.GetPatientByProtokolASycn(protokol);
@@ -78,6 +78,11 @@ namespace Services
             var Randevukontrol = await _repositoryManager.Muayene.ileriTarihliRandevuVarmi(protokol);
             if (Randevukontrol>0) throw new BadRequestException("Hastanın ileri tarihli randevusu bulunmaktadır. Hasta iptal edilemez");
             var muayeneKontrolParam = await _repositoryManager.SistemParametresi.GetirAsync("HASTA_SIL_MUAYENE_KONTROL_ZORUNLU_OLMASIN");
+            if(muayeneKontrolParam is null)
+            {
+                string paramName = "HASTA_SIL_MUAYENE_KONTROL_ZORUNLU_OLMASIN";
+                parametreEke(paramName);
+            }
             var muayeneKontrolParamDeger = muayeneKontrolParam?.Deger1?.ToUpper() ?? "EVET";
             if(muayeneKontrolParamDeger=="HAYIR")
             {
@@ -158,6 +163,20 @@ namespace Services
 
             await _repositoryManager.saveAsyc();
             return güncellenecekHasta;
+        }
+        private  void parametreEke(string paramName)
+        {
+            var paramEkle = new SistemParametresi()
+            {
+                ParametreAdi=paramName,
+                Deger1="HAYIR",
+                Deger2=null,
+                Deger3=null,
+                Deger4=null,
+                Deger5= null,
+                Aktif=true
+            };
+            _repositoryManager.SistemParametresi.Ekle(paramEkle);
         }
     }
 }

@@ -52,5 +52,6 @@ namespace Repositories.Contracts
         Task<List<int>> DoktorIdleriniGetir();
         Task<List<(int id, TimeSpan baslangicSaati)>> MuayenesiKapanmamisMuayeneIdleriniGetir();
         Task<int> MuayeneKapatmaUpdate(TimeSpan sure);
+        Task<List<YariniHastalariniGetirDTO>> YariniHastalariniGetir();
     }
 }

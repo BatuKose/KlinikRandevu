@@ -179,5 +179,57 @@ namespace Services
             _repositoryManager.SistemParametresi.Ekle(paramEkle);
             _repositoryManager.Save();
         }
+
+        public async Task OtomatikMuayeneAc()
+        {
+            var ozellikAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("JOB_BELIRLI_POLLERE_OTO_MUAYENE_AC");
+            if( ozellikAcikMi == null)
+            {
+                parametreEke("JOB_BELIRLI_POLLERE_OTO_MUAYENE_AC");
+            }
+            var paramDeger1 = ozellikAcikMi?.Deger1?.ToUpper()??"HAYIR";
+            var paramDeger2 = ozellikAcikMi?.Deger2;
+            if( paramDeger1!="EVET" && paramDeger2 != null)
+            {
+                return;
+            }
+            
+            var hastalar = await _repositoryManager.Muayene.YariniHastalariniGetir();
+            if( hastalar!=null && hastalar.Count>0)
+            {
+                var polNo = Convert.ToInt32(paramDeger2);
+                foreach (var hasta in hastalar)
+                {
+                    if(hasta.polno!=polNo)
+                    {
+                        return;
+                    }
+                    var muayeneeKaydi = new MuayeneKaydi()
+                    {
+                        PolNo=polNo,
+                        HastaTc=hasta.tc,
+                        ProtocolNo=hasta.protokol,
+                        DoktorNo=hasta.doktor,
+                        MuayeneTarihi=hasta.tarih,
+                        BaslangicSaati=hasta.muayenesaati,
+                        RandevuId=hasta.randevuid
+
+
+                    };
+                    _repositoryManager.Muayene.MuayeneKaydiOlustur(muayeneeKaydi);
+                    var log = new UserLog()
+                    {
+                        UserId=null,
+                        IpAdresi=null,
+                        Detay="JOB TARAFINDAN OTOMATİK OLARAK MUAYENE OLUŞTURULDU",
+                        EntityTipi="Muayene",
+                        AksiyonTipi="INSERT",
+                        EntityId=muayeneeKaydi.ProtocolNo
+                    };
+                }
+                await _repositoryManager.saveAsyc();
+            }
+
+        }
     }
 }

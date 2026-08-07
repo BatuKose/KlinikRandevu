@@ -35,6 +35,10 @@ RecurringJob.AddOrUpdate<IJobService>(
     "muayen-onayi-ver",
     job=>job.MuayeneOnayiVerilmemisKayitlariKapat(),
     "30 0 * * *");
+RecurringJob.AddOrUpdate<IJobService>(
+    "otomatik-muayene-olustur",
+    job=>job.OtomatikMuayeneAc(),
+    "30 0 * * *");
 
 if (app.Environment.IsDevelopment())
 {

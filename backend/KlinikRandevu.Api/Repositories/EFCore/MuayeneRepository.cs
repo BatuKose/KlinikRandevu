@@ -486,6 +486,25 @@ namespace Repositories.EFCore
                 "WHERE MuayeneTarihi = CAST(GETDATE() AS date) AND BitisSaati IS NULL",
                 new SqlParameter("@dk", (int)sure.TotalMinutes));
         }
+        public async Task<List<YariniHastalariniGetirDTO>> YariniHastalariniGetir()
+        {
+            return await _repositoryContext.Database.SqlQueryRaw<YariniHastalariniGetirDTO>(@"
+                SELECT 
+                    r.DoktorNo                    AS doktor,
+                    r.PolNo                       AS polno,
+                    r.ProtocolNo                  AS protokol,
+                    r.RandevuTarihi               AS tarih,
+                    CAST(r.RandevuTarihi AS TIME) AS muayenesaati,
+                    r.HastaTc                     AS tc,
+	                r.Id                          AS randevuid
+                FROM Randevular r
+                LEFT JOIN MuayeneKayitlari m ON m.RandevuId = r.Id
+                WHERE r.RandevuTarihi >= DATEADD(DAY, 1, CAST(GETUTCDATE() AS DATE))
+                AND r.RandevuTarihi <  DATEADD(DAY, 2, CAST(GETUTCDATE() AS DATE))
+                AND r.iptal = 0 and m.Id is null
+                ORDER BY r.RandevuTarihi;
+             ").ToListAsync();
+        }
     }
 
 }

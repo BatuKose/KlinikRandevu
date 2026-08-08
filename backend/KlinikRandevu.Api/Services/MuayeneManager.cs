@@ -22,6 +22,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Twilio.Rest.Numbers.V1;
+using static Entities.Enums.PoliklinikEnum;
 
 
 namespace Services
@@ -103,7 +104,29 @@ namespace Services
         {
 
             if (muayene == null) throw new BadRequestException("Muayene bilgilerini kontrol ediniz");
-
+            var uzKod = await _repositoryManager.Muayene.PolGetir(muayene.PolNo);
+            if(uzKod is not null)
+            {
+                if (uzKod.PolUzKod!=UzmanlikBransi.AcilTip)
+                {
+                    var borcParam = await _repositoryManager.SistemParametresi.GetirAsync("BORCLU_HASTAYA_KAYIT_AC");
+                    if(borcParam is null)
+                    {
+                        parametreEke("BORCLU_HASTAYA_KAYIT_AC");
+                    }
+                    var borcParamDeger = borcParam?.Deger1?.ToUpper() ??"HAYIR";
+                    if(borcParamDeger!="EVET")
+                    {
+                        var BorcKontrol = await _repositoryManager.Muayene.OdenmemisTedavileriGetir(muayene.ProtocolNo);
+                        if (BorcKontrol is not null && BorcKontrol.Count>0)
+                        {
+                            throw new BadRequestException("Ödenmemiş Borçları Bulunmaktadır. Muayene Açmak için ödeme yapınız");
+                        }
+                    }
+                  
+                }
+            }
+            
             var tatilBlokParam = await _repositoryManager.SistemParametresi.GetirAsync("TATIL_KAYIT_BLOKLA");
             if(tatilBlokParam is null)
             {
@@ -233,6 +256,7 @@ namespace Services
                 MuayeneTarihi= muayene.MuayeneTarihi,
                 RandevuId=randevuid
             };
+
             string aksiyonTipi = $"muayene oluşturma {kayit.HastaTc} tcli hastaya {kayit.MuayeneTarihi} tarihli " +
                 $"{kayit.PolNo} numaralı pole muayene oluşturuldu";
             string EntityTipi = "MuayeneKayitlari";
@@ -240,8 +264,24 @@ namespace Services
             logYaz(aksiyonTipi, entityId, EntityTipi);
             _repositoryManager.Muayene.MuayeneKaydiOlustur(kayit);
              await _repositoryManager.saveAsyc();
-            
-           
+            var tetkik = await _repositoryManager.Muayene.PoliklinikMuaynesiGetir();
+            if(tetkik != null)
+            {
+                var TedaviKaydiEkle = new TedaviKaydi()
+                {
+                    MuyaneId=kayit.Id,
+                    doktorId=kayit.DoktorNo,
+                    fiyat=tetkik.Fiyat,
+                    tedaviAdi=tetkik.TetikAdi,
+                    Odendi=false,
+                    tedaviKodu=tetkik.Kodu,
+                    prtokol=kayit.ProtocolNo
+                };
+                _repositoryManager.Muayene.TedaviKaydiEkle(TedaviKaydiEkle);
+                await _repositoryManager.saveAsyc();
+            }
+
+
             return new MuayeneKayitiOlusturDTO
             {
                 BaslangicSaati=kayit.BaslangicSaati,

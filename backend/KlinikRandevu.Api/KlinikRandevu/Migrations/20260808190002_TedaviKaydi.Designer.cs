@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories.EFCore;
 
@@ -11,9 +12,11 @@ using Repositories.EFCore;
 namespace KlinikRandevu.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20260808190002_TedaviKaydi")]
+    partial class TedaviKaydi
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -382,7 +385,7 @@ namespace KlinikRandevu.Migrations
                             Address = "BURSA, Türkiye",
                             BirthDate = new DateTime(2001, 2, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BloodType = 6,
-                            CreatedAt = new DateTime(2026, 8, 8, 22, 40, 10, 436, DateTimeKind.Local).AddTicks(8845),
+                            CreatedAt = new DateTime(2026, 8, 8, 22, 0, 1, 614, DateTimeKind.Local).AddTicks(9745),
                             Gender = 2,
                             IsActive = true,
                             Name = "BATUHAN",
@@ -579,7 +582,7 @@ namespace KlinikRandevu.Migrations
                             Aciklama = "D1: Aktif mi (EVET/HAYIR), D2: Hata mesajı",
                             Aktif = true,
                             Deger1 = "EVET",
-                            OlusturmaTarihi = new DateTime(2026, 8, 8, 22, 40, 10, 437, DateTimeKind.Local).AddTicks(9965),
+                            OlusturmaTarihi = new DateTime(2026, 8, 8, 22, 0, 1, 616, DateTimeKind.Local).AddTicks(1054),
                             ParametreAdi = "KADIN_DOGUM_ERKEK_YASAKLA"
                         },
                         new
@@ -590,7 +593,7 @@ namespace KlinikRandevu.Migrations
                             Deger1 = "EVET",
                             Deger2 = "0",
                             Deger3 = "16",
-                            OlusturmaTarihi = new DateTime(2026, 8, 8, 22, 40, 10, 437, DateTimeKind.Local).AddTicks(9973),
+                            OlusturmaTarihi = new DateTime(2026, 8, 8, 22, 0, 1, 616, DateTimeKind.Local).AddTicks(1062),
                             ParametreAdi = "PEDIATRI_YAS_LIMITI"
                         });
                 });
@@ -641,9 +644,6 @@ namespace KlinikRandevu.Migrations
                     b.Property<double>("fiyat")
                         .HasColumnType("float");
 
-                    b.Property<int>("prtokol")
-                        .HasColumnType("int");
-
                     b.Property<string>("tedaviAdi")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -655,33 +655,6 @@ namespace KlinikRandevu.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TedaviKaydi");
-                });
-
-            modelBuilder.Entity("Entities.Models.Tetkikler", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<double>("Fiyat")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Kodu")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TetikAdi")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("aktifMi")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tetkikler");
                 });
 
             modelBuilder.Entity("Entities.Models.User", b =>

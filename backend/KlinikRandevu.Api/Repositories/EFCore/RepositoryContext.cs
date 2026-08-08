@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -29,6 +30,8 @@ namespace Repositories.EFCore
         public DbSet<Tatil> Tatil { get; set; }
         public DbSet<IcdApiEntegrasyon> IcdApiEntegrasyon { get; set; }
         public DbSet<teshisler>Teshisler { get; set; }
+        public DbSet<TedaviKaydi>TedaviKaydi { get; set; }
+        public DbSet<Tetkikler> Tetkikler { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var property in modelBuilder.Model.GetEntityTypes()

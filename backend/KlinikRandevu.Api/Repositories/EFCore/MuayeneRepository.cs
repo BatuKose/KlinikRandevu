@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Repositories.EFCore
 {
-    public class MuayeneRepository:IMuayeneRepository
+    public class MuayeneRepository : IMuayeneRepository
     {
         private readonly RepositoryContext _repositoryContext;
 
@@ -504,6 +505,21 @@ namespace Repositories.EFCore
                 AND r.iptal = 0 and m.Id is null
                 ORDER BY r.RandevuTarihi;
              ").ToListAsync();
+        }
+        public async Task<Tetkikler> PoliklinikMuaynesiGetir()
+        {
+            var tetkik = await _repositoryContext.Tetkikler.SingleOrDefaultAsync(t=>t.Kodu=="ASC123" && t.aktifMi==true);
+            return tetkik;
+        }
+
+        public void TedaviKaydiEkle(TedaviKaydi tedaviKaydi)
+        {
+            _repositoryContext.Add(tedaviKaydi);
+        }
+        public async Task<List<TedaviKaydi>>OdenmemisTedavileriGetir(int protokol)
+        {
+            var tedaviler = await _repositoryContext.TedaviKaydi.Where(t => t.prtokol==protokol && t.Odendi==false).ToListAsync();
+            return tedaviler;
         }
     }
 

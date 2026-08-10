@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories.EFCore;
 
@@ -11,9 +12,11 @@ using Repositories.EFCore;
 namespace KlinikRandevu.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20260809113744_Taahütname")]
+    partial class Taahütname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -382,7 +385,7 @@ namespace KlinikRandevu.Migrations
                             Address = "BURSA, Türkiye",
                             BirthDate = new DateTime(2001, 2, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BloodType = 6,
-                            CreatedAt = new DateTime(2026, 8, 9, 15, 31, 46, 836, DateTimeKind.Local).AddTicks(199),
+                            CreatedAt = new DateTime(2026, 8, 9, 14, 37, 44, 363, DateTimeKind.Local).AddTicks(958),
                             Gender = 2,
                             IsActive = true,
                             Name = "BATUHAN",
@@ -579,7 +582,7 @@ namespace KlinikRandevu.Migrations
                             Aciklama = "D1: Aktif mi (EVET/HAYIR), D2: Hata mesajı",
                             Aktif = true,
                             Deger1 = "EVET",
-                            OlusturmaTarihi = new DateTime(2026, 8, 9, 15, 31, 46, 839, DateTimeKind.Local).AddTicks(5539),
+                            OlusturmaTarihi = new DateTime(2026, 8, 9, 14, 37, 44, 364, DateTimeKind.Local).AddTicks(1203),
                             ParametreAdi = "KADIN_DOGUM_ERKEK_YASAKLA"
                         },
                         new
@@ -590,7 +593,7 @@ namespace KlinikRandevu.Migrations
                             Deger1 = "EVET",
                             Deger2 = "0",
                             Deger3 = "16",
-                            OlusturmaTarihi = new DateTime(2026, 8, 9, 15, 31, 46, 839, DateTimeKind.Local).AddTicks(5562),
+                            OlusturmaTarihi = new DateTime(2026, 8, 9, 14, 37, 44, 364, DateTimeKind.Local).AddTicks(1209),
                             ParametreAdi = "PEDIATRI_YAS_LIMITI"
                         });
                 });
@@ -620,12 +623,6 @@ namespace KlinikRandevu.Migrations
 
                     b.Property<double>("ToplamBorc")
                         .HasColumnType("float");
-
-                    b.Property<bool>("iptal")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("odendi")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

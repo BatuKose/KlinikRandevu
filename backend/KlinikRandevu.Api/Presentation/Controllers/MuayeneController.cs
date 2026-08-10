@@ -109,5 +109,11 @@ namespace Presentation.Controllers
             var muayene = await _ServiceManager.MuayeneService.MuayeneKapat(id);
             return NoContent();
         }
+        [HttpPost("taahütnameEKle")]
+        public async Task<IActionResult> TaahütnameEKle([FromBody] TaahütnameEkleDTO taahütname)
+        {
+            var result= await _ServiceManager.MuayeneService.TaahütnameEkleAsync(taahütname);
+            return Ok(result);
+        }
     }
 }

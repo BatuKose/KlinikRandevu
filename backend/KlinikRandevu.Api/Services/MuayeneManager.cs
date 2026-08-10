@@ -742,5 +742,32 @@ namespace Services
             _repositoryManager.SistemParametresi.Ekle(paramEkle);
             _repositoryManager.Save();
         }
+        public async Task<Taahütname>TaahütnameEkleAsync(TaahütnameEkleDTO taahütname)
+        {
+            if (taahütname is null) throw new BadRequestException("Taahütname bilgileri boş olamaz");
+            var tedaviKaydi= await _repositoryManager.Muayene.TedaviKaydiGetir(taahütname.MuayeneId);
+            if (tedaviKaydi==null) throw new NotFoundException("Tedavi Kaydı bulunamadı");
+            double toplamBorc = await _repositoryManager.Muayene.MuayeneKaydininToplamBorucunuGetir(taahütname.MuayeneId);
+            if (toplamBorc<=0) throw new BadRequestException($"Hastanın {taahütname.MuayeneId} numaralı muayene kaydında borç bulunmamaktadır.");
+            bool taahütKontrol = await _repositoryManager.Muayene.iptalOlmayanTaahütüVarmi(taahütname.MuayeneId);
+            if(taahütKontrol is true)
+            {
+                throw new BadRequestException("İlgili kaydın iptal edilmemiş taahütnamesi bulunmaktadır önce onu iptal ediniz");
+            }
+            var result = new Taahütname
+            {
+                TahütTarihi=DateTime.UtcNow,
+                BilgilendirmeMail=false,
+                BilgilendirmeSms=false,
+                SonOdemeTarihi=taahütname.SonOdemeTarihi,
+                MuayeneId=taahütname.MuayeneId,
+                ToplamBorc=toplamBorc,
+                iptal=false,
+                odendi=false
+            };
+            _repositoryManager.Muayene.TahütnameEKle(result);
+            await _repositoryManager.saveAsyc();
+            return result;
+        }
     }
 }

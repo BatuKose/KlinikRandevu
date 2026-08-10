@@ -23,5 +23,6 @@ namespace Services.Contracts
             DateTime basla, DateTime bitis, bool muayeneOldumu);
         Task<teshisler> TeshisEkle(int muayeneId, string teshis);
         Task<int> MuayeneKapat(int id);
+        Task<Taahütname> TaahütnameEkleAsync(TaahütnameEkleDTO taahütname);
     }
 }

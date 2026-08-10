@@ -56,5 +56,9 @@ namespace Repositories.Contracts
         Task<Tetkikler> PoliklinikMuaynesiGetir();
         public void TedaviKaydiEkle(TedaviKaydi tedaviKaydi);
         Task<List<TedaviKaydi>> OdenmemisTedavileriGetir(int protokol);
+        public void TahütnameEKle(Taahütname taahütname);
+        Task<TedaviKaydi> TedaviKaydiGetir(int dosyaid);
+        Task<double> MuayeneKaydininToplamBorucunuGetir(int dosyaid);
+        Task<bool> iptalOlmayanTaahütüVarmi(int dosyaid);
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Entities.Data_Transfer_Objects.Muayene;
 using Entities.Enums;
 using Entities.Models;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Repositories.Contracts;
 using System;
 using System.Collections.Generic;
@@ -506,6 +508,29 @@ namespace Repositories.EFCore
                 ORDER BY r.RandevuTarihi;
              ").ToListAsync();
         }
+        public async Task<List<TaahütBilgilendirme>>YaklasanTahütBilgilendirme(bool sms)
+        {
+            string sql = "";
+            if (!sms)
+            {
+                 sql= "and t.BilgilendirmeMail=0";
+            }
+            else
+            {
+                sql="and t.BilgilendirmeSms=0";
+            }
+            var mainSorgu = $@"select 
+                p.Email as mail,p.Phone as tel,t.ToplamBorc as borc
+                ,t.SonOdemeTarihi as SondOemeTarih, t.TahütTarihi as TaTarih,
+                pol.Name as polAd, m.MuayeneTarihi as muaTarih
+                FROM taahütname t
+                INNER JOIN MuayeneKayitlari m on t.MuayeneId=m.Id
+                INNER JOIN Patients p on p.Protocol=m.ProtocolNo
+                INNER JOIN Poliklinikler pol on m.PolNo=pol.PolNo
+                 WHERE  t.SonOdemeTarihi >= DATEADD(DAY, 1, CAST(GETUTCDATE() AS DATE)) AND t.SonOdemeTarihi <  DATEADD(DAY, 2, CAST(GETUTCDATE() AS DATE))
+                 AND t.iptal=0 and t.odendi=0 {sql}";
+                return await _repositoryContext.Database.SqlQueryRaw<TaahütBilgilendirme>(mainSorgu).ToListAsync();
+        }
         public async Task<Tetkikler> PoliklinikMuaynesiGetir()
         {
             var tetkik = await _repositoryContext.Tetkikler.SingleOrDefaultAsync(t=>t.Kodu=="ASC123" && t.aktifMi==true);
@@ -521,6 +546,28 @@ namespace Repositories.EFCore
             var tedaviler = await _repositoryContext.TedaviKaydi.Where(t => t.prtokol==protokol && t.Odendi==false).ToListAsync();
             return tedaviler;
         }
+        public async Task<TedaviKaydi> TedaviKaydiGetir(int dosyaid)
+        {
+            var tedaviKaydi= await _repositoryContext.TedaviKaydi.SingleOrDefaultAsync(t=>t.MuyaneId==dosyaid);
+            return tedaviKaydi;
+        }
+        public void TahütnameEKle(Taahütname taahütname)
+        {
+            _repositoryContext.Add(taahütname);
+        }
+
+        public async Task<double> MuayeneKaydininToplamBorucunuGetir(int dosyaid)
+        {
+          
+            var borc = await _repositoryContext.TedaviKaydi.Where(b => b.MuyaneId==dosyaid).SumAsync(b => b.fiyat);
+            return borc;
+        }
+        public async Task<bool>iptalOlmayanTaahütüVarmi(int dosyaid)
+        {
+            var result = await _repositoryContext.taahütname.AnyAsync(t=>t.MuayeneId==dosyaid && t.iptal==false);
+            return result;
+        }
+        
     }
 
 }

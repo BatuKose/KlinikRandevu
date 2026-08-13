@@ -16,6 +16,7 @@ namespace Entities.Data_Transfer_Objects.Muayene
         public DateTime TaTarih { get; set; }
         public string polAd { get; set; }
         public DateTime muaTarih { get; set; }
+        public int taahütnameId { get; set; }
 
     }
 }

@@ -60,5 +60,9 @@ namespace Repositories.Contracts
         Task<TedaviKaydi> TedaviKaydiGetir(int dosyaid);
         Task<double> MuayeneKaydininToplamBorucunuGetir(int dosyaid);
         Task<bool> iptalOlmayanTaahütüVarmi(int dosyaid);
+        Task<List<TaahütBilgilendirme>> YaklasanTahütBilgilendirme(int sms);
+        Task HatirlatmaTaahütnameUpdateALL(IEnumerable<int> taahütnameIdler);
+        Task HatirlatmaTaahütnameUpdateSMS(IEnumerable<int> taahütnameIdler);
+        Task HatirlatmaTaahütnameUpdateMAIL(IEnumerable<int> taahütnameIdler);
     }
 }

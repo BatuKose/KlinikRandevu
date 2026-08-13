@@ -12,5 +12,6 @@ namespace Services.Contracts
         Task DoktorGunlukProgramHatirlatmaGonderAsync();
         Task MuayeneOnayiVerilmemisKayitlariKapat();
         Task OtomatikMuayeneAc();
+        Task TaahütnameBilgilendirme();
     }
 }

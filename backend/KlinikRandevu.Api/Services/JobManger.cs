@@ -231,5 +231,75 @@ namespace Services
             }
 
         }
+        public async Task TaahütnameBilgilendirme()
+        {
+            var jobAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("JOB_TAAHUTNAME_BILGILENDIRME_ACIK");
+            if (jobAcikMi == null)
+            {
+                parametreEke("JOB_TAAHUTNAME_BILGILENDIRME_ACIK");
+                return;   
+            }
+
+            var paramDeger1 = jobAcikMi?.Deger1?.ToUpper() ?? "HAYIR";
+            var paramDeger2 = jobAcikMi?.Deger2?.ToUpper() ?? "HAYIR";
+            var paramDeger3 = jobAcikMi?.Deger3?.ToUpper() ?? "HAYIR";
+
+            if (paramDeger1 != "EVET")
+                return;
+
+            int smsRequest;
+            if (paramDeger2 == "EVET" && paramDeger3 == "HAYIR")
+                smsRequest = 1;
+            else if (paramDeger2 == "HAYIR" && paramDeger3 == "EVET")
+                smsRequest = 2;
+            else if (paramDeger2 == "EVET" && paramDeger3 == "EVET")
+                smsRequest = 3;                          
+            else
+                return;                                  
+
+            var borcluHastalar = await _repositoryManager.Muayene.YaklasanTahütBilgilendirme(smsRequest);
+            if (borcluHastalar == null || borcluHastalar.Count == 0)
+                return;
+
+            var smsGidenler = new List<int>();
+            var mailGidenler = new List<int>();
+
+            foreach (var hasta in borcluHastalar)
+            {
+                var icerik = $"sayın hastamız {hasta.muaTarih} tarihli {hasta.polAd} poliklinik muayeneniz sonucu {hasta.TaTarih} tarihli " +
+                             $"taahütnameniz bulunmaktadır. Borcunuz {hasta.borc} TL'dir. Son ödeme tarihi {hasta.SonOdemeTarihi}'dir geçmiş olsun";
+
+                try
+                {
+                    if (smsRequest == 1)
+                    {
+                        await _twilioSmsManager.SmsGonderAsync(hasta.tel, icerik);
+                        smsGidenler.Add(hasta.taahütnameId);
+                    }
+                    else if (smsRequest == 2)
+                    {
+                        await _emailManager.MailGonderAsync(hasta.mail, "Taahütname Hk.", icerik);
+                        mailGidenler.Add(hasta.taahütnameId);
+                    }
+                    else if (smsRequest == 3)
+                    {
+                        await _emailManager.MailGonderAsync(hasta.mail, "Taahütname Hk.", icerik);
+                        await _twilioSmsManager.SmsGonderAsync(hasta.tel, icerik);
+                        smsGidenler.Add(hasta.taahütnameId);
+                        mailGidenler.Add(hasta.taahütnameId);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Taahütname bilgilendirme gönderilemedi. TaahütnameId: {Id}", hasta.taahütnameId);
+                }
+            }
+
+            if (smsGidenler.Count > 0)
+                await _repositoryManager.Muayene.HatirlatmaTaahütnameUpdateSMS(smsGidenler);
+
+            if (mailGidenler.Count > 0)
+                await _repositoryManager.Muayene.HatirlatmaTaahütnameUpdateMAIL(mailGidenler);
+        }
     }
 }

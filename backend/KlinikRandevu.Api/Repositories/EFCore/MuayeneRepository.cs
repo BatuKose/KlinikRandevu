@@ -466,6 +466,39 @@ namespace Repositories.EFCore
             await _repositoryContext.Database.ExecuteSqlRawAsync(
            $"UPDATE Randevular SET hatirlatmaMailiGonderildi = 1 WHERE Id IN ({idListesi})");
         }
+        public async Task HatirlatmaTaahütnameUpdateSMS(IEnumerable<int> taahütnameIdler)
+        {
+            if (taahütnameIdler == null || !taahütnameIdler.Any())
+                return;
+
+            var idListesi = string.Join(",", taahütnameIdler);
+
+            await _repositoryContext.Database.ExecuteSqlRawAsync(
+                $"update taahütname set BilgilendirmeSms=1 where Id IN ({idListesi})");
+        }
+
+        public async Task HatirlatmaTaahütnameUpdateMAIL(IEnumerable<int> taahütnameIdler)
+        {
+            if (taahütnameIdler == null || !taahütnameIdler.Any())
+                return;
+
+            var idListesi = string.Join(",", taahütnameIdler);
+
+            await _repositoryContext.Database.ExecuteSqlRawAsync(
+                $"update taahütname set BilgilendirmeMail=1 where Id IN ({idListesi})");
+        }
+
+        public async Task HatirlatmaTaahütnameUpdateALL(IEnumerable<int> taahütnameIdler)
+        {
+            if (taahütnameIdler == null || !taahütnameIdler.Any())
+                return;
+
+            var idListesi = string.Join(",", taahütnameIdler);
+
+            await _repositoryContext.Database.ExecuteSqlRawAsync(
+                $"update taahütname set BilgilendirmeMail=1, BilgilendirmeSms=1 where Id IN ({idListesi})");
+        }
+
         public async Task<List<int>> DoktorIdleriniGetir()
         {
             return await _repositoryContext.Doctors
@@ -508,21 +541,22 @@ namespace Repositories.EFCore
                 ORDER BY r.RandevuTarihi;
              ").ToListAsync();
         }
-        public async Task<List<TaahütBilgilendirme>>YaklasanTahütBilgilendirme(bool sms)
+        public async Task<List<TaahütBilgilendirme>>YaklasanTahütBilgilendirme(int  sms)
         {
             string sql = "";
-            if (!sms)
+            if (sms == 1)
+                sql = "and t.BilgilendirmeSms=0";
+            else if (sms == 2)     
+                sql = "and t.BilgilendirmeMail=0";
+            else                   
+                sql = "and (t.BilgilendirmeSms=0 or t.BilgilendirmeMail=0)";
+
+            try
             {
-                 sql= "and t.BilgilendirmeMail=0";
-            }
-            else
-            {
-                sql="and t.BilgilendirmeSms=0";
-            }
-            var mainSorgu = $@"select 
+                var mainSorgu = $@"select 
                 p.Email as mail,p.Phone as tel,t.ToplamBorc as borc
-                ,t.SonOdemeTarihi as SondOemeTarih, t.TahütTarihi as TaTarih,
-                pol.Name as polAd, m.MuayeneTarihi as muaTarih
+                ,t.SonOdemeTarihi as SonOdemeTarihi, t.TahütTarihi as TaTarih,
+                pol.Name as polAd, m.MuayeneTarihi as muaTarih,t.Id as taahütnameId
                 FROM taahütname t
                 INNER JOIN MuayeneKayitlari m on t.MuayeneId=m.Id
                 INNER JOIN Patients p on p.Protocol=m.ProtocolNo
@@ -530,6 +564,13 @@ namespace Repositories.EFCore
                  WHERE  t.SonOdemeTarihi >= DATEADD(DAY, 1, CAST(GETUTCDATE() AS DATE)) AND t.SonOdemeTarihi <  DATEADD(DAY, 2, CAST(GETUTCDATE() AS DATE))
                  AND t.iptal=0 and t.odendi=0 {sql}";
                 return await _repositoryContext.Database.SqlQueryRaw<TaahütBilgilendirme>(mainSorgu).ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString(), "Taahütname bilgilendirme job'u patladı.");
+                throw;
+            }
+           
         }
         public async Task<Tetkikler> PoliklinikMuaynesiGetir()
         {

@@ -64,5 +64,10 @@ namespace Repositories.Contracts
         Task HatirlatmaTaahütnameUpdateALL(IEnumerable<int> taahütnameIdler);
         Task HatirlatmaTaahütnameUpdateSMS(IEnumerable<int> taahütnameIdler);
         Task HatirlatmaTaahütnameUpdateMAIL(IEnumerable<int> taahütnameIdler);
+        public void OdemeYap(odeme odeme);
+        Task<double> MuayeneKaydininToplamOdemesiniGetir(int dosyaid);
+        Task<double> TedaviKaydininToplamBorucunuGetir(int dosyaid);
+        Task<TedaviKaydi> SingleTedaviKaydiGetir(int dosyaid);
+        Task<Taahütname>taahütnameGetir(int dosyaid);
     }
 }

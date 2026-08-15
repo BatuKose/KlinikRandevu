@@ -769,5 +769,53 @@ namespace Services
             await _repositoryManager.saveAsyc();
             return result;
         }
+        public async Task<OdemeYapDTO> OdemeYap(OdemeYapDTO odeme)
+        {
+            if (odeme is null) throw new BadRequestException("Odeme bilgileri boş olamaz");
+            if (odeme.odemeToplam<=0) throw new BadRequestException("Ödeme fiyat bilgisi sıfırdan büyük olmalıdır");
+            var toplamBorc = await _repositoryManager.Muayene.TedaviKaydininToplamBorucunuGetir(odeme.TedaviId);
+            if (odeme.odemeToplam>toplamBorc) throw new BadRequestException("Ödeme toplam borçtan büyük olamaz");
+            if (toplamBorc <=0) throw new BadRequestException("Tedavini Borcu bulunmamaktadır");
+            if(odeme.odemeToplam!=toplamBorc)
+            {
+                throw new BadRequestException("Odeme Fiyat bilgisi eşit değildir");
+            }
+            var odemeUpdate = await _repositoryManager.Muayene.SingleTedaviKaydiGetir(odeme.TedaviId);
+            if(odemeUpdate!= null)
+            {
+                odemeUpdate.Odendi=true;
+            }
+            var InsertOdeme = new odeme
+            {
+                muayeneId=odeme.muayeneId,
+                odemeToplam=odeme.odemeToplam,
+                odemeTarihi=DateTime.UtcNow
+            };
+            _repositoryManager.Muayene.OdemeYap(InsertOdeme);
+            var otoTaahütnameOdemeParam = await _repositoryManager.SistemParametresi.GetirAsync("ODEME_SONRASI_OTOMATIK_TAAHUTNAME_ODENDI_YAP");
+            if (otoTaahütnameOdemeParam is null)
+            {
+                parametreEke("ODEME_SONRASI_OTOMATIK_TAAHUTNAME_ODENDI_YAP");
+            }
+            var paramDeger = otoTaahütnameOdemeParam?.Deger1?.ToUpper() ?? "HAYIR";
+            if (paramDeger =="EVET")
+
+            {
+                var taahütname = await _repositoryManager.Muayene.taahütnameGetir(odeme.muayeneId);
+                if (taahütname != null)
+                {
+                    if (taahütname.ToplamBorc==odeme.odemeToplam)
+                    {
+                        taahütname.odendi=true;
+                    }
+                }
+            }
+            await _repositoryManager.saveAsyc();
+            return new OdemeYapDTO
+            {
+                muayeneId=odeme.muayeneId,
+                odemeToplam=odeme.odemeToplam
+            };
+        }
     }
 }

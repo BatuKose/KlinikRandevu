@@ -24,5 +24,6 @@ namespace Services.Contracts
         Task<teshisler> TeshisEkle(int muayeneId, string teshis);
         Task<int> MuayeneKapat(int id);
         Task<Taahütname> TaahütnameEkleAsync(TaahütnameEkleDTO taahütname);
+        Task<OdemeYapDTO> OdemeYap(OdemeYapDTO odeme);
     }
 }

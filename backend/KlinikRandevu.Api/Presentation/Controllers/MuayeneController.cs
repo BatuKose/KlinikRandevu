@@ -115,5 +115,11 @@ namespace Presentation.Controllers
             var result= await _ServiceManager.MuayeneService.TaahütnameEkleAsync(taahütname);
             return Ok(result);
         }
+        [HttpPost("odenemeYap")]
+        public async Task<IActionResult> OdemeYap([FromBody] OdemeYapDTO odeneme)
+        {
+            var result = await _ServiceManager.MuayeneService.OdemeYap(odeneme);
+            return Ok(result);
+        }
     }
 }

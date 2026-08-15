@@ -603,12 +603,38 @@ namespace Repositories.EFCore
             var borc = await _repositoryContext.TedaviKaydi.Where(b => b.MuyaneId==dosyaid).SumAsync(b => b.fiyat);
             return borc;
         }
+        public async Task<double> TedaviKaydininToplamBorucunuGetir(int dosyaid)
+        {
+
+            var borc = await _repositoryContext.TedaviKaydi.Where(b => b.Id==dosyaid && b.Odendi==false).SumAsync(b => b.fiyat);
+            return borc;
+        }
+        public async Task<TedaviKaydi> SingleTedaviKaydiGetir(int dosyaid)
+        {
+            var tedaviKaydi = await _repositoryContext.TedaviKaydi.SingleOrDefaultAsync(t => t.Id==dosyaid);
+            return tedaviKaydi;
+        }
+        public async Task<double> MuayeneKaydininToplamOdemesiniGetir(int dosyaid)
+        {
+
+            var odeme = await _repositoryContext.odeme.Where(b => b.muayeneId==dosyaid).SumAsync(b => b.odemeToplam);
+            return odeme;
+        }
         public async Task<bool>iptalOlmayanTaahütüVarmi(int dosyaid)
         {
             var result = await _repositoryContext.taahütname.AnyAsync(t=>t.MuayeneId==dosyaid && t.iptal==false);
             return result;
         }
-        
+        public void OdemeYap(odeme odeme)
+        {
+            _repositoryContext.odeme.Add(odeme);
+        }
+
+        public async Task<Taahütname> taahütnameGetir(int dosyaid)
+        {
+            var result = await _repositoryContext.taahütname.SingleOrDefaultAsync(t=>t.MuayeneId==dosyaid);
+            return result;
+        }
     }
 
 }

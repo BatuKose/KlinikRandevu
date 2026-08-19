@@ -121,5 +121,11 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.OdemeYap(odeneme);
             return Ok(result);
         }
+        [HttpPost("tedaviEkle")]
+        public async Task<IActionResult> TedaviEkle([FromBody] TedaviEkleDTO tedavi)
+        {
+            var result = await _ServiceManager.MuayeneService.MuayeneyeTedaviEKle(tedavi);
+            return Ok(result);
+        }
     }
 }

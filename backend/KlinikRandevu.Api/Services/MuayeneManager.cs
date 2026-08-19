@@ -773,25 +773,54 @@ namespace Services
         {
             if (odeme is null) throw new BadRequestException("Odeme bilgileri boş olamaz");
             if (odeme.odemeToplam<=0) throw new BadRequestException("Ödeme fiyat bilgisi sıfırdan büyük olmalıdır");
-            var toplamBorc = await _repositoryManager.Muayene.TedaviKaydininToplamBorucunuGetir(odeme.TedaviId);
-            if (odeme.odemeToplam>toplamBorc) throw new BadRequestException("Ödeme toplam borçtan büyük olamaz");
-            if (toplamBorc <=0) throw new BadRequestException("Tedavini Borcu bulunmamaktadır");
-            if(odeme.odemeToplam!=toplamBorc)
+            if (odeme.odeme==odemeTipiEnum.OdemeEnum.tedaviBazli) 
             {
-                throw new BadRequestException("Odeme Fiyat bilgisi eşit değildir");
+                var toplamBorc = await _repositoryManager.Muayene.TedaviKaydininToplamBorucunuGetir(odeme.TedaviId);
+                if (odeme.odemeToplam>toplamBorc) throw new BadRequestException("Ödeme toplam borçtan büyük olamaz");
+                if (toplamBorc <=0) throw new BadRequestException("Tedavini Borcu bulunmamaktadır");
+                if (odeme.odemeToplam!=toplamBorc)
+                {
+                    throw new BadRequestException("Odeme Fiyat bilgisi eşit değildir");
+                }
+                var odemeUpdate = await _repositoryManager.Muayene.SingleTedaviKaydiGetir(odeme.TedaviId);
+                if (odemeUpdate!= null)
+                {
+                    odemeUpdate.Odendi=true;
+                }
+                var InsertOdeme = new odeme
+                {
+                    muayeneId=odeme.muayeneId,
+                    odemeToplam=odeme.odemeToplam,
+                    odemeTarihi=DateTime.UtcNow
+                };
+                _repositoryManager.Muayene.OdemeYap(InsertOdeme);
             }
-            var odemeUpdate = await _repositoryManager.Muayene.SingleTedaviKaydiGetir(odeme.TedaviId);
-            if(odemeUpdate!= null)
+            else if(odeme.odeme==odemeTipiEnum.OdemeEnum.toplamMuayene)
             {
-                odemeUpdate.Odendi=true;
+                var toplamBorc = await _repositoryManager.Muayene.MuayeneKaydininToplamBorucunuGetir(odeme.muayeneId);
+                if(toplamBorc<=0)
+                {
+                    throw new BadRequestException("Muayene Kaydının borcu bulunmamaktadır");
+
+                }
+                if (odeme.odemeToplam>toplamBorc) throw new BadRequestException("Ödeme toplam borçtan büyük olamaz");
+                if (odeme.odemeToplam<toplamBorc) throw new BadRequestException("Ödeme muayenenin toplam borcundan küçük olamaz");
+                if(odeme.odemeToplam==toplamBorc)
+                {
+                    var InsertOdeme = new odeme
+                    {
+                        muayeneId=odeme.muayeneId,
+                        odemeToplam=odeme.odemeToplam,
+                        odemeTarihi=DateTime.UtcNow
+                    };
+                    var odenecekTedaviler = await _repositoryManager.Muayene.MuayeneKaydininOdenecekTedavileri(odeme.muayeneId);
+                    foreach(var tedavi in odenecekTedaviler)
+                    {
+                        tedavi.Odendi=true;
+                    }
+                }
             }
-            var InsertOdeme = new odeme
-            {
-                muayeneId=odeme.muayeneId,
-                odemeToplam=odeme.odemeToplam,
-                odemeTarihi=DateTime.UtcNow
-            };
-            _repositoryManager.Muayene.OdemeYap(InsertOdeme);
+
             var otoTaahütnameOdemeParam = await _repositoryManager.SistemParametresi.GetirAsync("ODEME_SONRASI_OTOMATIK_TAAHUTNAME_ODENDI_YAP");
             if (otoTaahütnameOdemeParam is null)
             {
@@ -802,7 +831,7 @@ namespace Services
 
             {
                 var taahütname = await _repositoryManager.Muayene.taahütnameGetir(odeme.muayeneId);
-                if (taahütname != null)
+                if (taahütname != null && taahütname.odendi==false)
                 {
                     if (taahütname.ToplamBorc==odeme.odemeToplam)
                     {
@@ -815,6 +844,91 @@ namespace Services
             {
                 muayeneId=odeme.muayeneId,
                 odemeToplam=odeme.odemeToplam
+            };
+            
+        }
+        public async Task<TedaviEkleDTO> MuayeneyeTedaviEKle(TedaviEkleDTO giris)
+        {
+            var muayene = await _repositoryManager.Muayene.GetMuayeneById(giris.MuyaneId);
+            if (muayene == null) throw new NotFoundException("Muayene Kaydı Bulunamadı");
+            if (muayene.BitisSaati is not null) throw new BadRequestException("Muayene onayı verilmiş kayda tetkik eklenemez");
+            var tedavi = new Tetkikler();
+            if(!string.IsNullOrEmpty(giris.tedaviAdi))
+            {
+                 tedavi = await _repositoryManager.Muayene.TetkikGetir(giris.tedaviAdi);
+            }
+            else if(!string.IsNullOrEmpty(giris.tedaviKodu))
+            {
+                tedavi = await _repositoryManager.Muayene.TetkikGetir(giris.tedaviKodu);
+            }
+            if (tedavi is null) throw new NotFoundException("tetkik bilgisi bulunamadı");
+            var taahütnameVarMi = await _repositoryManager.Muayene.taahütnameGetir(giris.MuyaneId);
+            if (taahütnameVarMi is not null)
+            {
+              var taahütnameliKaydaTedaviEkleParam = await _repositoryManager.SistemParametresi.GetirAsync("TAAHUTNAMELI_MUAYENEYE_TEDAVI_GIRISI");
+                if (taahütnameliKaydaTedaviEkleParam is null)
+                {
+                    parametreEke("TAAHUTNAMELI_MUAYENEYE_TEDAVI_GIRISI");
+                }
+                var taahütnameParamDeger = taahütnameliKaydaTedaviEkleParam?.Deger1?.ToUpper() ?? "HAYIR";
+                if (taahütnameParamDeger=="EVET")
+                {
+                    var toplamBorc = taahütnameVarMi.ToplamBorc;
+                    var yeniBorc = toplamBorc+tedavi.Fiyat;
+                    taahütnameVarMi.ToplamBorc = yeniBorc;
+                    string konu = "Taahütname Fiyat değişikliği hk.";
+                    string mesaj = $"{muayene.MuayeneTarihi} tarihli muayenenize yeni tetkikler eklenmiştir.  {taahütnameVarMi.TahütTarihi} tarihli taahütname" +
+                        $"toplam borcu {taahütnameVarMi.ToplamBorc} olmuştur.";
+                    var hasta = await _repositoryManager.Muayene.HastaBilgisiGetir(muayene.ProtocolNo);
+                    var paramD2 = taahütnameliKaydaTedaviEkleParam?.Deger2?.ToUpper() ?? "HAYIR";
+                    var paramD3 = taahütnameliKaydaTedaviEkleParam?.Deger3?.ToUpper() ?? "HAYIR";
+                    if(paramD2 =="EVET" && hasta.Email is not null)
+                    {
+                        try
+                        {
+                            await _emailService.MailGonderAsync(hasta.Email, konu, mesaj);
+                        }
+                        catch(Exception ex)
+                        {
+                            _logger.LogWarning("HATA---------------------------");
+                            _logger.LogWarning($"{ex}");
+                        }
+                    }
+                    else if(paramD3=="EVET" && hasta.Phone is not null)
+                    {
+                       try
+                        {
+                            await _twilioSms.SmsGonderAsync(hasta.Phone, mesaj);
+                        }
+                          catch(Exception ex)
+                        {
+                            _logger.LogWarning($"{ex}");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new BadRequestException("Taahütnamesi olan kayıta tedavi ekleyemezsiniz önce onu iptal edin");
+                }
+            }
+          
+            var insertTedavi = new TedaviKaydi()
+            {
+                doktorId=muayene.DoktorNo,
+                MuyaneId=muayene.Id,
+                fiyat=tedavi.Fiyat,
+                Odendi=false,
+                prtokol=muayene.ProtocolNo,
+                tedaviAdi=tedavi.TetikAdi,
+                tedaviKodu=tedavi.Kodu
+            };
+            _repositoryManager.Muayene.TedaviKaydiEkle(insertTedavi);
+            await _repositoryManager.saveAsyc();
+            return new TedaviEkleDTO
+            {
+                MuyaneId=insertTedavi.MuyaneId,
+                tedaviAdi=insertTedavi.tedaviAdi,
+                tedaviKodu=insertTedavi.tedaviKodu
             };
         }
     }

@@ -25,5 +25,6 @@ namespace Services.Contracts
         Task<int> MuayeneKapat(int id);
         Task<Taahütname> TaahütnameEkleAsync(TaahütnameEkleDTO taahütname);
         Task<OdemeYapDTO> OdemeYap(OdemeYapDTO odeme);
+        Task<TedaviEkleDTO> MuayeneyeTedaviEKle(TedaviEkleDTO giris);
     }
 }

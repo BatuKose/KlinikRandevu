@@ -577,6 +577,11 @@ namespace Repositories.EFCore
             var tetkik = await _repositoryContext.Tetkikler.SingleOrDefaultAsync(t=>t.Kodu=="ASC123" && t.aktifMi==true);
             return tetkik;
         }
+        public async Task<Tetkikler> TetkikGetir( string bilgi)
+        {
+            var tetkik = await _repositoryContext.Tetkikler.FirstOrDefaultAsync(t => t.Kodu==bilgi || t.TetikAdi==bilgi && t.aktifMi==true);
+            return tetkik;
+        }
 
         public void TedaviKaydiEkle(TedaviKaydi tedaviKaydi)
         {
@@ -600,8 +605,13 @@ namespace Repositories.EFCore
         public async Task<double> MuayeneKaydininToplamBorucunuGetir(int dosyaid)
         {
           
-            var borc = await _repositoryContext.TedaviKaydi.Where(b => b.MuyaneId==dosyaid).SumAsync(b => b.fiyat);
+            var borc = await _repositoryContext.TedaviKaydi.Where(b => b.MuyaneId==dosyaid && b.Odendi==false).SumAsync(b => b.fiyat);
             return borc;
+        }
+        public async Task<List<TedaviKaydi>> MuayeneKaydininOdenecekTedavileri(int muayeneId)
+        {
+            var tedaviler = await _repositoryContext.TedaviKaydi.Where(t => t.MuyaneId==muayeneId && t.Odendi==false).ToListAsync();
+            return tedaviler;
         }
         public async Task<double> TedaviKaydininToplamBorucunuGetir(int dosyaid)
         {
@@ -634,6 +644,12 @@ namespace Repositories.EFCore
         {
             var result = await _repositoryContext.taahütname.SingleOrDefaultAsync(t=>t.MuayeneId==dosyaid);
             return result;
+        }
+
+        public async Task<Patient> HastaBilgisiGetir(int protokol)
+        {
+            var hasta = await _repositoryContext.Patients.SingleOrDefaultAsync(p => p.Protocol==protokol);
+            return hasta;
         }
     }
 

@@ -72,5 +72,6 @@ namespace Repositories.Contracts
         Task<List<TedaviKaydi>> MuayeneKaydininOdenecekTedavileri(int muayeneId);
         Task<Tetkikler> TetkikGetir(string bilgi);
         Task<Patient> HastaBilgisiGetir(int protokol);
+        Task<bool> MuayenedeTetkikDahaOncedenIslenmisMı(string tetkik, int muayeneId);
     }
 }

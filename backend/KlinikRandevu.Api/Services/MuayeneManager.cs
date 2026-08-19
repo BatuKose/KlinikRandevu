@@ -862,6 +862,20 @@ namespace Services
                 tedavi = await _repositoryManager.Muayene.TetkikGetir(giris.tedaviKodu);
             }
             if (tedavi is null) throw new NotFoundException("tetkik bilgisi bulunamadı");
+            var mükerrerTetkikGirisParam = await _repositoryManager.SistemParametresi.GetirAsync("MUKERRER_TETKIK_GIRISI");
+            if(mükerrerTetkikGirisParam is null)
+            {
+                parametreEke("MUKERRER_TETKIK_GIRISI");
+            }
+            var mükerrerParamD1= mükerrerTetkikGirisParam?.Deger1?.ToUpper() ?? "HAYIR";
+            if(mükerrerParamD1=="HAYIR")
+            {
+                bool tetkikDahaOncedenIslenmiMı = await _repositoryManager.Muayene.MuayenedeTetkikDahaOncedenIslenmisMı(tedavi.Kodu, giris.MuyaneId);
+                if (tetkikDahaOncedenIslenmiMı)
+                {
+                    throw new BadRequestException($"Tetkik {giris.MuyaneId} idli muayene'ye daha önceden işlenmiştir. Yenisi eklenemez");
+                }
+            }
             var taahütnameVarMi = await _repositoryManager.Muayene.taahütnameGetir(giris.MuyaneId);
             if (taahütnameVarMi is not null)
             {

@@ -579,10 +579,14 @@ namespace Repositories.EFCore
         }
         public async Task<Tetkikler> TetkikGetir( string bilgi)
         {
-            var tetkik = await _repositoryContext.Tetkikler.FirstOrDefaultAsync(t => t.Kodu==bilgi || t.TetikAdi==bilgi && t.aktifMi==true);
+            var tetkik = await _repositoryContext.Tetkikler.FirstOrDefaultAsync(t => t.Kodu.Contains(bilgi) || t.TetikAdi.Contains(bilgi) && t.aktifMi==true);
             return tetkik;
         }
-
+        public async Task<bool>MuayenedeTetkikDahaOncedenIslenmisMı(string tetkik,int muayeneId)
+        {
+            var result = await _repositoryContext.TedaviKaydi.AnyAsync(t => t.tedaviKodu==tetkik && t.MuyaneId==muayeneId);
+            return result;
+        }
         public void TedaviKaydiEkle(TedaviKaydi tedaviKaydi)
         {
             _repositoryContext.Add(tedaviKaydi);

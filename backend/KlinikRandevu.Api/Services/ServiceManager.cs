@@ -29,11 +29,12 @@ namespace Services
             IHttpClientFactory httpClientFactory,
             ILogger<TwilioSmsManager> TwilioLogger,
             ILogger<IcdApiManager> IcdApiLogger,
-            ILogger<JobManger> jobLogger         
+            ILogger<JobManger> jobLogger,
+            ILogger<EmailManager> MailLogger
             )
         {
             _mailService = new Lazy<IEmailService>(() =>
-                new EmailManager(configuration));
+                new EmailManager(configuration,MailLogger));
             _patientService = new Lazy<IPatientService>(() =>
                 new PatientManager(repositoryManager));
             _MuayeneService = new Lazy<IMuayeneService>(() =>

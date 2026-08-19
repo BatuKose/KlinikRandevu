@@ -1,6 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MimeKit;
 using Repositories.Contracts;
 using Services.Contracts;
@@ -10,32 +11,43 @@ namespace Services
     public class EmailManager : IEmailService
     {
         private readonly IConfiguration _configuration;
-
-        public EmailManager( IConfiguration configuration)
+        private readonly ILogger<EmailManager> _logger;
+        public EmailManager( IConfiguration configuration,ILogger<EmailManager> logger)
         {
             _configuration = configuration;
+            _logger=logger;
         }
 
         public async Task MailGonderAsync(string aliciMail, string konu, string htmlIcerik)
         {
-            var emailSettings = _configuration.GetSection("EmailSettings");
-            var smtpServer = emailSettings["SmtpServer"];
-            var port = int.Parse(emailSettings["Port"] ?? throw new InvalidOperationException("SmtpServer ayarı bulunamadı"));
-            var senderEmail = emailSettings["SenderEmail"];
-            var senderName = emailSettings["SenderName"];
-            var password = emailSettings["Password"];
+            try
+            {
+                var emailSettings = _configuration.GetSection("EmailSettings");
+                var smtpServer = emailSettings["SmtpServer"];
+                var port = int.Parse(emailSettings["Port"] ?? throw new InvalidOperationException("SmtpServer ayarı bulunamadı"));
+                var senderEmail = emailSettings["SenderEmail"];
+                var senderName = emailSettings["SenderName"];
+                var password = emailSettings["Password"];
 
-            var mesaj = new MimeMessage();
-            mesaj.From.Add(new MailboxAddress(senderName, senderEmail));
-            mesaj.To.Add(MailboxAddress.Parse(aliciMail));
-            mesaj.Subject = konu;
-            mesaj.Body = new BodyBuilder { HtmlBody = htmlIcerik }.ToMessageBody();
+                var mesaj = new MimeMessage();
+                mesaj.From.Add(new MailboxAddress(senderName, senderEmail));
+                mesaj.To.Add(MailboxAddress.Parse(aliciMail));
+                mesaj.Subject = konu;
+                mesaj.Body = new BodyBuilder { HtmlBody = htmlIcerik }.ToMessageBody();
 
-            using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(smtpServer, port, SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync(senderEmail, password);
-            await smtp.SendAsync(mesaj);
-            await smtp.DisconnectAsync(true);
+                using var smtp = new SmtpClient();
+                await smtp.ConnectAsync(smtpServer, port, SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync(senderEmail, password);
+                await smtp.SendAsync(mesaj);
+                await smtp.DisconnectAsync(true);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogWarning("**********Mail Gönderilemedi Hataları kontrol ediniz****************");
+                _logger.LogWarning(ex.ToString());
+            }
+
+            
         }
 
         public async Task RandevuOnayMailiGonder(string aliciMail, string hastaAdi, string doktorAdi, DateTime randevuTarihi)

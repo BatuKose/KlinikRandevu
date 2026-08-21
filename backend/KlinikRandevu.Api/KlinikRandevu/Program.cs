@@ -43,6 +43,10 @@ RecurringJob.AddOrUpdate<IJobService>(
     "taahütname-bilgilendirme",
     job => job.TaahütnameBilgilendirme(),
     "30 0 * * *");
+RecurringJob.AddOrUpdate<IJobService>(
+    "randevu-bekleyen-bilgilendirme",
+    job => job.RandevuBekletenHastalariBildir(),
+    "30 0 * * *");
 
 if (app.Environment.IsDevelopment())
 {

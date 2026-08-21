@@ -363,7 +363,37 @@ namespace Services
                 plan.DoktorNo, plan.PolNo, yeniBaslangic, yeniBitis);
 
             if (cakismaVar)
-                throw new BadRequestException("Bu saatte doktorun başka bir randevusu bulunmaktadır.");
+            {
+                var randevuBekletmeParam = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVU_BEKLETMEYI_KAPAT");
+                if(randevuBekletmeParam is null)
+                {
+                    parametreEke("RANDEVU_BEKLETMEYI_KAPAT");
+                }
+                var randevuBekletmeParamDeger= randevuBekletmeParam?.Deger1?.ToString() ?? "HAYIR";
+                if (plan.RandevuBekleme==true && randevuBekletmeParamDeger=="HAYIR")
+                {
+                    RandevuBekleyenHastalar randevuBekleyen = new RandevuBekleyenHastalar()
+                    {
+                        Bilgilendirme=false,
+                        RandevuVerildi=false,
+                        doktorNo=plan.DoktorNo,
+                        polNo=plan.PolNo,
+                        protokol=plan.ProtocolNo,
+                        RandevuTarihi=plan.RandevuTarihi,
+                        tcKimlik=plan.HastaTc
+                    };
+                    _repositoryManager.Muayene.RandevuBekletmeEkke(randevuBekleyen);
+                    await _repositoryManager.saveAsyc();
+                    throw new BadRequestException($"Bu saatte doktorun başka bir randevusu bulunmaktadır. {plan.RandevuTarihi} tarihli bekleme listesine alındınız" +
+                        $"müsaitlik olursa size  bilgilendirme mail/sms gönderilcektir.");
+                }
+                else
+                {
+                    throw new BadRequestException("Bu saatte doktorun başka bir randevusu bulunmaktadır.");
+                }
+                    
+            }
+               
 
             var hastaAyniGunRandevu = await _repositoryManager.Muayene.HastaAyniGunRandevusuVarMi(
                 plan.HastaTc, plan.DoktorNo, plan.RandevuTarihi);

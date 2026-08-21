@@ -15,5 +15,6 @@ namespace Entities.Data_Transfer_Objects.Muayene
         public DateTime RandevuTarihi { get; set; }
         public int SureDakika { get; set; }
         public string? Notlar { get; set; }
+        public bool RandevuBekleme { get; set; }=false;
     }
 }

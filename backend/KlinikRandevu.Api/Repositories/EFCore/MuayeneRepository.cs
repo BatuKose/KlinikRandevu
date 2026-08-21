@@ -476,6 +476,16 @@ namespace Repositories.EFCore
             await _repositoryContext.Database.ExecuteSqlRawAsync(
                 $"update taahütname set BilgilendirmeSms=1 where Id IN ({idListesi})");
         }
+        public async Task HatirlatmaBekleyenRandevuUpdate(IEnumerable<int> bekleyenId)
+        {
+            if (bekleyenId == null || !bekleyenId.Any())
+                return;
+
+            var idListesi = string.Join(",", bekleyenId);
+
+            await _repositoryContext.Database.ExecuteSqlRawAsync(
+                $"update RandevuBekleyenHastalar set Bilgilendirme=1 where Id IN ({idListesi})");
+        }
 
         public async Task HatirlatmaTaahütnameUpdateMAIL(IEnumerable<int> taahütnameIdler)
         {
@@ -572,6 +582,25 @@ namespace Repositories.EFCore
             }
            
         }
+        public async Task<List<RandevuBekleyenHastalar>>RandevuBekleyenHastalariGetirAsync()
+        {
+            try
+            {
+                return await _repositoryContext.Database.SqlQueryRaw<RandevuBekleyenHastalar>(@"SELECT 
+                    b.Id,b.tcKimlik, protokol, b.doktorNo, b.polNo, b.RandevuTarihi,
+                    b.Bilgilendirme, b.RandevuVerildi, b.randevuNotu
+                    FROM RandevuBekleyenHastalar b
+                    INNER JOIN Randevular r ON r.RandevuTarihi = b.RandevuTarihi
+                    WHERE r.iptal = 1
+                    AND CAST(b.RandevuTarihi AS DATE) BETWEEN CAST(GETDATE() AS DATE) AND CAST(DATEADD(DAY, 1, GETDATE()) AS DATE);"
+                ).ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString(), ex.ToString());
+                return new List<RandevuBekleyenHastalar>();
+            }
+        }
         public async Task<Tetkikler> PoliklinikMuaynesiGetir()
         {
             var tetkik = await _repositoryContext.Tetkikler.SingleOrDefaultAsync(t=>t.Kodu=="ASC123" && t.aktifMi==true);
@@ -654,6 +683,11 @@ namespace Repositories.EFCore
         {
             var hasta = await _repositoryContext.Patients.SingleOrDefaultAsync(p => p.Protocol==protokol);
             return hasta;
+        }
+
+        public void RandevuBekletmeEkke(RandevuBekleyenHastalar randevuBekleyenHastalar)
+        {
+            _repositoryContext.RandevuBekleyenHastalar.Add(randevuBekleyenHastalar);
         }
     }
 

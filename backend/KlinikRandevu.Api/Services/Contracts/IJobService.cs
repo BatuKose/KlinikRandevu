@@ -13,5 +13,6 @@ namespace Services.Contracts
         Task MuayeneOnayiVerilmemisKayitlariKapat();
         Task OtomatikMuayeneAc();
         Task TaahütnameBilgilendirme();
+        Task RandevuBekletenHastalariBildir();
     }
 }

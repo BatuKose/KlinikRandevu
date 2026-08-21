@@ -73,5 +73,8 @@ namespace Repositories.Contracts
         Task<Tetkikler> TetkikGetir(string bilgi);
         Task<Patient> HastaBilgisiGetir(int protokol);
         Task<bool> MuayenedeTetkikDahaOncedenIslenmisMı(string tetkik, int muayeneId);
+        public void RandevuBekletmeEkke(RandevuBekleyenHastalar randevuBekleyenHastalar);
+        Task<List<RandevuBekleyenHastalar>> RandevuBekleyenHastalariGetirAsync();
+        Task HatirlatmaBekleyenRandevuUpdate(IEnumerable<int> bekleyenId);
     }
 }

@@ -301,5 +301,70 @@ namespace Services
             if (mailGidenler.Count > 0)
                 await _repositoryManager.Muayene.HatirlatmaTaahütnameUpdateMAIL(mailGidenler);
         }
+
+        public async Task RandevuBekletenHastalariBildir()
+        {
+            var ozellikAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("RANDEVU_BEKLEYEN_HASTALARI_BILDIR");
+            if (ozellikAcikMi is null)
+            {
+                string paramName = "RANDEVU_BEKLEYEN_HASTALARI_BILDIR";
+                parametreEke(paramName);
+            }
+            var paramdeger = ozellikAcikMi?.Deger1?.ToUpper() ??"HAYIR";
+            if (paramdeger !="EVET")
+            {
+                return;
+            }
+            var hastalar =  await _repositoryManager.Muayene.RandevuBekleyenHastalariGetirAsync();
+            if(hastalar is null || hastalar.Count<0)
+            {
+                return;
+            }
+            var paramDeger2 = ozellikAcikMi?.Deger2?.ToUpper() ?? "HAYIR";
+            var paramDeger3 = ozellikAcikMi?.Deger3?.ToUpper() ?? "HAYIR";
+            int smsRequest;
+            if (paramDeger2 == "EVET" && paramDeger3 == "HAYIR")
+                smsRequest = 1;
+            else if (paramDeger2 == "HAYIR" && paramDeger3 == "EVET")
+                smsRequest = 2;
+            else if (paramDeger2 == "EVET" && paramDeger3 == "EVET")
+                smsRequest = 3;
+            else
+                return;
+            var BilgilendirmeGidenler = new List<int>();
+            foreach (var hasta in hastalar)
+            {
+                var hastaBilgi = await _repositoryManager.Muayene.HastaBilgisiGetir(hasta.protokol);
+                if(hastaBilgi is null)
+                {
+                    return;
+                }
+                string bilgilendir = $"{hasta.RandevuTarihi} tarihli oluşturduğunuz randevu Bekleme istemi olumlu sonuclandı randevu alabilirsiniz";
+                if(smsRequest== 1 && hastaBilgi.Phone is not null)
+                {
+                   await _twilioSmsManager.SmsGonderAsync(hastaBilgi.Phone, bilgilendir);
+                    BilgilendirmeGidenler.Add(hasta.Id);
+                }
+                else if(smsRequest== 2 && hastaBilgi.Email is not null)
+                {
+                    await _emailManager.MailGonderAsync(hastaBilgi.Email, "Bekleyen Randevu", bilgilendir);
+                    BilgilendirmeGidenler.Add(hasta.Id);
+                }
+                else if(smsRequest== 3 && hastaBilgi.Email is not null && hastaBilgi.Phone is not null)
+                {
+                    await _emailManager.MailGonderAsync(hastaBilgi.Email, "Bekleyen Randevu", bilgilendir);
+                    await _twilioSmsManager.SmsGonderAsync(hastaBilgi.Phone, bilgilendir);
+                    BilgilendirmeGidenler.Add(hasta.Id);
+                }
+                else
+                {
+                    return;
+                }
+                if(BilgilendirmeGidenler.Count>0)
+                {
+                     await _repositoryManager.Muayene.HatirlatmaBekleyenRandevuUpdate(BilgilendirmeGidenler);
+                }
+            }
+        }
     }
 }

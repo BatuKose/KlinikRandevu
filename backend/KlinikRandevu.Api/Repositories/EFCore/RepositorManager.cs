@@ -45,11 +45,29 @@ namespace Repositories.EFCore
 
         public async Task saveAsyc()
         {
-           await _repositoryContext.SaveChangesAsync();
+            try
+            {
+                await _repositoryContext.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("**********************DB KAYIT ETME HATASI**********************");
+                Console.WriteLine(ex.Message.ToString());
+            }
+          
         }
         public void Save()
         {
-            _repositoryContext.SaveChanges();
+            try
+            {
+                _repositoryContext.SaveChanges();
+            }
+            
+            catch(Exception ex)
+            {
+                Console.WriteLine("**********************DB KAYIT ETME HATASI**********************");
+                Console.WriteLine(ex.Message.ToString());
+            }
         }
         public ISistemParametresiRepository SistemParametresi => _sistemParametresiRepository.Value;
         public IAuthenticationRepository Authentication => _authenticationRepository.Value;

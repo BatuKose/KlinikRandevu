@@ -590,7 +590,7 @@ namespace Repositories.EFCore
                     b.Id,b.tcKimlik, protokol, b.doktorNo, b.polNo, b.RandevuTarihi,
                     b.Bilgilendirme, b.RandevuVerildi, b.randevuNotu
                     FROM RandevuBekleyenHastalar b
-                    INNER JOIN Randevular r ON r.RandevuTarihi = b.RandevuTarihi
+                    INNER JOIN Randevular r ON r.RandevuTarihi = b.RandevuTarihi AND r.PolNo=b.polNo
                     WHERE r.iptal = 1
                     AND CAST(b.RandevuTarihi AS DATE) BETWEEN CAST(GETDATE() AS DATE) AND CAST(DATEADD(DAY, 1, GETDATE()) AS DATE);"
                 ).ToListAsync();
@@ -688,6 +688,18 @@ namespace Repositories.EFCore
         public void RandevuBekletmeEkke(RandevuBekleyenHastalar randevuBekleyenHastalar)
         {
             _repositoryContext.RandevuBekleyenHastalar.Add(randevuBekleyenHastalar);
+        }
+        public async Task<RandevuBekleyenHastalar?>RandevuTarihiVePoleGoreRandevuBekleyenHastayiGetir(DateTime date,int pol,int protokol)
+        {
+            var randevuBekleyen = await _repositoryContext.RandevuBekleyenHastalar.SingleOrDefaultAsync(r => r.RandevuTarihi==date && r.protokol==protokol && r.polNo==pol);
+            if(randevuBekleyen!=null)
+            {
+                return randevuBekleyen;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 

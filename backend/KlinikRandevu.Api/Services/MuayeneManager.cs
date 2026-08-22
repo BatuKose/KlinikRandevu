@@ -414,12 +414,17 @@ namespace Services
             };
 
             _repositoryManager.Muayene.RandevuOlustur(randevuOlustur);
+            var hastaRandevuBekledenMi = await _repositoryManager.Muayene.RandevuTarihiVePoleGoreRandevuBekleyenHastayiGetir(plan.RandevuTarihi, plan.PolNo, plan.ProtocolNo);
+            if(hastaRandevuBekledenMi is not null)
+            {
+                hastaRandevuBekledenMi.RandevuVerildi=true;
+            }
             string aksiyonTipi = $"Randevu oluşturma {plan.HastaTc} tcli hastaya {plan.RandevuTarihi} tarihli randevu oluşturuldu";
             string EntityTipi = "randevular";
             int entityId = plan.ProtocolNo;
             logYaz(aksiyonTipi, entityId, EntityTipi);
             await _repositoryManager.saveAsyc();
-            //randevu mail
+
             var mailParametre = await _repositoryManager.SistemParametresi.GetirAsync("EMAIL_GONDERME");
             if(mailParametre is null)
             {

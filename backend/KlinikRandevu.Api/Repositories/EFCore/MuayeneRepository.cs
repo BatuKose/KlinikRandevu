@@ -646,6 +646,11 @@ namespace Repositories.EFCore
             var tedaviler = await _repositoryContext.TedaviKaydi.Where(t => t.MuyaneId==muayeneId && t.Odendi==false).ToListAsync();
             return tedaviler;
         }
+        public async Task<List<TedaviKaydi>> MuayeneKaydininOdemesiIptalEdilecekTedavileri(int muayeneId)
+        {
+            var tedaviler = await _repositoryContext.TedaviKaydi.Where(t => t.MuyaneId==muayeneId && t.Odendi==true).ToListAsync();
+            return tedaviler;
+        }
         public async Task<double> TedaviKaydininToplamBorucunuGetir(int dosyaid)
         {
 

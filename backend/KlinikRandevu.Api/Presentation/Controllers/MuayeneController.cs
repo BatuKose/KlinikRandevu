@@ -127,5 +127,11 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.MuayeneyeTedaviEKle(tedavi);
             return Ok(result);
         }
+        [HttpPatch("OdemeIptal")]
+        public async Task<IActionResult> OdemeIptalET([FromBody]OdemeIptalDTO iptal)
+        {
+            var result = await _ServiceManager.MuayeneService.OdemeIade(iptal);
+            return NoContent();
+        }
     }
 }

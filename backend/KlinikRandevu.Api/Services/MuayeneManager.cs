@@ -855,7 +855,7 @@ namespace Services
                     }
                 }
             }
-
+            
             var otoTaahütnameOdemeParam = await _repositoryManager.SistemParametresi.GetirAsync("ODEME_SONRASI_OTOMATIK_TAAHUTNAME_ODENDI_YAP");
             if (otoTaahütnameOdemeParam is null)
             {
@@ -881,6 +881,45 @@ namespace Services
                 odemeToplam=odeme.odemeToplam
             };
             
+        }
+        public async Task<OdemeIptalDTO>OdemeIade(OdemeIptalDTO odemeIptal)
+        {
+            if (odemeIptal == null) throw new BadRequestException("Ödeme tipini kontrol ediniz");
+            var tahhütnameKontrol = await _repositoryManager.Muayene.taahütnameGetir(odemeIptal.muyaneId);
+            if(tahhütnameKontrol is not null && tahhütnameKontrol.iptal==false)
+            {
+                throw new BadRequestException("Muayenenin aktif taahütnamesi bulunmaktadır. Önce onu iptal ediniz");
+            }
+            if (odemeIptal.odemeIptalTipi==odemeTipiEnum.OdemeEnum.tedaviBazli)
+            {
+                if (odemeIptal.tedaviId.HasValue)
+                {
+
+
+                    var tedavi = await _repositoryManager.Muayene.SingleTedaviKaydiGetir(odemeIptal.tedaviId.Value);
+                    if (tedavi !=null && tedavi.Odendi==true)
+                    {
+                        tedavi.Odendi=false;
+                    }
+                }
+            }else if(odemeIptal.odemeIptalTipi==odemeTipiEnum.OdemeEnum.toplamMuayene)
+            {
+                var muayenedekiTedaviler = await _repositoryManager.Muayene.MuayeneKaydininOdemesiIptalEdilecekTedavileri(odemeIptal.muyaneId);
+                if(muayenedekiTedaviler is not null && muayenedekiTedaviler.Count>0)
+                {
+                    foreach(var tedavi in muayenedekiTedaviler)
+                    {
+                        tedavi.Odendi = false;
+                    }
+                }
+            }
+            await _repositoryManager.saveAsyc();
+            return new OdemeIptalDTO
+            {
+                muyaneId=odemeIptal.muyaneId,
+                odemeIptalTipi=odemeIptal.odemeIptalTipi,
+                tedaviId=odemeIptal.tedaviId
+            };
         }
         public async Task<TedaviEkleDTO> MuayeneyeTedaviEKle(TedaviEkleDTO giris)
         {

@@ -4,6 +4,7 @@ using Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Presentation.ActionFilters;
+using Presentation.Wrappers;
 using Services;
 using Services.Contracts;
 using System;
@@ -113,7 +114,7 @@ namespace Presentation.Controllers
         public async Task<IActionResult> TaahütnameEKle([FromBody] TaahütnameEkleDTO taahütname)
         {
             var result= await _ServiceManager.MuayeneService.TaahütnameEkleAsync(taahütname);
-            return Ok(result);
+            return Ok(ApiResponse<TaahütnameDTO>.SuccessResponse(result, "Tahütname Başarıyla eklendi"));
         }
         [HttpPost("odenemeYap")]
         public async Task<IActionResult> OdemeYap([FromBody] OdemeYapDTO odeneme)

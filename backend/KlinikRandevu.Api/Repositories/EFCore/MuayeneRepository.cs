@@ -627,8 +627,17 @@ namespace Repositories.EFCore
         }
         public async Task<TedaviKaydi> TedaviKaydiGetir(int dosyaid)
         {
-            var tedaviKaydi= await _repositoryContext.TedaviKaydi.SingleOrDefaultAsync(t=>t.MuyaneId==dosyaid);
-            return tedaviKaydi;
+            try
+            {
+                var tedaviKaydi = await _repositoryContext.TedaviKaydi.SingleOrDefaultAsync(t => t.MuyaneId==dosyaid);
+                return tedaviKaydi;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+
         }
         public void TahütnameEKle(Taahütname taahütname)
         {

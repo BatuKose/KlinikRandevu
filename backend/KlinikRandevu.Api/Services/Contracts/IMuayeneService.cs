@@ -23,7 +23,7 @@ namespace Services.Contracts
             DateTime basla, DateTime bitis, bool muayeneOldumu);
         Task<teshisler> TeshisEkle(int muayeneId, string teshis);
         Task<int> MuayeneKapat(int id);
-        Task<Taahütname> TaahütnameEkleAsync(TaahütnameEkleDTO taahütname);
+        Task<TaahütnameDTO> TaahütnameEkleAsync(TaahütnameEkleDTO taahütname);
         Task<OdemeYapDTO> OdemeYap(OdemeYapDTO odeme);
         Task<TedaviEkleDTO> MuayeneyeTedaviEKle(TedaviEkleDTO giris);
         Task<OdemeIptalDTO> OdemeIade(OdemeIptalDTO odemeIptal);

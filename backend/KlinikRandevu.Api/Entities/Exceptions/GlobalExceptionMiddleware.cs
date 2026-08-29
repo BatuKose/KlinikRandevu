@@ -2,8 +2,10 @@
 using Entities.Exeptions.CustomExceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Presentation.Wrappers;
 using System.Net;
 using System.Text.Json;
+
 
 namespace Entities.Exeptions
 {
@@ -56,11 +58,7 @@ namespace Entities.Exeptions
                 logger.LogError(ex,ex.Message);
             }
             context.Response.StatusCode = statusCode;
-            var result = JsonSerializer.Serialize(new
-            {
-                statusCode=statusCode,
-                message=message
-            });
+            var result = JsonSerializer.Serialize(ApiResponse<object>.Fail(message));
             return context.Response.WriteAsync(result);
         }  
     }

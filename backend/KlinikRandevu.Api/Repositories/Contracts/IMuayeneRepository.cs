@@ -78,5 +78,7 @@ namespace Repositories.Contracts
         Task HatirlatmaBekleyenRandevuUpdate(IEnumerable<int> bekleyenId);
         Task<RandevuBekleyenHastalar?> RandevuTarihiVePoleGoreRandevuBekleyenHastayiGetir(DateTime date, int pol, int protokol);
         Task<List<TedaviKaydi>> MuayeneKaydininOdemesiIptalEdilecekTedavileri(int muayeneId);
+        Task<List<OzelMesajDTO>> JobRandevuluHastalaraOzelMesajGonderilcekleriGetir(int pol);
+        Task OzelMesajGonderilenlerUpdate(IEnumerable<int> randevuId);
     }
 }

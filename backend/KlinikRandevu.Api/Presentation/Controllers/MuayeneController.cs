@@ -120,7 +120,7 @@ namespace Presentation.Controllers
         public async Task<IActionResult> OdemeYap([FromBody] OdemeYapDTO odeneme)
         {
             var result = await _ServiceManager.MuayeneService.OdemeYap(odeneme);
-            return Ok(result);
+            return Ok(ApiResponse<OdemeYapDTO>.SuccessResponse(result));
         }
         [HttpPost("tedaviEkle")]
         public async Task<IActionResult> TedaviEkle([FromBody] TedaviEkleDTO tedavi)

@@ -364,7 +364,99 @@ namespace Services
                 {
                      await _repositoryManager.Muayene.HatirlatmaBekleyenRandevuUpdate(BilgilendirmeGidenler);
                 }
+
             }
+        }
+
+        public async Task RandevuOzelMesajGonder()
+        {
+            var ozellikAcikMi = await _repositoryManager.SistemParametresi.GetirAsync("SERVISE_OZEL_RANDEVU_SONRASI_OZEL_MESAJ_GONDER");
+            if( ozellikAcikMi == null ) 
+            {
+                parametreEke("SERVISE_OZEL_RANDEVU_SONRASI_OZEL_MESAJ_GONDER");
+                return; 
+            }
+            var ParamD1= ozellikAcikMi.Deger1?.ToUpper() ?? "HAYIR";
+            if( ParamD1 =="HAYIR")
+            {
+                return;
+            }
+            var paramD2 = int.TryParse(ozellikAcikMi.Deger2, out var parsed) ? parsed : 0;
+            if( paramD2 == 0 )
+            {
+                return;
+            }
+            var paramD3=ozellikAcikMi.Deger3;
+            if(string.IsNullOrEmpty(paramD3))
+            {
+                return;
+            }
+            var param4=int.TryParse(ozellikAcikMi.Deger4,out var parsed2) ? parsed2 : 0;
+            if(parsed2== 0)
+            {
+                return;
+            }
+            var hastalar = await _repositoryManager.Muayene.JobRandevuluHastalaraOzelMesajGonderilcekleriGetir(paramD2);
+            if(hastalar == null || hastalar.Count<1)
+            {
+                return;
+            }
+            int bilgilendirmeRequest;
+            if(param4 == 1)
+            {
+                bilgilendirmeRequest=1;
+            }
+            else if(param4==2)
+            {
+                bilgilendirmeRequest=2;
+            }
+            else if( param4==3)
+            {
+                bilgilendirmeRequest=3;
+            }
+            else
+            {
+                return;
+            }
+            var BilgilendirmeGidenler = new List<int>();
+            foreach(var hasta in hastalar)
+            {
+                var hastaBilgi = await _repositoryManager.Muayene.HastaBilgisiGetir(hasta.protokol);
+                if (hastaBilgi is null)
+                {
+                    return;
+                }
+                string mesaj = paramD3;
+                if(bilgilendirmeRequest==1 && hastaBilgi.Email is not null)
+                {
+                    await _emailManager.MailGonderAsync(hastaBilgi.Email, "Bilgilendirme", mesaj);
+                    BilgilendirmeGidenler.Add(hasta.randevuid);
+                }
+                else if(bilgilendirmeRequest==2 && hastaBilgi.Phone is not null)
+                {
+                    await _twilioSmsManager.SmsGonderAsync(hastaBilgi.Phone, mesaj);
+                    BilgilendirmeGidenler.Add(hasta.randevuid);
+                }
+                else if(bilgilendirmeRequest==3 && hastaBilgi.Email is not null && hastaBilgi.Phone is not null)
+                {
+                    await _emailManager.MailGonderAsync(hastaBilgi.Email, "Bilgilendirme", mesaj);
+                    await _twilioSmsManager.SmsGonderAsync(hastaBilgi.Phone, mesaj);
+                    BilgilendirmeGidenler.Add(hasta.randevuid);
+                }
+                else
+                {
+                    return;
+                }
+                if(BilgilendirmeGidenler.Count > 0)
+                {
+                    await _repositoryManager.Muayene.OzelMesajGonderilenlerUpdate(BilgilendirmeGidenler);
+                }
+                else
+                {
+                    return;
+                }
+            }
+
         }
     }
 }

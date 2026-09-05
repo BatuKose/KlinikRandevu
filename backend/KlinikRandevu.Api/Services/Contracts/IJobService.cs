@@ -14,5 +14,6 @@ namespace Services.Contracts
         Task OtomatikMuayeneAc();
         Task TaahütnameBilgilendirme();
         Task RandevuBekletenHastalariBildir();
+        Task RandevuOzelMesajGonder();
     }
 }

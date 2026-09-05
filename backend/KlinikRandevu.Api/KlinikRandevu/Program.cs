@@ -47,7 +47,8 @@ RecurringJob.AddOrUpdate<IJobService>(
     "randevu-bekleyen-bilgilendirme",
     job => job.RandevuBekletenHastalariBildir(),
     "30 0 * * *");
-
+RecurringJob.AddOrUpdate<IJobService>("randevu-ozel-mesaj-gonder",
+    job=>job.RandevuOzelMesajGonder(), "30 0 * * *");
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

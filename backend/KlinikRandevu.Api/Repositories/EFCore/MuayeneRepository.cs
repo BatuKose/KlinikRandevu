@@ -456,6 +456,31 @@ namespace Repositories.EFCore
               and r.hatirlatmaMailiGonderildi = 0
         ", sqlParams).ToListAsync();
         }
+        public async Task<List<OzelMesajDTO>>JobRandevuluHastalaraOzelMesajGonderilcekleriGetir(int pol)
+        {
+            try
+            {
+                var sqlParams = new[]
+{
+                new SqlParameter("@polno",pol)
+            };
+                return await _repositoryContext.Database.SqlQueryRaw<OzelMesajDTO>(@"select 
+                        CONCAT(p.Name,' ',p.Surname) as hasta, pol.Name as pol, r.RandevuTarihi as randevu,
+                        p.Protocol as protokol, r.Id as randevuid
+                    from Randevular r
+                    INNER JOIN Patients p on p.Protocol=r.ProtocolNo
+                    INNER JOIN Poliklinikler pol on pol.PolNo=r.PolNo
+                    WHERE CAST(r.RandevuTarihi AS DATE) = CAST(DATEADD(day, 1, GETDATE()) AS DATE)
+                      and r.PolNo=@polno 
+                      and r.RandevuOzelMesajGonderildi=0", sqlParams
+                ).ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
         public async Task HatirlatmaMilUpte(IEnumerable<int> randevuIdler)
         {
             if(!randevuIdler.Any())
@@ -485,6 +510,21 @@ namespace Repositories.EFCore
 
             await _repositoryContext.Database.ExecuteSqlRawAsync(
                 $"update RandevuBekleyenHastalar set Bilgilendirme=1 where Id IN ({idListesi})");
+        }
+        public async  Task OzelMesajGonderilenlerUpdate(IEnumerable<int>randevuId)
+        {
+          try
+            {
+                if (randevuId == null || !randevuId.Any())
+                    return;
+                var idListesi = string.Join(",", randevuId);
+                await _repositoryContext.Database.ExecuteSqlAsync($"update Randevular set RandevuOzelMesajGonderildi=1 where Id IN ({idListesi})");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString);
+                return ;
+            }
         }
 
         public async Task HatirlatmaTaahütnameUpdateMAIL(IEnumerable<int> taahütnameIdler)

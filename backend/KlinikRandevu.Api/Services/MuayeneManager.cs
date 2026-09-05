@@ -57,6 +57,27 @@ namespace Services
         public async Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan)
         {
             if (plan == null) throw new BadRequestException("Çalıma planındaki bütün bilgilerin girilmesi gerekmektedir");
+            var haftaSonuKısıtParam = await _repositoryManager.SistemParametresi.GetirAsync("HAFTASONU_CALISMA_PLANI_KISITLA");
+            if (haftaSonuKısıtParam is null)
+            {
+                parametreEke("HAFTASONU_CALISMA_PLANI_KISITLA");
+            }
+            var hastasonuparamD1 = haftaSonuKısıtParam.Deger1?.ToUpper() ?? "HAYIR";
+
+            var izinliPolNolari = (haftaSonuKısıtParam.Deger2 ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(x => int.TryParse(x, out var p) ? p : (int?)null)
+                .Where(x => x.HasValue)
+                .Select(x => x!.Value)
+                .ToHashSet();
+
+            if (hastasonuparamD1 == "EVET" && !izinliPolNolari.Contains(plan.PolNo))
+            {
+                if (plan.GunAdi == DayOfWeek.Saturday || plan.GunAdi == DayOfWeek.Sunday)
+                {
+                    throw new BadRequestException("Haftasonu çalışma planı oluşturamazsınız");
+                }
+            }
             var doctorExists = await _repositoryManager.Muayene.doktorVarMI(plan.DoktorNo);
             if (!doctorExists) throw new NotFoundException("Doktor bilgisi bulunamadı");
             var polExists = await _repositoryManager.Muayene.polVarMI(plan.PolNo);

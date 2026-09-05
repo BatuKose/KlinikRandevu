@@ -755,6 +755,50 @@ namespace Repositories.EFCore
                 return null;
             }
         }
+        public async Task<int> tatilBlokParamRandevuKontrol(int polno,int protokol)
+        {
+            try
+            {
+                var sqlParams = new[]
+{
+                new SqlParameter("@polno",polno),
+                new SqlParameter("@protokol",protokol)
+            };
+                var kontrol = await _repositoryContext.Database.SqlQueryRaw<int>(@"select COUNT(*) as Value  from Randevular r 
+                where CAST(r.RandevuTarihi AS DATE) = CAST(GETDATE() AS DATE)
+                AND r.PolNo=@polno and r.ProtocolNo=@protokol", sqlParams).FirstAsync();
+                return kontrol;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return 0;
+            }
+        }
+        public async Task<int> tatilBlokParamUzKodKontrol(int polno,int protokol)
+        {
+            try
+            {
+                var sqlParams = new []
+                {
+                    new SqlParameter("@polno",polno),
+                    new SqlParameter("@protokol",protokol)
+                };
+                var kontrol = await _repositoryContext.Database.SqlQueryRaw<int>(@"
+                    select u.Kod as Value from Randevular r
+                    JOIN Poliklinikler p on p.PolNo=r.PolNo
+                    JOIN UzmanlikDallari u on u.Kod=p.PolUzKod
+                    where CAST(r.RandevuTarihi AS DATE) = CAST(GETDATE() AS DATE)
+                    AND r.PolNo=@polno and r.ProtocolNo=@protokol", sqlParams).FirstAsync();
+                return kontrol;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return 0;
+            }
+        }
+
     }
 
 }

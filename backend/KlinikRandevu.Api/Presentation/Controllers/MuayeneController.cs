@@ -39,7 +39,7 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.RandevuOlusturAsync(plan);
             return Ok(result);
         }
-        [YetkiKontrol(YetkiKodlari.RandevuAcma)]
+       // [YetkiKontrol(YetkiKodlari.RandevuAcma)]
         [HttpPost("muayeneolustur")]
         public async Task<IActionResult> MuayeneOlusturAsync([FromBody] MuayeneKayitiOlusturDTO muayene)
         {

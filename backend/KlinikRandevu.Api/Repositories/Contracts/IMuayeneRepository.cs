@@ -80,5 +80,7 @@ namespace Repositories.Contracts
         Task<List<TedaviKaydi>> MuayeneKaydininOdemesiIptalEdilecekTedavileri(int muayeneId);
         Task<List<OzelMesajDTO>> JobRandevuluHastalaraOzelMesajGonderilcekleriGetir(int pol);
         Task OzelMesajGonderilenlerUpdate(IEnumerable<int> randevuId);
+        Task<int> tatilBlokParamRandevuKontrol(int polno, int protokol);
+        Task<int> tatilBlokParamUzKodKontrol(int polno, int protokol);
     }
 }

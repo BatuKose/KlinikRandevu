@@ -154,7 +154,10 @@ namespace Services
                 string paramName = "TATIL_KAYIT_BLOKLA";
                 parametreEke(paramName);
             }
-            if (tatilBlokParam != null && tatilBlokParam.Deger1?.ToUpperInvariant() == "EVET")
+            int tatilBlokParamRandevuKontrol = await _repositoryManager.Muayene.tatilBlokParamRandevuKontrol(muayene.PolNo, muayene.ProtocolNo);
+            int tatilBlokParamUzKodKontrol= await _repositoryManager.Muayene.tatilBlokParamUzKodKontrol(muayene.PolNo,muayene.ProtocolNo);
+            if (tatilBlokParam != null && tatilBlokParam.Deger1?.ToUpperInvariant() == "EVET" 
+                && tatilBlokParamRandevuKontrol<=0 && tatilBlokParamUzKodKontrol!=(int)UzmanlikBransi.AcilTip)
             {
                 var yil = muayene.MuayeneTarihi.Year;
                 var key = $"tatiller:{yil}";

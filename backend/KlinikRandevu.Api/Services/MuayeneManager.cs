@@ -27,7 +27,7 @@ using static Entities.Enums.PoliklinikEnum;
 
 namespace Services
 {
-    public class MuayeneManager:IMuayeneService
+    public class MuayeneManager : IMuayeneService
     {
         private readonly IRepositoryManager _repositoryManager;
         private readonly ILogger<MuayeneManager> _logger;
@@ -1117,6 +1117,38 @@ namespace Services
                 IzinBitis = InsertDB.IzinBitis,
                 DoktorNo= InsertDB.DoktorNo
             };
+        }
+
+        public async Task<CalismaPlaniKopyala> CalismaPlaniKopyala(CalismaPlaniKopyala model)
+        {
+            if (model == null) throw new BadRequestException("Çalışma planı bilgilerini girmek zorunludur");
+            var calismaPlani = _repositoryManager.Muayene.CalismaPlaniGetir(model.CalismaPlaniId);
+            if(calismaPlani==null)
+            {
+                throw new NotFoundException("Doktor çalışma listesi bulunamadı");
+            }
+            if(calismaPlani.IsActive==false)
+            {
+                throw new BadRequestException("İptal olan çalışma planı kopyalanamaz");
+            }
+                var yeniCalismaPlani = new CalismaPlaniOlusturDTO()
+                {
+                    DoktorNo=calismaPlani.DoktorNo,
+                    BaslangicSaati=calismaPlani.BaslangicSaati,
+                    RandevuSuresiDk=calismaPlani.RandevuSuresiDk,
+                    GunAdi=model.yeniGün,
+                    BitisSaati=calismaPlani.BitisSaati,
+                    PolNo=calismaPlani.PolNo
+                };
+
+                await CalismaPlaniOlusturAsync(yeniCalismaPlani);
+                return new CalismaPlaniKopyala
+                {
+                    CalismaPlaniId=model.CalismaPlaniId,
+                    yeniGün=model.yeniGün
+                };
+            
+            
         }
     }
 }

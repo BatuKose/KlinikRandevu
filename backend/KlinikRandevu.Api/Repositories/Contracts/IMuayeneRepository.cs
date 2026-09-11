@@ -84,5 +84,6 @@ namespace Repositories.Contracts
         Task<int> tatilBlokParamUzKodKontrol(int polno, int protokol);
         public void DoktorIzınEkle(DoktorIzın doktorIzın);
         public bool SeciliGundeDoktorunIzniVarmi(int doktorno, DateOnly baslangic, DateOnly bitis);
+        public DoktorCalismaPlani? CalismaPlaniGetir(int dosyaid);
     }
 }

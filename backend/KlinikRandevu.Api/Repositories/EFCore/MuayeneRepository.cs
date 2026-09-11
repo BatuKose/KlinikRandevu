@@ -806,13 +806,49 @@ namespace Repositories.EFCore
 
         public bool SeciliGundeDoktorunIzniVarmi(int doktorno, DateOnly baslangic, DateOnly bitis)
         {
-            var kontrol = _repositoryContext.DoktorIzın.Any(i =>
-                i.DoktorNo == doktorno &&
-                i.IzinBaslangic <= bitis &&
-                i.IzinBitis >= baslangic &&
-                !i.Iptal);
+           try
+            {
+                var kontrol = _repositoryContext.DoktorIzın.Any(i =>
+               i.DoktorNo == doktorno &&
+               i.IzinBaslangic <= bitis &&
+               i.IzinBitis >= baslangic &&
+               !i.Iptal);
 
-            return kontrol;
+                return kontrol;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
+        
+        }
+        public DoktorCalismaPlani? CalismaPlaniGetir(int dosyaid)
+        {
+            if(dosyaid>0)
+            {
+               try
+                {
+                    var calismaPlani = _repositoryContext.DoktorCalismaPlanis.SingleOrDefault(c => c.Id==dosyaid);
+                    if (calismaPlani!=null)
+                    {
+                        return calismaPlani;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 

@@ -29,5 +29,6 @@ namespace Services.Contracts
         Task<OdemeIptalDTO> OdemeIade(OdemeIptalDTO odemeIptal);
         Task<DoktorIzınOlusturDTO> DoktorIzınOlusturAsync(DoktorIzınOlusturDTO model);
         Task<CalismaPlaniKopyala> CalismaPlaniKopyala(CalismaPlaniKopyala model);
+        Task<CalismaPlaniKopyalaBransBazliDTO> BransBazliCalismaPlaniKopyalaAsync(CalismaPlaniKopyalaBransBazliDTO model);
     }
 }

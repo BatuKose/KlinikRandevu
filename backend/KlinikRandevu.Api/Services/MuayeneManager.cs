@@ -7,6 +7,7 @@ using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -1149,6 +1150,45 @@ namespace Services
                 };
             
             
+        }
+        public async Task<CalismaPlaniKopyalaBransBazliDTO> BransBazliCalismaPlaniKopyalaAsync(CalismaPlaniKopyalaBransBazliDTO model)
+        {
+            if (model == null) throw new BadRequestException("Çalışma planı bilgileri boş olamaz");
+            var uygulanacakDoktor = await _repositoryManager.Muayene.DoktoruGetir(model.DoktorNumara);
+            if(uygulanacakDoktor is null)
+            {
+                throw new BadRequestException("Uygulanacak doktor bilgisi bulunamadı");
+            }
+            var calismaPlani = _repositoryManager.Muayene.CalismaPlaniGetir(model.CalismaPlaniId);
+            if (calismaPlani == null) throw new NotFoundException("Çalışma planı bulunamadı");
+            var kopyalanacakDoktorBilgisi= await _repositoryManager.Muayene.DoktoruGetir(calismaPlani.DoktorNo);
+            if (kopyalanacakDoktorBilgisi is null)
+            {
+                throw new BadRequestException("bilgisi kopyalanacak doktor bilgisi bulunamadı");
+            }
+            if (uygulanacakDoktor.doktorUzKod!=kopyalanacakDoktorBilgisi.doktorUzKod)
+            {
+                throw new BadRequestException("Branş bazlı çalışma planı kopyalamak için doktorların aynı uzmanlık kodu olması gerekmektedir.");
+            }
+            if (calismaPlani.IsActive==false)
+            {
+                throw new BadRequestException("İptal olan çalışma planı kopyalanamaz");
+            }
+            var yeniCalismaPlani = new CalismaPlaniOlusturDTO()
+            {
+                DoktorNo=calismaPlani.DoktorNo,
+                BaslangicSaati=calismaPlani.BaslangicSaati,
+                RandevuSuresiDk=calismaPlani.RandevuSuresiDk,
+                GunAdi=model.YeniGün,
+                BitisSaati=calismaPlani.BitisSaati,
+                PolNo=calismaPlani.PolNo
+            };
+            await CalismaPlaniOlusturAsync(yeniCalismaPlani);
+            return new CalismaPlaniKopyalaBransBazliDTO
+            {
+                CalismaPlaniId=model.CalismaPlaniId,
+                YeniGün=model.YeniGün
+            };
         }
     }
 }

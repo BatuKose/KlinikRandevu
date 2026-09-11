@@ -146,5 +146,11 @@ namespace Presentation.Controllers
             var result =  await _ServiceManager.MuayeneService.CalismaPlaniKopyala(model);
             return Ok(ApiResponse<CalismaPlaniKopyala>.SuccessResponse(result));
         }
+        [HttpPost("bransBazliCalismaPlaniKopyala")]
+        public async Task<IActionResult> BransBazliCalismaPlaniKopyala([FromBody] CalismaPlaniKopyalaBransBazliDTO model)
+        {
+            var result = await _ServiceManager.MuayeneService.BransBazliCalismaPlaniKopyalaAsync(model);
+            return Ok(ApiResponse<CalismaPlaniKopyalaBransBazliDTO>.SuccessResponse(result));
+        }
     }
 }

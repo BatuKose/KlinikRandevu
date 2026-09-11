@@ -134,5 +134,11 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.OdemeIade(iptal);
             return NoContent();
         }
+        [HttpPost("DoktorIzınEkle")]
+        public async Task<IActionResult> DoktorIzınEkle([FromBody] DoktorIzınOlusturDTO model)
+        {
+            var result = await _ServiceManager.MuayeneService.DoktorIzınOlusturAsync(model);
+            return Ok(ApiResponse<DoktorIzınOlusturDTO>.SuccessResponse(result));
+        }
     }
 }

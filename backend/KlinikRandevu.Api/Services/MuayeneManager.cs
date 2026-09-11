@@ -1053,5 +1053,52 @@ namespace Services
                 tedaviKodu=insertTedavi.tedaviKodu
             };
         }
+        public async Task<DoktorIzınOlusturDTO>DoktorIzınOlusturAsync(DoktorIzınOlusturDTO model)
+        {
+            if (model is null) throw new BadRequestException("Doktor izin bilgileri boş olamaz");
+            var doktorVarmi = await _repositoryManager.Muayene.doktorVarMI(model.DoktorNo);
+            if (doktorVarmi==false) throw new NotFoundException("Doktor bilgisi bulunamaadı");
+            if (model.IzinBaslangic < DateOnly.FromDateTime(DateTime.UtcNow))
+            {
+                throw new BadRequestException("İzin başlangıç tarihi bugünden küçük olamaz");
+            }
+            if(model.IzinBaslangic>model.IzinBitis)
+            {
+                throw new BadRequestException("İzin başlangıç tarihi bitiş tarihinden büyük olamaz");
+
+            }
+            if(model.IzinBitis<model.IzinBitis)
+            {
+                throw new BadRequestException("İzin bitiş tarihi başlangç tarihinden küçük olamaz");
+
+            }
+            DateOnly maxIzın = new DateOnly(2030, 12, 31);
+            if(model.IzinBitis>=maxIzın)
+            {
+                throw new BadRequestException("İzin bitiş tarihini anlanmı girin");
+            }
+            var cakismaKontrolü= _repositoryManager.Muayene.SeciliGundeDoktorunIzniVarmi(model.DoktorNo,model.IzinBaslangic,model.IzinBitis);
+            if(cakismaKontrolü==true)
+            {
+                throw new BadRequestException("Doktorun seçilen tarihlerde izni bulunmaktadır");
+            }
+            var InsertDB = new DoktorIzın()
+            {
+                DoktorNo=model.DoktorNo,
+                Aciklama=model.Aciklama,
+                Iptal=false,
+                IzinBaslangic=model.IzinBaslangic,
+                IzinBitis=model.IzinBitis
+            };
+            _repositoryManager.Muayene.DoktorIzınEkle(InsertDB);
+            await _repositoryManager.saveAsyc();
+            return new DoktorIzınOlusturDTO()
+            {
+                Aciklama = InsertDB.Aciklama,
+                IzinBaslangic=InsertDB.IzinBaslangic,
+                IzinBitis = InsertDB.IzinBitis,
+                DoktorNo= InsertDB.DoktorNo
+            };
+        }
     }
 }

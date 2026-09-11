@@ -799,6 +799,21 @@ namespace Repositories.EFCore
             }
         }
 
+        public void DoktorIzınEkle(DoktorIzın doktorIzın)
+        {
+            _repositoryContext.DoktorIzın.Add(doktorIzın);
+        }
+
+        public bool SeciliGundeDoktorunIzniVarmi(int doktorno, DateOnly baslangic, DateOnly bitis)
+        {
+            var kontrol = _repositoryContext.DoktorIzın.Any(i =>
+                i.DoktorNo == doktorno &&
+                i.IzinBaslangic <= bitis &&
+                i.IzinBitis >= baslangic &&
+                !i.Iptal);
+
+            return kontrol;
+        }
     }
 
 }

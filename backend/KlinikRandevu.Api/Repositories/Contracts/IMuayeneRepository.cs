@@ -82,5 +82,7 @@ namespace Repositories.Contracts
         Task OzelMesajGonderilenlerUpdate(IEnumerable<int> randevuId);
         Task<int> tatilBlokParamRandevuKontrol(int polno, int protokol);
         Task<int> tatilBlokParamUzKodKontrol(int polno, int protokol);
+        public void DoktorIzınEkle(DoktorIzın doktorIzın);
+        public bool SeciliGundeDoktorunIzniVarmi(int doktorno, DateOnly baslangic, DateOnly bitis);
     }
 }

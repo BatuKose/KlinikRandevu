@@ -35,6 +35,7 @@ namespace Repositories.EFCore
         public DbSet<Taahütname> taahütname {  get; set; }
         public DbSet<odeme> odeme { get; set; }
         public DbSet<RandevuBekleyenHastalar> RandevuBekleyenHastalar { get; set; }
+        public DbSet<DoktorIzın> DoktorIzın { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var property in modelBuilder.Model.GetEntityTypes()

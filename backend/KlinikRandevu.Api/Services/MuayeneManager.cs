@@ -1176,7 +1176,7 @@ namespace Services
             }
             var yeniCalismaPlani = new CalismaPlaniOlusturDTO()
             {
-                DoktorNo=calismaPlani.DoktorNo,
+                DoktorNo=model.DoktorNumara,
                 BaslangicSaati=calismaPlani.BaslangicSaati,
                 RandevuSuresiDk=calismaPlani.RandevuSuresiDk,
                 GunAdi=model.YeniGün,

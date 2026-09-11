@@ -78,6 +78,13 @@ namespace Services
                     throw new BadRequestException("Haftasonu çalışma planı oluşturamazsınız");
                 }
             }
+            //var bugun = DateOnly.FromDateTime(DateTime.UtcNow);
+            //bool doktorSuAnIzinli = _repositoryManager.Muayene.SeciliGundeDoktorunIzniVarmi(plan.DoktorNo, bugun, bugun);
+
+            //if (doktorSuAnIzinli)
+            //{
+            //    throw new BadRequestException("Doktor şu anda izinli, çalışma planı oluşturulamaz");
+            //}
             var doctorExists = await _repositoryManager.Muayene.doktorVarMI(plan.DoktorNo);
             if (!doctorExists) throw new NotFoundException("Doktor bilgisi bulunamadı");
             var polExists = await _repositoryManager.Muayene.polVarMI(plan.PolNo);
@@ -125,6 +132,12 @@ namespace Services
         {
 
             if (muayene == null) throw new BadRequestException("Muayene bilgilerini kontrol ediniz");
+            var muayeneGunu = DateOnly.FromDateTime(muayene.MuayeneTarihi);
+            bool doktorIzinliMi = _repositoryManager.Muayene.SeciliGundeDoktorunIzniVarmi(muayene.DoktorNo, muayeneGunu, muayeneGunu);
+            if(doktorIzinliMi)
+            {
+                throw new BadRequestException($"seçilen doktor {muayeneGunu} tarihinde izinlidir kayıt açılamaz");
+            }
             var uzKod = await _repositoryManager.Muayene.PolGetir(muayene.PolNo);
             if(uzKod is not null)
             {
@@ -319,7 +332,12 @@ namespace Services
 
         public async Task<RandevuOlusturDTO> RandevuOlusturAsync(RandevuOlusturDTO plan)
         {
-
+            var RandevuGunu= DateOnly.FromDateTime(plan.RandevuTarihi);
+            bool doktorIzinlimi =  _repositoryManager.Muayene.SeciliGundeDoktorunIzniVarmi(plan.DoktorNo, RandevuGunu, RandevuGunu);
+            if(doktorIzinlimi)
+            {
+                throw new BadRequestException($"seçilen doktor {RandevuGunu} tarihinde izinlidir randevu alınamaz");
+            }
             var tatilBlokParam = await _repositoryManager.SistemParametresi.GetirAsync("TATIL_KAYIT_BLOKLA");
             if(tatilBlokParam is null)
             {

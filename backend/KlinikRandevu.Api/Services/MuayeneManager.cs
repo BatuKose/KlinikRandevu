@@ -390,18 +390,6 @@ namespace Services
 
             if (calismaPlani == null)
                 throw new BadRequestException("Uygun randevu saati bulunmamaktadır.");
-            if(calismaPlani.YesilAlanZorunlu==true)
-            {
-                var poliklinik = await _repositoryManager.Muayene.PolGetir(plan.PolNo);
-                if (poliklinik == null) throw new NotFoundException("Pol bulunamadı");
-                DateTime CurrDate= DateTime.UtcNow;
-                var yesilHasta = await _repositoryManager.Muayene.HastaYesilListeHastaGetir(plan.HastaTc,poliklinik.PolUzKod);
-                if (yesilHasta == null) throw new NotFoundException("Yeşil listede hasta bulunamadı");
-                int gecenGun = (CurrDate.Date - yesilHasta.EklenmeTarihi.Date).Days;
-                var PolYesilAyarları = await _repositoryManager.Muayene.PoliklinikYesilListeAyarlarınıGetir(plan.PolNo);
-                if(PolYesilAyarları is null) throw new NotFoundException("Poliklinik yeşil liste ayarları bulunamadı kontrol ediniz");
-                if (gecenGun>PolYesilAyarları.gecerlilikSüresi) throw new BadRequestException("Yeşil liste süresi dolmuştur Yeniden başvuru gereklidir");
-            }
 
             var calismaBaslangictanGecenDk = (randevuSaati - calismaPlani.BaslangicSaati).TotalMinutes;
 
@@ -457,7 +445,19 @@ namespace Services
 
             if (hastaAyniGunRandevu)
                 throw new BadRequestException("Bu tarihte hastanın aynı doktora başka bir randevusu bulunmaktadır.");
-
+            if (calismaPlani.YesilAlanZorunlu==true)
+            {
+                var poliklinik = await _repositoryManager.Muayene.PolGetir(plan.PolNo);
+                if (poliklinik == null) throw new NotFoundException("Pol bulunamadı");
+                DateTime CurrDate = DateTime.UtcNow;
+                var yesilHasta = await _repositoryManager.Muayene.HastaYesilListeHastaGetir(plan.HastaTc, poliklinik.PolUzKod);
+                if (yesilHasta == null) throw new NotFoundException("Yeşil listede hasta bulunamadı");
+                int gecenGun = (CurrDate.Date - yesilHasta.EklenmeTarihi.Date).Days;
+                var PolYesilAyarları = await _repositoryManager.Muayene.PoliklinikYesilListeAyarlarınıGetir(plan.PolNo);
+                if (PolYesilAyarları is null) throw new NotFoundException("Poliklinik yeşil liste ayarları bulunamadı kontrol ediniz");
+                if (gecenGun>PolYesilAyarları.gecerlilikSüresi) throw new BadRequestException("Yeşil liste süresi dolmuştur Yeniden başvuru gereklidir");
+                yesilHasta.aktifMi=false;
+            }
 
             var randevuOlustur = new Randevu
             {
@@ -480,6 +480,7 @@ namespace Services
             string EntityTipi = "randevular";
             int entityId = plan.ProtocolNo;
             logYaz(aksiyonTipi, entityId, EntityTipi);
+            
             await _repositoryManager.saveAsyc();
 
             var mailParametre = await _repositoryManager.SistemParametresi.GetirAsync("EMAIL_GONDERME");

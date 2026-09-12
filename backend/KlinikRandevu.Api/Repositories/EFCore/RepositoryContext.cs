@@ -36,6 +36,8 @@ namespace Repositories.EFCore
         public DbSet<odeme> odeme { get; set; }
         public DbSet<RandevuBekleyenHastalar> RandevuBekleyenHastalar { get; set; }
         public DbSet<DoktorIzın> DoktorIzın { get; set; }
+        public DbSet<PoliklinikYesilAlanAyarları> PoliklinikYesilAlanAyarları { get; set; }
+        public DbSet<HastaYesilListe> HastaYesilListe { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var property in modelBuilder.Model.GetEntityTypes()

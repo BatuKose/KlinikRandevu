@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Entities.Enums.PoliklinikEnum;
 
 namespace Repositories.Contracts
 {
@@ -85,5 +86,12 @@ namespace Repositories.Contracts
         public void DoktorIzınEkle(DoktorIzın doktorIzın);
         public bool SeciliGundeDoktorunIzniVarmi(int doktorno, DateOnly baslangic, DateOnly bitis);
         public DoktorCalismaPlani? CalismaPlaniGetir(int dosyaid);
+        public  Task< bool> PoliklinikYesilAlanVarmı(int polno);
+        public void PoliklinikYesilAlanAyarlarıEkle(PoliklinikYesilAlanAyarları model);
+        void HastaYesilListeEkle(HastaYesilListe model);
+         Task<Patient> HastaBilgisiGetirTC(long tc);
+        Task<Doctor> DoktoruGetirTc(long tc);
+        Task<HastaYesilListe?> HastaYesilListeHastaGetir(long tc, UzmanlikBransi brans);
+        Task<PoliklinikYesilAlanAyarları> PoliklinikYesilListeAyarlarınıGetir(int polno);
     }
 }

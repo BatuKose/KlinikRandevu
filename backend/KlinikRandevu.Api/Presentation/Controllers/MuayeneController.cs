@@ -152,5 +152,17 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.BransBazliCalismaPlaniKopyalaAsync(model);
             return Ok(ApiResponse<CalismaPlaniKopyalaBransBazliDTO>.SuccessResponse(result));
         }
+        [HttpPost("PoliklinikYesilAlanEKle")]
+        public async Task<IActionResult> PolYesilAlanAyarEkle([FromBody] PoliklinikYesilAlanAyarlarıEkleDto model)
+        {
+            var result= await _ServiceManager.MuayeneService.PoliklinikYesilAlanAyariEkle(model);
+            return Ok(ApiResponse<PoliklinikYesilAlanAyarlarıEkleDto>.SuccessResponse(result));
+        }
+        [HttpPost("HastaYesilAlanEKle")]
+        public async Task<IActionResult> HastaYesilAlanEKleAsync([FromBody] YesilListeyeHastaEkleDTO model)
+        {
+            var result= await _ServiceManager.MuayeneService.YesilListeyeHastaEkleAsync(model);
+            return Ok(ApiResponse<YesilListeyeHastaEkleDTO>.SuccessResponse(model));
+        }
     }
 }

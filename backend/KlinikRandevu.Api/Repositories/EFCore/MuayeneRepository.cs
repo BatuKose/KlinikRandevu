@@ -13,6 +13,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Entities.Enums.PoliklinikEnum;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -735,10 +736,22 @@ namespace Repositories.EFCore
 
         public async Task<Patient> HastaBilgisiGetir(int protokol)
         {
+            
             var hasta = await _repositoryContext.Patients.SingleOrDefaultAsync(p => p.Protocol==protokol);
             return hasta;
         }
+        public async Task<Patient> HastaBilgisiGetirTC(long tc)
+        {
 
+            var hasta = await _repositoryContext.Patients.SingleOrDefaultAsync(p => p.TcKimlik==tc);
+            return hasta;
+        }
+        public async Task<Doctor> DoktoruGetirTc(long tc)
+        {
+
+            var doktor = await _repositoryContext.Doctors.SingleOrDefaultAsync(p => p.doktorTc==tc);
+            return doktor;
+        }
         public void RandevuBekletmeEkke(RandevuBekleyenHastalar randevuBekleyenHastalar)
         {
             _repositoryContext.RandevuBekleyenHastalar.Add(randevuBekleyenHastalar);
@@ -849,6 +862,39 @@ namespace Repositories.EFCore
             {
                 return null;
             }
+        }
+        public void PoliklinikYesilAlanAyarlarıEkle(PoliklinikYesilAlanAyarları model)
+        {
+            _repositoryContext.PoliklinikYesilAlanAyarları.Add(model);
+        }
+        public async Task <bool> PoliklinikYesilAlanVarmı(int polno)
+        {
+            try
+            {
+                var result = await _repositoryContext.PoliklinikYesilAlanAyarları.AnyAsync(a => a.polNo==polno);
+                return result;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
+
+        }
+        public async Task<PoliklinikYesilAlanAyarları> PoliklinikYesilListeAyarlarınıGetir(int polno)
+        {
+            var result = await _repositoryContext.PoliklinikYesilAlanAyarları.SingleOrDefaultAsync(p => p.polNo==polno);
+            return result;
+        }
+        public void HastaYesilListeEkle(HastaYesilListe model)
+        {
+            _repositoryContext.HastaYesilListe.Add(model);
+        }
+        public async Task<HastaYesilListe?> HastaYesilListeHastaGetir(long tc, UzmanlikBransi brans)
+        {
+            var hasta = await _repositoryContext.HastaYesilListe.FirstOrDefaultAsync(h => h.hastaTc==tc && h.aktifMi==true && h.PolUzKod==brans);
+            if(hasta==null) return null;
+            return hasta;
         }
     }
 

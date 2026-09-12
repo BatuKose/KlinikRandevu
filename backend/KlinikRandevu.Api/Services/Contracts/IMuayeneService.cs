@@ -30,5 +30,7 @@ namespace Services.Contracts
         Task<DoktorIzınOlusturDTO> DoktorIzınOlusturAsync(DoktorIzınOlusturDTO model);
         Task<CalismaPlaniKopyala> CalismaPlaniKopyala(CalismaPlaniKopyala model);
         Task<CalismaPlaniKopyalaBransBazliDTO> BransBazliCalismaPlaniKopyalaAsync(CalismaPlaniKopyalaBransBazliDTO model);
+        Task<PoliklinikYesilAlanAyarlarıEkleDto> PoliklinikYesilAlanAyariEkle(PoliklinikYesilAlanAyarlarıEkleDto model);
+        Task<YesilListeyeHastaEkleDTO> YesilListeyeHastaEkleAsync(YesilListeyeHastaEkleDTO model);
     }
 }

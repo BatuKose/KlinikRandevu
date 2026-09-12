@@ -16,5 +16,6 @@ namespace Entities.Models
         public TimeSpan BitisSaati { get; set; }     
         public int RandevuSuresiDk { get; set; }  
         public bool IsActive { get; set; } = true;
+        public bool YesilAlanZorunlu { get; set; } = false;
     }
 }

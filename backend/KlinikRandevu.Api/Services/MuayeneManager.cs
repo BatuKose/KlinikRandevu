@@ -113,7 +113,8 @@ namespace Services
                 DoktorNo=plan.DoktorNo,
                 GunAdi=plan.GunAdi,
                 PolNo=plan.PolNo,
-                RandevuSuresiDk=plan.RandevuSuresiDk
+                RandevuSuresiDk=plan.RandevuSuresiDk,
+                YesilAlanZorunlu=plan.YesilAlan
             };
              _repositoryManager.Muayene.CalismaPlaniOlustur(CalismaPlani);
             await _repositoryManager.saveAsyc();
@@ -124,7 +125,8 @@ namespace Services
                 DoktorNo=CalismaPlani.DoktorNo,
                 GunAdi=CalismaPlani.GunAdi,
                 PolNo=CalismaPlani.PolNo,
-                RandevuSuresiDk=CalismaPlani.RandevuSuresiDk
+                RandevuSuresiDk=CalismaPlani.RandevuSuresiDk,
+                YesilAlan=CalismaPlani.YesilAlanZorunlu
             };
             return result;
         }
@@ -388,6 +390,18 @@ namespace Services
 
             if (calismaPlani == null)
                 throw new BadRequestException("Uygun randevu saati bulunmamaktadır.");
+            if(calismaPlani.YesilAlanZorunlu==true)
+            {
+                var poliklinik = await _repositoryManager.Muayene.PolGetir(plan.PolNo);
+                if (poliklinik == null) throw new NotFoundException("Pol bulunamadı");
+                DateTime CurrDate= DateTime.UtcNow;
+                var yesilHasta = await _repositoryManager.Muayene.HastaYesilListeHastaGetir(plan.HastaTc,poliklinik.PolUzKod);
+                if (yesilHasta == null) throw new NotFoundException("Yeşil listede hasta bulunamadı");
+                int gecenGun = (CurrDate.Date - yesilHasta.EklenmeTarihi.Date).Days;
+                var PolYesilAyarları = await _repositoryManager.Muayene.PoliklinikYesilListeAyarlarınıGetir(plan.PolNo);
+                if(PolYesilAyarları is null) throw new NotFoundException("Poliklinik yeşil liste ayarları bulunamadı kontrol ediniz");
+                if (gecenGun>PolYesilAyarları.gecerlilikSüresi) throw new BadRequestException("Yeşil liste süresi dolmuştur Yeniden başvuru gereklidir");
+            }
 
             var calismaBaslangictanGecenDk = (randevuSaati - calismaPlani.BaslangicSaati).TotalMinutes;
 
@@ -1188,6 +1202,67 @@ namespace Services
             {
                 CalismaPlaniId=model.CalismaPlaniId,
                 YeniGün=model.YeniGün
+            };
+        }
+        public async Task<PoliklinikYesilAlanAyarlarıEkleDto> PoliklinikYesilAlanAyariEkle(PoliklinikYesilAlanAyarlarıEkleDto model)
+        {
+            if (model is null) throw new BadRequestException("Ayar bilgileri boş olamaz");
+            if (model.gecerlilikSüresi<=0) throw new BadRequestException("Geçerlililik süresi sıfırdan büyük olmalıdır");
+            var polVarmi = await _repositoryManager.Muayene.polVarMI(model.polNo);
+            if (polVarmi==false) throw new BadRequestException("Poliklinik bilgisi bulunamadı");
+            var dahaOnceEklendiMi = await _repositoryManager.Muayene.PoliklinikYesilAlanVarmı(model.polNo);
+            if(dahaOnceEklendiMi==true)
+            {
+                throw new BadRequestException("İlgili polikliniğin ayarı mevcuttur yenisi eklenemez güncelleme yapınız");
+            }
+            var InsertDb = new PoliklinikYesilAlanAyarları()
+            {
+                gecerlilikSüresi=model.gecerlilikSüresi,
+                polNo=model.polNo
+            };
+            _repositoryManager.Muayene.PoliklinikYesilAlanAyarlarıEkle(InsertDb);
+            _repositoryManager.Save();
+            return new PoliklinikYesilAlanAyarlarıEkleDto()
+            {
+                gecerlilikSüresi=InsertDb.gecerlilikSüresi,
+                polNo=InsertDb.polNo
+            };
+
+        }
+        public async Task<YesilListeyeHastaEkleDTO> YesilListeyeHastaEkleAsync(YesilListeyeHastaEkleDTO model)
+        {
+            if(model==null) throw new BadRequestException("Bilgiler eksik eklenemez");
+            var hastaBilgileri = await _repositoryManager.Muayene.HastaBilgisiGetirTC(model.hastaTc);
+            if (hastaBilgileri==null) throw new NotFoundException("Hasta bilgileri bulunamadı");
+            var doktorBilgileri = await _repositoryManager.Muayene.DoktoruGetirTc(model.EkleyenDoktorTC);
+            if (doktorBilgileri==null) throw new NotFoundException("Doktor bilgileri bulunamadı");
+            if (model.EklenmeTarihi<DateTime.UtcNow) throw new BadRequestException("Yeşil listeye geçmiş tarihli ekleyemezsin");
+            var kayıtKontrol = DateTime.UtcNow.AddYears(1);
+            if (model.EklenmeTarihi>=kayıtKontrol) throw new BadRequestException("Bir  yıl sonrasına yeşil alan eklemesi yapılmaz");
+            var muayeneGetir = await _repositoryManager.Muayene.GetMuayeneById(model.muayeneId);
+            if (muayeneGetir==null) throw new NotFoundException("Muayene kaydı bulunamadı");
+            var muayeneDoktoru = await _repositoryManager.Muayene.DoktoruGetir(muayeneGetir.DoktorNo);
+            if (muayeneDoktoru == null) throw new BadRequestException("Muayene eden doktor bilgisine ulaşılamadı");
+            if (model.EkleyenDoktorTC!=muayeneDoktoru.doktorTc) throw new BadRequestException("Yeşil listeye ekleyen doktor ile muayene eden doktor aynı olmalıdır");
+            var muayenedekiHasta = await _repositoryManager.Muayene.HastaBilgisiGetir(muayeneGetir.ProtocolNo);
+            if (model.hastaTc!=muayenedekiHasta.TcKimlik) throw new BadRequestException("Muayenedeki hasta ile yeşil alana eklenmek istenen hastalar farklıdır");
+            var InsertDb = new HastaYesilListe()
+            {
+                aktifMi=true,
+                EklenmeTarihi=model.EklenmeTarihi,
+                EkleyenDoktorTC=model.EkleyenDoktorTC,
+                hastaTc=model.hastaTc,
+                muayeneId=model.muayeneId
+            };
+            _repositoryManager.Muayene.HastaYesilListeEkle(InsertDb);
+            await _repositoryManager.saveAsyc();
+            return new YesilListeyeHastaEkleDTO()
+            {
+
+                EklenmeTarihi=model.EklenmeTarihi,
+                EkleyenDoktorTC=model.EkleyenDoktorTC,
+                hastaTc=model.hastaTc,
+                muayeneId=model.muayeneId
             };
         }
     }

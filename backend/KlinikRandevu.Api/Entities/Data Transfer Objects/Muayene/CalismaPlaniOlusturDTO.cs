@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components.Web;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,6 @@ namespace Entities.Data_Transfer_Objects.Muayene
         public TimeSpan BaslangicSaati { get; set; }  
         public TimeSpan BitisSaati { get; set; }       
         public int RandevuSuresiDk { get; set; }
+        public bool YesilAlan { get; set; } = false;
     }
 }

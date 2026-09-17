@@ -2,7 +2,18 @@ using Hangfire;
 using KlinikRandevu.Extensions;
 using Services.Contracts;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args); // prodda deðiþicek
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddControllers().AddApplicationPart(typeof(Presentation.Controllers.PatientController).Assembly);
 
 builder.Services.ConfigureSwagger();
@@ -21,6 +32,9 @@ builder.Services.AddHttpContextAccessor();
 builder.AddSerilogLogging();
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");// prodda deðiþicek
+
 app.UseHangfireDashboard("/hangfire");
 
 RecurringJob.AddOrUpdate<IJobService>(

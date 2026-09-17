@@ -1,0 +1,123 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.layout-icerik {
+  flex: 1;
+  min-width: 0;
+  background: var(--renk-arkaplan);
+  min-height: 100vh;
+  transition: margin-left 0.25s ease;
+}
+
+.layout.sidebar-acik .layout-icerik {
+  margin-left: var(--sidebar-genislik);
+}
+
+.layout.sidebar-kapali .layout-icerik {
+  margin-left: var(--sidebar-kapali-genislik);
+}
+
+/* Tüm sayfalar için ortak wrapper */
+.sayfa {
+  padding: 28px 32px;
+}
+
+.sayfa-baslik {
+  margin-bottom: 24px;
+}
+
+.sayfa-baslik h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--renk-metin);
+}
+
+/* ── Backdrop (sadece mobilde görünür) ── */
+.sidebar-backdrop {
+  display: none;
+}
+
+/* ── Mobil topbar (sadece mobilde görünür) ── */
+.mobil-topbar {
+  display: none;
+}
+
+/* ── Tablet: 640px – 1023px ── */
+@media (max-width: 1023px) {
+  .sayfa {
+    padding: 20px 24px;
+  }
+}
+
+/* ── Mobil: < 640px ── */
+@media (max-width: 639px) {
+  /* İçerik her zaman tam genişlik alır; sidebar overlay olarak üste biner */
+  .layout.sidebar-acik .layout-icerik,
+  .layout.sidebar-kapali .layout-icerik {
+    margin-left: 0;
+  }
+
+  .sayfa {
+    padding: 16px;
+  }
+
+  .sayfa-baslik h1 {
+    font-size: 1.25rem;
+  }
+
+  /* Backdrop görünür olur */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 99;
+  }
+
+  /* Mobil topbar görünür olur */
+  .mobil-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--renk-kart);
+    border-bottom: 1px solid var(--renk-kenar);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: var(--golge);
+  }
+
+  .mobil-menu-btn {
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: var(--renk-metin);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .mobil-menu-btn:hover {
+    background: var(--renk-arkaplan);
+  }
+
+  .mobil-menu-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+  }
+
+  .mobil-site-adi {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--renk-metin);
+  }
+}

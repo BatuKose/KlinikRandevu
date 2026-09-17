@@ -24,13 +24,21 @@ namespace Presentation.Controllers
         {
             _ServiceManager=ıserviceManager;
         }
+        [HttpGet("hepsinigetir")]
+        public async Task<IActionResult> HepsiniGetir()
+        {
+            var parametreler = await _ServiceManager.SistemParametreService.HepsiniGetirAsync();
+            return Ok(parametreler);
+        }
+
         [HttpPost("parametreekle")]
         public async Task<IActionResult> ParamtreEkle([FromBody] ParametreEkleDTO param)
         {
             var parametre =  await _ServiceManager.SistemParametreService.ParametreEkleAsync(param);
             return NoContent();
         }
-        [HttpPatch("parametreguncelle")]
+
+        [HttpPatch("parametreguncelle/{id}")]
         public async Task<IActionResult> ParamtreGuncelle([FromRoute] int id,[FromBody] ParametreEkleDTO param)
         {
             var parametre = await _ServiceManager.SistemParametreService.ParametreGuncelle(param,id);

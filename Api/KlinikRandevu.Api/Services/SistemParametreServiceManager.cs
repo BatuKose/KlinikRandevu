@@ -38,6 +38,11 @@ namespace Services
                 
         }
 
+        public async Task<List<SistemParametresi>> HepsiniGetirAsync()
+        {
+            return await _repositoryManager.SistemParametresi.HepsiniGetirAsync();
+        }
+
         public async Task<bool> AktifMi(string parametreAdi)
         {
            var param= await GetirAsync(parametreAdi);

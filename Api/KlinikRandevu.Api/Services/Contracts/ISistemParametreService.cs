@@ -12,6 +12,7 @@ namespace Services.Contracts
     public interface ISistemParametreService
     {
         Task<SistemParametresi?> GetirAsync(string parametreAdi);
+        Task<List<SistemParametresi>> HepsiniGetirAsync();
         Task<bool> AktifMi(string parametreAdi);
         Task<ParametreEkleDTO> ParametreEkleAsync(ParametreEkleDTO parametre);
         Task<ParametreEkleDTO> ParametreGuncelle(ParametreEkleDTO parametre, int id);

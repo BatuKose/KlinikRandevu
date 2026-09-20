@@ -93,5 +93,12 @@ namespace Repositories.Contracts
         Task<Doctor> DoktoruGetirTc(long tc);
         Task<HastaYesilListe?> HastaYesilListeHastaGetir(long tc, UzmanlikBransi brans);
         Task<PoliklinikYesilAlanAyarları> PoliklinikYesilListeAyarlarınıGetir(int polno);
+        List<AktifDoktorlariGetirDTO> AktifDoktorlariGetir();
+        List<AktifServisListesiGetirDto> AktifServisleriGetir();
+        Task<MuayeneKaydi?> GetMuayeneByRandevuId(int randevuId);
+        Task<List<teshisler>> TeshisleriGetir(int muayeneId);
+        Task<List<TedaviKaydi>> TedavileriGetir(int muayeneId);
+        Task<List<odeme>> OdemeleriGetir(int muayeneId);
+        Task<List<PoliklinikHastaListesiDTO>> PoliklinikHastaListesiGetir(int polNo, DateTime baslangic, DateTime bitis);
     }
 }

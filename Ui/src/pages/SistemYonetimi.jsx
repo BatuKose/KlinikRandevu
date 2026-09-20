@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { parametreService } from '../services/parametreService';
+import { getApiErrorMessage } from '../utils/apiError';
 import './SistemYonetimi.css';
 
 const BOSH_PARAMETRE = {
@@ -40,7 +41,7 @@ function ParametreModal({ parametre, onKaydet, onKapat }) {
     try {
       await onKaydet(form);
     } catch (err) {
-      setHata(err?.response?.data?.message || err?.message || 'Bir hata oluştu');
+      setHata(getApiErrorMessage(err));
     } finally {
       setYukleniyor(false);
     }
@@ -125,7 +126,7 @@ function KullaniciEkle() {
     } catch (err) {
       setMesaj({
         tip: 'hata',
-        metin: err?.response?.data?.message || err?.message || 'Bir hata oluştu',
+        metin: getApiErrorMessage(err),
       });
     } finally {
       setYukleniyor(false);
@@ -190,7 +191,7 @@ export default function SistemYonetimi() {
       const res = await parametreService.hepsiniGetir();
       setParametreler(res.data);
     } catch (err) {
-      setHata(err?.response?.data?.message || 'Parametreler yüklenemedi');
+      setHata(getApiErrorMessage(err, 'Parametreler yüklenemedi'));
     } finally {
       setYukleniyor(false);
     }
@@ -233,7 +234,7 @@ export default function SistemYonetimi() {
       await parametreService.cacheTemizle();
       bildirimGoster('Cache başarıyla temizlendi');
     } catch (err) {
-      bildirimGoster(err?.response?.data?.message || 'Cache temizlenemedi');
+      bildirimGoster(getApiErrorMessage(err, 'Cache temizlenemedi'));
     }
   };
 

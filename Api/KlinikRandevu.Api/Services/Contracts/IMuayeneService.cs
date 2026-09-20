@@ -32,5 +32,15 @@ namespace Services.Contracts
         Task<CalismaPlaniKopyalaBransBazliDTO> BransBazliCalismaPlaniKopyalaAsync(CalismaPlaniKopyalaBransBazliDTO model);
         Task<PoliklinikYesilAlanAyarlarıEkleDto> PoliklinikYesilAlanAyariEkle(PoliklinikYesilAlanAyarlarıEkleDto model);
         Task<YesilListeyeHastaEkleDTO> YesilListeyeHastaEkleAsync(YesilListeyeHastaEkleDTO model);
+        List<AktifDoktorlariGetirDTO> AktifDoktorlariGetir();
+        List<AktifServisListesiGetirDto> AktifServisleriGetir();
+        Task<MuayeneKaydiDetayDTO> MuayeneDetayGetir(int muayeneId);
+        Task<MuayeneKaydiDetayDTO> MuayeneDetayRandevuIleGetir(int randevuId);
+        Task<List<teshisler>> TeshisleriGetir(int muayeneId);
+        Task<List<TedaviKaydi>> TedavileriGetir(int muayeneId);
+        Task<List<odeme>> OdemeleriGetir(int muayeneId);
+        Task<double> MuayeneBorcGetir(int muayeneId);
+        Task<double> MuayeneOdemeToplamGetir(int muayeneId);
+        Task<List<PoliklinikHastaListesiDTO>> PoliklinikHastaListesiGetir(int polNo, DateTime baslangic, DateTime bitis);
     }
 }

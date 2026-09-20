@@ -164,5 +164,65 @@ namespace Presentation.Controllers
             var result= await _ServiceManager.MuayeneService.YesilListeyeHastaEkleAsync(model);
             return Ok(ApiResponse<YesilListeyeHastaEkleDTO>.SuccessResponse(model));
         }
+        [HttpGet("doktorListesiGetir")]
+        public IActionResult AktifDoktorlariGetir()
+        {
+            var doktorList = _ServiceManager.MuayeneService.AktifDoktorlariGetir();
+            return Ok(ApiResponse<List<AktifDoktorlariGetirDTO>>.SuccessResponse(doktorList));
+        }
+        [HttpGet("ServisListesiGetir")]
+        public IActionResult AktifServisListesiniGetir()
+        {
+            var servisList = _ServiceManager.MuayeneService.AktifServisleriGetir();
+            return Ok(ApiResponse<List<AktifServisListesiGetirDto>>.SuccessResponse(servisList));
+        }
+        [HttpGet("muayeneGetir")]
+        public async Task<IActionResult> MuayeneGetir([FromQuery] int id)
+        {
+            var result = await _ServiceManager.MuayeneService.MuayeneDetayGetir(id);
+            return Ok(ApiResponse<MuayeneKaydiDetayDTO>.SuccessResponse(result));
+        }
+        [HttpGet("muayeneRandevuIleGetir")]
+        public async Task<IActionResult> MuayeneRandevuIleGetir([FromQuery] int randevuId)
+        {
+            var result = await _ServiceManager.MuayeneService.MuayeneDetayRandevuIleGetir(randevuId);
+            return Ok(ApiResponse<MuayeneKaydiDetayDTO>.SuccessResponse(result));
+        }
+        [HttpGet("teshisleriGetir")]
+        public async Task<IActionResult> TeshisleriGetir([FromQuery] int muayeneId)
+        {
+            var result = await _ServiceManager.MuayeneService.TeshisleriGetir(muayeneId);
+            return Ok(ApiResponse<List<teshisler>>.SuccessResponse(result));
+        }
+        [HttpGet("tedavileriGetir")]
+        public async Task<IActionResult> TedavileriGetir([FromQuery] int muayeneId)
+        {
+            var result = await _ServiceManager.MuayeneService.TedavileriGetir(muayeneId);
+            return Ok(ApiResponse<List<TedaviKaydi>>.SuccessResponse(result));
+        }
+        [HttpGet("odemeleriGetir")]
+        public async Task<IActionResult> OdemeleriGetir([FromQuery] int muayeneId)
+        {
+            var result = await _ServiceManager.MuayeneService.OdemeleriGetir(muayeneId);
+            return Ok(ApiResponse<List<odeme>>.SuccessResponse(result));
+        }
+        [HttpGet("muayeneBorcGetir")]
+        public async Task<IActionResult> MuayeneBorcGetir([FromQuery] int muayeneId)
+        {
+            var result = await _ServiceManager.MuayeneService.MuayeneBorcGetir(muayeneId);
+            return Ok(ApiResponse<double>.SuccessResponse(result));
+        }
+        [HttpGet("muayeneOdemeToplamGetir")]
+        public async Task<IActionResult> MuayeneOdemeToplamGetir([FromQuery] int muayeneId)
+        {
+            var result = await _ServiceManager.MuayeneService.MuayeneOdemeToplamGetir(muayeneId);
+            return Ok(ApiResponse<double>.SuccessResponse(result));
+        }
+        [HttpGet("poliklinikHastaListesiGetir")]
+        public async Task<IActionResult> PoliklinikHastaListesiGetir([FromQuery] int polNo, [FromQuery] DateTime baslangic, [FromQuery] DateTime bitis)
+        {
+            var result = await _ServiceManager.MuayeneService.PoliklinikHastaListesiGetir(polNo, baslangic, bitis);
+            return Ok(ApiResponse<List<PoliklinikHastaListesiDTO>>.SuccessResponse(result));
+        }
     }
 }

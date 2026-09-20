@@ -265,7 +265,7 @@ namespace Services
             if (!patientExists)
                 throw new NotFoundException("Hasta bilgisi bulunamadı");
 
-            if (muayene.MuayeneTarihi<DateTime.UtcNow) 
+            if (muayene.MuayeneTarihi.Date<DateTime.UtcNow.Date)
                 throw new BadRequestException("Muayene tarihi geçmiş tarihli olamaz");
 
             int? randevuid=null;
@@ -324,6 +324,7 @@ namespace Services
 
             return new MuayeneKayitiOlusturDTO
             {
+                Id=kayit.Id,
                 BaslangicSaati=kayit.BaslangicSaati,
                 ProtocolNo=kayit.ProtocolNo,
                 DoktorNo=kayit.DoktorNo,
@@ -561,11 +562,11 @@ namespace Services
         {
             if (baslangic < new DateTime(1900, 1, 1) || bitis < new DateTime(1900, 1, 1))
             {
-                throw new ArgumentException("Geçersiz tarih aralığı.");
+                throw new BadRequestException("Geçersiz tarih aralığı.");
             }
             if (baslangic > bitis)
             {
-                throw new ArgumentException("Başlangıç tarihi bitişten büyük olamaz.");
+                throw new BadRequestException("Başlangıç tarihi bitişten büyük olamaz.");
             }
 
             var result = await _repositoryManager.Muayene.HastaRandevulariniGetir(baslangic, bitis);
@@ -916,6 +917,7 @@ namespace Services
                         odemeToplam=odeme.odemeToplam,
                         odemeTarihi=DateTime.UtcNow
                     };
+                    _repositoryManager.Muayene.OdemeYap(InsertOdeme);
                     var odenecekTedaviler = await _repositoryManager.Muayene.MuayeneKaydininOdenecekTedavileri(odeme.muayeneId);
                     foreach(var tedavi in odenecekTedaviler)
                     {
@@ -1265,6 +1267,81 @@ namespace Services
                 hastaTc=model.hastaTc,
                 muayeneId=model.muayeneId
             };
+        }
+        public List<AktifDoktorlariGetirDTO> AktifDoktorlariGetir()
+        {
+            var doktorlar = _repositoryManager.Muayene.AktifDoktorlariGetir();
+            if(doktorlar is null || doktorlar.Count<=0)
+            {
+                throw new NotFoundException("Doktor listesi bulunamadı");
+            }
+            return doktorlar;
+        }
+        public List<AktifServisListesiGetirDto> AktifServisleriGetir()
+        {
+            var servisler = _repositoryManager.Muayene.AktifServisleriGetir();
+            if(servisler is null || servisler.Count<=0)
+            {
+                throw new NotFoundException("Servis listesi bulunamadı");
+            }
+            return servisler;
+        }
+        public async Task<MuayeneKaydiDetayDTO> MuayeneDetayGetir(int muayeneId)
+        {
+            var muayene = await _repositoryManager.Muayene.GetMuayeneById(muayeneId);
+            if (muayene == null) throw new NotFoundException("Muayene kaydı bulunamadı");
+            return await MuayeneKaydiDetayaDonustur(muayene);
+        }
+        public async Task<MuayeneKaydiDetayDTO> MuayeneDetayRandevuIleGetir(int randevuId)
+        {
+            var muayene = await _repositoryManager.Muayene.GetMuayeneByRandevuId(randevuId);
+            if (muayene == null) throw new NotFoundException("Bu randevuya ait muayene kaydı bulunamadı");
+            return await MuayeneKaydiDetayaDonustur(muayene);
+        }
+        private async Task<MuayeneKaydiDetayDTO> MuayeneKaydiDetayaDonustur(MuayeneKaydi muayene)
+        {
+            var doktor = await _repositoryManager.Muayene.DoktoruGetir(muayene.DoktorNo);
+            var pol = await _repositoryManager.Muayene.PolGetir(muayene.PolNo);
+            return new MuayeneKaydiDetayDTO
+            {
+                Id = muayene.Id,
+                ProtocolNo = muayene.ProtocolNo,
+                DoktorNo = muayene.DoktorNo,
+                DoktorAd = doktor?.DoktorAd,
+                PolNo = muayene.PolNo,
+                PolAdi = pol?.Name,
+                HastaTc = muayene.HastaTc,
+                MuayeneTarihi = muayene.MuayeneTarihi,
+                BaslangicSaati = muayene.BaslangicSaati,
+                BitisSaati = muayene.BitisSaati,
+                RandevuId = muayene.RandevuId
+            };
+        }
+        public async Task<List<teshisler>> TeshisleriGetir(int muayeneId)
+        {
+            return await _repositoryManager.Muayene.TeshisleriGetir(muayeneId);
+        }
+        public async Task<List<TedaviKaydi>> TedavileriGetir(int muayeneId)
+        {
+            return await _repositoryManager.Muayene.TedavileriGetir(muayeneId);
+        }
+        public async Task<List<odeme>> OdemeleriGetir(int muayeneId)
+        {
+            return await _repositoryManager.Muayene.OdemeleriGetir(muayeneId);
+        }
+        public async Task<double> MuayeneBorcGetir(int muayeneId)
+        {
+            return await _repositoryManager.Muayene.MuayeneKaydininToplamBorucunuGetir(muayeneId);
+        }
+        public async Task<double> MuayeneOdemeToplamGetir(int muayeneId)
+        {
+            return await _repositoryManager.Muayene.MuayeneKaydininToplamOdemesiniGetir(muayeneId);
+        }
+        public async Task<List<PoliklinikHastaListesiDTO>> PoliklinikHastaListesiGetir(int polNo, DateTime baslangic, DateTime bitis)
+        {
+            if (polNo <= 0) throw new BadRequestException("Poliklinik seçiniz");
+            if (baslangic > bitis) throw new BadRequestException("Başlangıç tarihi bitişten büyük olamaz");
+            return await _repositoryManager.Muayene.PoliklinikHastaListesiGetir(polNo, baslangic, bitis);
         }
     }
 }

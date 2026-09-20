@@ -200,7 +200,8 @@ namespace Repositories.EFCore
                 pol.Name AS Poliklinik,
                 d.DoktorAd AS Doktor,
                 uz.Ad AS UzmanlikDali,
-                r.RandevuTarihi AS RandevuTarihi
+                r.RandevuTarihi AS RandevuTarihi,
+                r.iptal AS Iptal
             FROM Randevular AS r
             INNER JOIN Patients AS p ON p.Protocol = r.ProtocolNo
             INNER JOIN Poliklinikler AS pol ON pol.PolNo = r.PolNo
@@ -306,7 +307,8 @@ namespace Repositories.EFCore
                 pol.Name AS Poliklinik,
                 d.DoktorAd AS Doktor,
                 uz.Ad AS UzmanlikDali,
-                r.RandevuTarihi AS RandevuTarihi
+                r.RandevuTarihi AS RandevuTarihi,
+                r.iptal AS Iptal
             FROM Randevular AS r
             INNER JOIN Patients AS p ON p.Protocol = r.ProtocolNo
             INNER JOIN Poliklinikler AS pol ON pol.PolNo = r.PolNo
@@ -895,6 +897,124 @@ namespace Repositories.EFCore
             var hasta = await _repositoryContext.HastaYesilListe.FirstOrDefaultAsync(h => h.hastaTc==tc && h.aktifMi==true && h.PolUzKod==brans);
             if(hasta==null) return null;
             return hasta;
+        }
+        public List<AktifDoktorlariGetirDTO> AktifDoktorlariGetir()
+        {
+            return _repositoryContext.Doctors
+                .AsNoTracking()
+                .Where(d => d.isActive)
+                .Select(d => new AktifDoktorlariGetirDTO
+                {
+                    DoktorNo = d.doktorNo,
+                    DoktorAd = d.DoktorAd
+                })
+                .ToList();
+        }
+        public List<AktifServisListesiGetirDto>AktifServisleriGetir()
+        {
+            return _repositoryContext.Polikliniks.AsNoTracking().Where(p => p.isActive==true).Select(p => new AktifServisListesiGetirDto
+            {
+                PolUzKod=p.PolUzKod,
+                ServisAdi=p.Name,
+                ServisNo=p.PolNo
+            }).ToList();
+
+        }
+        public async Task<MuayeneKaydi?> GetMuayeneByRandevuId(int randevuId)
+        {
+            return await _repositoryContext.MuayeneKaydis
+                .Where(m => m.RandevuId == randevuId && m.IsActive)
+                .OrderByDescending(m => m.Id)
+                .FirstOrDefaultAsync();
+        }
+        public async Task<List<teshisler>> TeshisleriGetir(int muayeneId)
+        {
+            return await _repositoryContext.Teshisler.Where(t => t.muayeneId == muayeneId).ToListAsync();
+        }
+        public async Task<List<TedaviKaydi>> TedavileriGetir(int muayeneId)
+        {
+            return await _repositoryContext.TedaviKaydi.Where(t => t.MuyaneId == muayeneId).ToListAsync();
+        }
+        public async Task<List<odeme>> OdemeleriGetir(int muayeneId)
+        {
+            return await _repositoryContext.odeme.Where(o => o.muayeneId == muayeneId).ToListAsync();
+        }
+        public async Task<List<PoliklinikHastaListesiDTO>> PoliklinikHastaListesiGetir(int polNo, DateTime baslangic, DateTime bitis)
+        {
+            var randevular = await _repositoryContext.Randevus
+                .Where(r => r.PolNo == polNo && r.RandevuTarihi >= baslangic && r.RandevuTarihi <= bitis && !r.iptal)
+                .ToListAsync();
+            var randevuIdleri = randevular.Select(r => r.Id).ToList();
+
+            var tarihliMuayeneler = await _repositoryContext.MuayeneKaydis
+                .Where(m => m.PolNo == polNo && m.IsActive
+                    && m.MuayeneTarihi.Date >= baslangic.Date && m.MuayeneTarihi.Date <= bitis.Date)
+                .ToListAsync();
+            var randevuyaBagliMuayeneler = await _repositoryContext.MuayeneKaydis
+                .Where(m => m.IsActive && m.RandevuId != null && randevuIdleri.Contains(m.RandevuId.Value))
+                .ToListAsync();
+            var muayeneler = tarihliMuayeneler.Concat(randevuyaBagliMuayeneler)
+                .GroupBy(m => m.Id)
+                .Select(g => g.First())
+                .ToList();
+
+            var protokoller = randevular.Select(r => r.ProtocolNo)
+                .Concat(muayeneler.Select(m => m.ProtocolNo))
+                .Distinct()
+                .ToList();
+            var hastalar = await _repositoryContext.Patients.Where(p => protokoller.Contains(p.Protocol)).ToListAsync();
+
+            var doktorNolar = randevular.Select(r => r.DoktorNo)
+                .Concat(muayeneler.Select(m => m.DoktorNo))
+                .Distinct()
+                .ToList();
+            var doktorlar = await _repositoryContext.Doctors.Where(d => doktorNolar.Contains(d.doktorNo)).ToListAsync();
+
+            var sonuc = new List<PoliklinikHastaListesiDTO>();
+
+            foreach (var m in muayeneler)
+            {
+                var hasta = hastalar.FirstOrDefault(h => h.Protocol == m.ProtocolNo);
+                if (hasta == null) continue;
+                var doktor = doktorlar.FirstOrDefault(d => d.doktorNo == m.DoktorNo);
+                sonuc.Add(new PoliklinikHastaListesiDTO
+                {
+                    MuayeneId = m.Id,
+                    DosyaId = m.RandevuId,
+                    Protokol = m.ProtocolNo,
+                    Ad = hasta.Name,
+                    Soyad = hasta.Surname,
+                    Tc = hasta.TcKimlik,
+                    Doktor = doktor?.DoktorAd,
+                    Tarih = m.MuayeneTarihi.Date + m.BaslangicSaati,
+                    MuayeneVarMi = true
+                });
+            }
+
+            var muayeneliRandevuIdleri = muayeneler.Where(m => m.RandevuId != null)
+                .Select(m => m.RandevuId!.Value)
+                .ToHashSet();
+            foreach (var r in randevular)
+            {
+                if (muayeneliRandevuIdleri.Contains(r.Id)) continue;
+                var hasta = hastalar.FirstOrDefault(h => h.Protocol == r.ProtocolNo);
+                if (hasta == null) continue;
+                var doktor = doktorlar.FirstOrDefault(d => d.doktorNo == r.DoktorNo);
+                sonuc.Add(new PoliklinikHastaListesiDTO
+                {
+                    MuayeneId = null,
+                    DosyaId = r.Id,
+                    Protokol = r.ProtocolNo,
+                    Ad = hasta.Name,
+                    Soyad = hasta.Surname,
+                    Tc = hasta.TcKimlik,
+                    Doktor = doktor?.DoktorAd,
+                    Tarih = r.RandevuTarihi,
+                    MuayeneVarMi = false
+                });
+            }
+
+            return sonuc.OrderBy(x => x.Tarih).ToList();
         }
     }
 

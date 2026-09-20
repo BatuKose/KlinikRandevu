@@ -211,6 +211,57 @@
   color: #475569;
 }
 
+.sidebar-kullanici {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kullanici-bilgi {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.kullanici-adi {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sidebar-metin-aktif);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cikis-btn {
+  min-width: 30px;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sidebar-metin);
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.cikis-btn:hover {
+  background: var(--renk-tehlike);
+  color: #fff;
+}
+
+.cikis-btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+}
+
 /* ── Mobil: < 640px — sidebar overlay olarak çalışır ── */
 @media (max-width: 639px) {
   .sidebar {

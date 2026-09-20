@@ -1,0 +1,88 @@
+.ana-sayfa-alt {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: var(--renk-metin-ikincil);
+}
+
+.modul-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.modul-kart {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  background: var(--renk-kart);
+  border: 1px solid var(--renk-kenar);
+  border-radius: var(--radius);
+  box-shadow: var(--golge);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+a.modul-kart:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--golge-orta);
+  border-color: var(--renk-birincil);
+}
+
+.modul-ikon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  background: var(--renk-birincil-acik);
+  color: var(--renk-birincil);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modul-ikon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+}
+
+.modul-metin h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--renk-metin);
+  margin-bottom: 4px;
+}
+
+.modul-metin p {
+  font-size: 0.82rem;
+  color: var(--renk-metin-ikincil);
+  line-height: 1.4;
+}
+
+.modul-kart-pasif {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.modul-kart-pasif .modul-ikon {
+  background: var(--renk-arkaplan);
+  color: var(--renk-metin-ikincil);
+}
+
+.modul-rozet {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--renk-metin-ikincil);
+  background: var(--renk-arkaplan);
+  border: 1px solid var(--renk-kenar);
+  border-radius: 999px;
+  padding: 3px 8px;
+}

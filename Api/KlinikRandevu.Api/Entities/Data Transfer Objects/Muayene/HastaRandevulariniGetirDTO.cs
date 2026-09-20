@@ -17,5 +17,6 @@ namespace Entities.Data_Transfer_Objects.Muayene
         public string Doktor { get; set; }
         public string UzmanlikDali { get; set; }
         public DateTime RandevuTarihi { get; set; }
+        public bool Iptal { get; set; }
     }
 }

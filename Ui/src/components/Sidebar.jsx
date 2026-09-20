@@ -1,7 +1,53 @@
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Sidebar.css';
 
 const menuItems = [
+  {
+    baslik: 'Genel',
+    icerik: [
+      {
+        yol: '/',
+        bitis: true,
+        etiket: 'Ana Sayfa',
+        ikon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9.5 12 3l9 6.5" />
+            <path d="M5 9.5V21h14V9.5" />
+            <path d="M9 21v-6h6v6" />
+          </svg>
+        ),
+      },
+    ],
+  },
+  {
+    baslik: 'Hasta',
+    icerik: [
+      {
+        yol: '/hasta-kayit',
+        etiket: 'Hasta Kayıt',
+        ikon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" y1="8" x2="19" y2="14" />
+            <line x1="16" y1="11" x2="22" y2="11" />
+          </svg>
+        ),
+      },
+      {
+        yol: '/poliklinik',
+        etiket: 'Poliklinik',
+        ikon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3" />
+            <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4" />
+            <circle cx="20" cy="10" r="2" />
+          </svg>
+        ),
+      },
+    ],
+  },
   {
     baslik: 'Sistem',
     icerik: [
@@ -31,7 +77,17 @@ const IkonSag = () => (
   </svg>
 );
 
+const IkonCikis = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
+  </svg>
+);
+
 export default function Sidebar({ acik, onToggle }) {
+  const { user, logout } = useAuth();
+
   return (
     <aside className={`sidebar ${acik ? 'sidebar-acik' : 'sidebar-kapali'}`}>
       {/* Logo + Toggle */}
@@ -62,6 +118,7 @@ export default function Sidebar({ acik, onToggle }) {
               <NavLink
                 key={item.yol}
                 to={item.yol}
+                end={item.bitis}
                 title={!acik ? item.etiket : undefined}
                 className={({ isActive }) => `nav-item ${isActive ? 'nav-item-aktif' : ''}`}
               >
@@ -75,7 +132,23 @@ export default function Sidebar({ acik, onToggle }) {
 
       {/* Alt */}
       <div className="sidebar-alt">
-        {acik ? <div className="versiyon">v1.0.0</div> : <div className="versiyon-kisa">v1</div>}
+        {acik ? (
+          <div className="sidebar-kullanici">
+            <div className="kullanici-bilgi">
+              <span className="kullanici-adi" title={user?.username || ''}>
+                {user?.username || 'Kullanıcı'}
+              </span>
+              <span className="versiyon">v1.0.0</span>
+            </div>
+            <button className="cikis-btn" onClick={logout} title="Çıkış yap">
+              <IkonCikis />
+            </button>
+          </div>
+        ) : (
+          <button className="cikis-btn" onClick={logout} title="Çıkış yap">
+            <IkonCikis />
+          </button>
+        )}
       </div>
     </aside>
   );

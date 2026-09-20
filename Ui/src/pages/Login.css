@@ -1,0 +1,121 @@
+.login-sayfa {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--renk-arkaplan);
+  padding: 16px;
+}
+
+.login-kart {
+  width: 100%;
+  max-width: 360px;
+  background: var(--renk-kart);
+  border: 1px solid var(--renk-kenar);
+  border-radius: var(--radius);
+  box-shadow: var(--golge-orta);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.login-logo-ikon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  background: var(--renk-birincil);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-logo-ikon svg {
+  width: 20px;
+  height: 20px;
+  stroke: #fff;
+}
+
+.login-baslik {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--renk-metin);
+  line-height: 1.2;
+}
+
+.login-alt {
+  font-size: 0.8rem;
+  color: var(--renk-metin-ikincil);
+  line-height: 1.2;
+}
+
+.login-alan {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--renk-metin);
+}
+
+.login-alan input {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 400;
+  padding: 10px 12px;
+  border: 1px solid var(--renk-kenar);
+  border-radius: var(--radius);
+  background: var(--renk-arkaplan);
+  color: var(--renk-metin);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.login-alan input:focus {
+  border-color: var(--renk-birincil);
+  box-shadow: 0 0 0 3px var(--renk-birincil-acik);
+}
+
+.login-alan input:disabled {
+  opacity: 0.6;
+}
+
+.login-hata {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--renk-tehlike);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  padding: 8px 10px;
+}
+
+.login-buton {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--renk-birincil);
+  border: none;
+  border-radius: var(--radius);
+  padding: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.login-buton:hover:not(:disabled) {
+  background: var(--renk-birincil-koyu);
+}
+
+.login-buton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

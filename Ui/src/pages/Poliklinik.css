@@ -1,0 +1,388 @@
+.mk-panel {
+  background: var(--renk-kart);
+  border: 1px solid var(--renk-kenar);
+  border-radius: var(--radius);
+  box-shadow: var(--golge);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.mk-bos-metin {
+  color: var(--renk-metin-ikincil);
+  font-size: 0.85rem;
+  padding: 4px 0;
+}
+
+.mk-uyari-metin {
+  color: var(--renk-uyari);
+}
+
+.mk-hata {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--renk-tehlike);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  margin: 8px 0;
+}
+
+.mk-alt-baslik {
+  font-size: 0.85rem;
+  color: var(--renk-metin-ikincil);
+  margin-top: 2px;
+}
+
+/* ── Poliklinik + tarih seçimi (bağlamsız giriş) ── */
+.mk-pol-secim {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mk-hizli-tarih {
+  display: flex;
+  gap: 8px;
+}
+
+.mk-geri-btn {
+  margin-bottom: 16px;
+}
+
+/* ── Header ── */
+.mk-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.mk-header-bilgi h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--renk-metin);
+}
+
+.mk-header-bilgi p {
+  font-size: 0.85rem;
+  color: var(--renk-metin-ikincil);
+  margin-top: 2px;
+}
+
+.mk-header-durum {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Grid (Teşhis / Tedavi / Ödeme) ── */
+.mk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.mk-bolum h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--renk-metin);
+  margin-bottom: 10px;
+}
+
+/* ── Listeler ── */
+.mk-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  margin-bottom: 12px;
+}
+
+.mk-liste-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--renk-kenar);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--renk-arkaplan);
+  font-size: 0.85rem;
+  color: var(--renk-metin);
+}
+
+.mk-liste-item-genis {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.mk-liste-item-sag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mk-liste-item-tiklanabilir {
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.mk-liste-item-tiklanabilir:hover {
+  border-color: var(--renk-birincil);
+  background: var(--renk-birincil-acik);
+}
+
+.mk-kod {
+  font-weight: 700;
+  color: var(--renk-birincil);
+  margin-right: 6px;
+}
+
+.mk-fiyat {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mk-kayit-tarih {
+  color: var(--renk-metin-ikincil);
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+/* ── Rozetler ── */
+.mk-durum-rozet {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.mk-durum-acik {
+  color: var(--renk-basari);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.mk-durum-kapali {
+  color: var(--renk-metin-ikincil);
+  background: var(--renk-arkaplan);
+  border: 1px solid var(--renk-kenar);
+}
+
+.mk-durum-odendi {
+  color: var(--renk-basari);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.mk-durum-bekliyor {
+  color: var(--renk-uyari);
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.mk-durum-randevu {
+  margin-left: 8px;
+  color: var(--renk-birincil);
+  background: var(--renk-birincil-acik);
+  border: 1px solid #bfdbfe;
+}
+
+/* ── Ekleme formu (teşhis/tedavi) ── */
+.mk-ekle-form {
+  display: flex;
+  gap: 8px;
+}
+
+.mk-ekle-form input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 8px 10px;
+  border: 1px solid var(--renk-kenar);
+  border-radius: 6px;
+  outline: none;
+}
+
+.mk-ekle-form input:focus {
+  border-color: var(--renk-birincil);
+  box-shadow: 0 0 0 3px var(--renk-birincil-acik);
+}
+
+/* ── Butonlar ── */
+.mk-btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: 1px solid var(--renk-kenar);
+  background: #fff;
+  color: var(--renk-metin);
+}
+
+.mk-btn:hover:not(:disabled) {
+  background: var(--renk-arkaplan);
+}
+
+.mk-btn-birincil {
+  border-color: var(--renk-birincil);
+  background: var(--renk-birincil);
+  color: #fff;
+}
+
+.mk-btn-birincil:hover:not(:disabled) {
+  background: var(--renk-birincil-koyu);
+}
+
+.mk-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mk-mini-btn {
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--renk-tehlike);
+  background: #fff;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mk-mini-btn:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.mk-mini-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mk-form-aksiyonlar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* ── Ödeme özet kartları ── */
+.mk-ozet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.mk-ozet-kart {
+  border: 1px solid var(--renk-kenar);
+  border-radius: 6px;
+  padding: 10px;
+  background: var(--renk-arkaplan);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mk-ozet-kart span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--renk-metin-ikincil);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.mk-ozet-kart strong {
+  font-size: 1.05rem;
+  color: var(--renk-metin);
+}
+
+.mk-borc-var {
+  color: var(--renk-tehlike) !important;
+}
+
+/* ── Muayene Aç formu ── */
+.mk-ac-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.mk-satir-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mk-alan {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mk-alan span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--renk-metin-ikincil);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.mk-alan input,
+.mk-alan select {
+  font-family: inherit;
+  font-size: 0.88rem;
+  padding: 8px 10px;
+  border: 1px solid var(--renk-kenar);
+  border-radius: 6px;
+  color: var(--renk-metin);
+  background: #fff;
+}
+
+.mk-alan input:focus,
+.mk-alan select:focus {
+  outline: none;
+  border-color: var(--renk-birincil);
+  box-shadow: 0 0 0 3px var(--renk-birincil-acik);
+}
+
+/* ── Ödeme yap modalı içindeki tutar özeti ── */
+.mk-odenecek-tutar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--renk-arkaplan);
+  border: 1px solid var(--renk-kenar);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: var(--renk-metin);
+}
+
+.mk-odenecek-tutar strong {
+  font-size: 1.05rem;
+}
+
+@media (max-width: 639px) {
+  .mk-satir-2,
+  .mk-ozet-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mk-pol-secim {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

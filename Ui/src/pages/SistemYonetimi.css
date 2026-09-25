@@ -34,6 +34,12 @@
   color: #fff;
 }
 
+.tab-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
 /* ── İçerik ── */
 .icerik {
   background: var(--renk-kart);
@@ -484,4 +490,30 @@
   .tablo td {
     padding: 8px 10px;
   }
+}
+
+/* ── Doktor / Servis ekleme formları ── */
+.form-alani select {
+  padding: 8px 12px;
+  border: 1px solid var(--renk-kenar);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--renk-metin);
+  background: #fff;
+  font-family: inherit;
+}
+
+.form-alani select:focus {
+  outline: none;
+  border-color: var(--renk-birincil);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-onay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--renk-metin);
+  cursor: pointer;
 }

@@ -1304,6 +1304,107 @@ namespace Services
                 muayeneId=model.muayeneId
             };
         }
+        public async Task<List<UzmanlikBransiDTO>> UzmanlikBranslariniGetirAsync()
+        {
+            var branslar = await _repositoryManager.Muayene.UzmanlikBranslariniGetir();
+            return branslar.Where(b => Enum.IsDefined(typeof(UzmanlikBransi), b.Kod)).ToList();
+        }
+        public async Task<YeniKayitSonucDTO> DoktorEkleAsync(DoktorEkleDTO model)
+        {
+            if (model is null) throw new BadRequestException("Doktor bilgileri boş olamaz");
+            var ad = model.DoktorAd?.Trim();
+            if (string.IsNullOrWhiteSpace(ad)) throw new BadRequestException("Doktor adı boş olamaz");
+            if (ad.Length > 100) throw new BadRequestException("Doktor adı en fazla 100 karakter olabilir");
+            if (model.DoktorTc < 10000000000L || model.DoktorTc > 99999999999L)
+                throw new BadRequestException("TC kimlik numarası 11 haneli olmalıdır");
+            if (model.TescilNo <= 0) throw new BadRequestException("Tescil numarası sıfırdan büyük olmalıdır");
+            if (!Enum.IsDefined(typeof(UzmanlikBransi), model.UzmanlikKodu))
+                throw new BadRequestException("Geçersiz uzmanlık branşı");
+
+            string? email = null;
+            if (!string.IsNullOrWhiteSpace(model.Email))
+            {
+                email = model.Email.Trim();
+                if (!System.Net.Mail.MailAddress.TryCreate(email, out _))
+                    throw new BadRequestException("e-posta girişi hatalı");
+            }
+
+            if (await _repositoryManager.Muayene.DoktoruGetirTc(model.DoktorTc) is not null)
+                throw new BadRequestException("Bu TC kimlik numarasıyla kayıtlı bir doktor zaten mevcut");
+
+            int servisNo = model.ServisNo ?? 0;
+            Poliklinik? secilenPol = null;
+            if (servisNo != 0)
+            {
+                secilenPol = await _repositoryManager.Muayene.PolGetir(servisNo)
+                    ?? throw new NotFoundException("Seçilen poliklinik bulunamadı");
+            }
+
+            var doktor = new Doctor
+            {
+                doktorNo = await _repositoryManager.Muayene.SonrakiDoktorNoGetir(),
+                DoktorAd = ad,
+                doktorUzKod = (UzmanlikBransi)model.UzmanlikKodu,
+                doktorTc = model.DoktorTc,
+                ServisNo = servisNo,
+                tescilNO = model.TescilNo,
+                Email = email,
+                isActive = true
+            };
+            _repositoryManager.Muayene.DoktorEkle(doktor);
+            // Bağ iki yönlü kurulsun; polikliniğin sorumlu doktoru zaten atanmışsa ellemiyoruz.
+            if (secilenPol is not null && secilenPol.DoktorNo == 0)
+                secilenPol.DoktorNo = doktor.doktorNo;
+            await _repositoryManager.saveAsyc();
+            return new YeniKayitSonucDTO { No = doktor.doktorNo, Ad = doktor.DoktorAd };
+        }
+        public async Task<YeniKayitSonucDTO> ServisEkleAsync(ServisEkleDTO model)
+        {
+            if (model is null) throw new BadRequestException("Poliklinik bilgileri boş olamaz");
+            var ad = model.Name?.Trim();
+            if (string.IsNullOrWhiteSpace(ad)) throw new BadRequestException("Poliklinik adı boş olamaz");
+            if (ad.Length > 100) throw new BadRequestException("Poliklinik adı en fazla 100 karakter olabilir");
+            if (!Enum.IsDefined(typeof(UzmanlikBransi), model.UzmanlikKodu))
+                throw new BadRequestException("Geçersiz uzmanlık branşı");
+            if (model.Aciklama?.Length > 500) throw new BadRequestException("Açıklama en fazla 500 karakter olabilir");
+            if (model.OdaNo?.Length > 20) throw new BadRequestException("Oda bilgisi en fazla 20 karakter olabilir");
+            if (model.Telefon?.Length > 20) throw new BadRequestException("Telefon en fazla 20 karakter olabilir");
+            if (model.MaxRandevuSuresi is <= 0) throw new BadRequestException("Maksimum randevu süresi sıfırdan büyük olmalıdır");
+            if (model.GunlukMaksRandevuSayisi is <= 0) throw new BadRequestException("Günlük maksimum randevu sayısı sıfırdan büyük olmalıdır");
+
+            if (await _repositoryManager.Muayene.PolAdiVarMi(ad))
+                throw new BadRequestException("Bu isimde bir poliklinik zaten mevcut");
+
+            int doktorNo = model.DoktorNo ?? 0;
+            Doctor? secilenDoktor = null;
+            if (doktorNo != 0)
+            {
+                secilenDoktor = await _repositoryManager.Muayene.DoktoruGetir(doktorNo)
+                    ?? throw new NotFoundException("Seçilen doktor bulunamadı");
+            }
+
+            var pol = new Poliklinik
+            {
+                PolNo = await _repositoryManager.Muayene.SonrakiPolNoGetir(),
+                Name = ad,
+                Aciklama = string.IsNullOrWhiteSpace(model.Aciklama) ? null : model.Aciklama.Trim(),
+                PolUzKod = (UzmanlikBransi)model.UzmanlikKodu,
+                DoktorNo = doktorNo,
+                KatNo = model.KatNo,
+                OdaNo = string.IsNullOrWhiteSpace(model.OdaNo) ? null : model.OdaNo.Trim(),
+                MaxRandevuSuresi = model.MaxRandevuSuresi,
+                GunlukMaksRandevuSayisi = model.GunlukMaksRandevuSayisi,
+                Telefon = string.IsNullOrWhiteSpace(model.Telefon) ? null : model.Telefon.Trim(),
+                OnlineRandevuAktif = model.OnlineRandevuAktif,
+                isActive = true
+            };
+            _repositoryManager.Muayene.PolEkle(pol);
+            // Bağ iki yönlü kurulsun; doktorun servisi zaten atanmışsa ellemiyoruz.
+            if (secilenDoktor is not null && secilenDoktor.ServisNo == 0)
+                secilenDoktor.ServisNo = pol.PolNo;
+            await _repositoryManager.saveAsyc();
+            return new YeniKayitSonucDTO { No = pol.PolNo, Ad = pol.Name };
+        }
         public List<AktifDoktorlariGetirDTO> AktifDoktorlariGetir()
         {
             var doktorlar = _repositoryManager.Muayene.AktifDoktorlariGetir();

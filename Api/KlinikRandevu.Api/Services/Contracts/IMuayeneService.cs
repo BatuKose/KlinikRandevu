@@ -35,6 +35,9 @@ namespace Services.Contracts
         Task<CalismaPlaniKopyalaBransBazliDTO> BransBazliCalismaPlaniKopyalaAsync(CalismaPlaniKopyalaBransBazliDTO model);
         Task<PoliklinikYesilAlanAyarlarıEkleDto> PoliklinikYesilAlanAyariEkle(PoliklinikYesilAlanAyarlarıEkleDto model);
         Task<YesilListeyeHastaEkleDTO> YesilListeyeHastaEkleAsync(YesilListeyeHastaEkleDTO model);
+        Task<YeniKayitSonucDTO> DoktorEkleAsync(DoktorEkleDTO model);
+        Task<YeniKayitSonucDTO> ServisEkleAsync(ServisEkleDTO model);
+        Task<List<UzmanlikBransiDTO>> UzmanlikBranslariniGetirAsync();
         List<AktifDoktorlariGetirDTO> AktifDoktorlariGetir();
         List<AktifServisListesiGetirDto> AktifServisleriGetir();
         Task<MuayeneKaydiDetayDTO> MuayeneDetayGetir(int muayeneId);

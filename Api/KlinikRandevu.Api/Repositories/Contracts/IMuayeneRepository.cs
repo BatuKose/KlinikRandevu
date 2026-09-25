@@ -34,6 +34,12 @@ namespace Repositories.Contracts
         Task<bool> hastaVarmiProtokol(int number);
         Task<Doctor?> DoktoruGetir(int number);
         Task<Poliklinik?> PolGetir(int number);
+        void DoktorEkle(Doctor doktor);
+        void PolEkle(Poliklinik poliklinik);
+        Task<int> SonrakiDoktorNoGetir();
+        Task<int> SonrakiPolNoGetir();
+        Task<bool> PolAdiVarMi(string ad);
+        Task<List<UzmanlikBransiDTO>> UzmanlikBranslariniGetir();
         Task<int> DoktorIleriRandevuSorgula(int number);
         Task<int> PolIleriRandevuSorgula(int number);
         Task<PoliklinikEnum.UzmanlikBransi> PolUzmanlikKoduAsync(int polNo);

@@ -350,6 +350,32 @@ namespace Repositories.EFCore
             var doktor = await _repositoryContext.Doctors.SingleOrDefaultAsync(d=>d.doktorNo==number);
             return doktor;
         }
+        public void DoktorEkle(Doctor doktor)
+        {
+            _repositoryContext.Doctors.Add(doktor);
+        }
+        public void PolEkle(Poliklinik poliklinik)
+        {
+            _repositoryContext.Polikliniks.Add(poliklinik);
+        }
+        public async Task<int> SonrakiDoktorNoGetir()
+        {
+            return (await _repositoryContext.Doctors.MaxAsync(d => (int?)d.doktorNo) ?? 0) + 1;
+        }
+        public async Task<int> SonrakiPolNoGetir()
+        {
+            return (await _repositoryContext.Polikliniks.MaxAsync(p => (int?)p.PolNo) ?? 0) + 1;
+        }
+        public async Task<bool> PolAdiVarMi(string ad)
+        {
+            return await _repositoryContext.Polikliniks.AnyAsync(p => p.Name == ad);
+        }
+        public async Task<List<UzmanlikBransiDTO>> UzmanlikBranslariniGetir()
+        {
+            return await _repositoryContext.Database
+                .SqlQueryRaw<UzmanlikBransiDTO>("SELECT CAST(Kod AS int) AS Kod, Ad FROM UzmanlikDallari ORDER BY Ad")
+                .ToListAsync();
+        }
         public async Task<Poliklinik?> PolGetir(int number)
         {
             var pol = await _repositoryContext.Polikliniks.SingleOrDefaultAsync(d => d.PolNo==number);

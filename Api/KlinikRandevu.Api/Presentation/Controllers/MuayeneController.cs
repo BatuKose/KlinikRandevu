@@ -182,6 +182,24 @@ namespace Presentation.Controllers
             var result= await _ServiceManager.MuayeneService.YesilListeyeHastaEkleAsync(model);
             return Ok(ApiResponse<YesilListeyeHastaEkleDTO>.SuccessResponse(model));
         }
+        [HttpPost("doktorEkle")]
+        public async Task<IActionResult> DoktorEkle([FromBody] DoktorEkleDTO model)
+        {
+            var result = await _ServiceManager.MuayeneService.DoktorEkleAsync(model);
+            return Ok(ApiResponse<YeniKayitSonucDTO>.SuccessResponse(result, "Doktor başarıyla eklendi"));
+        }
+        [HttpPost("servisEkle")]
+        public async Task<IActionResult> ServisEkle([FromBody] ServisEkleDTO model)
+        {
+            var result = await _ServiceManager.MuayeneService.ServisEkleAsync(model);
+            return Ok(ApiResponse<YeniKayitSonucDTO>.SuccessResponse(result, "Poliklinik başarıyla eklendi"));
+        }
+        [HttpGet("uzmanlikBranslariniGetir")]
+        public async Task<IActionResult> UzmanlikBranslariniGetir()
+        {
+            var result = await _ServiceManager.MuayeneService.UzmanlikBranslariniGetirAsync();
+            return Ok(ApiResponse<List<UzmanlikBransiDTO>>.SuccessResponse(result));
+        }
         [HttpGet("doktorListesiGetir")]
         public IActionResult AktifDoktorlariGetir()
         {

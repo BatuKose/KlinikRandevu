@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { tokenStorage } from './tokenStorage';
 
-const baseURL = import.meta.env.VITE_API_URL || 'https://localhost:1000';
+export const baseURL = import.meta.env.VITE_API_URL || 'https://localhost:1000';
 
 const api = axios.create({
   baseURL,

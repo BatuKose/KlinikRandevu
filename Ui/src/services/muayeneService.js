@@ -11,6 +11,9 @@ export const muayeneService = {
   muayeneOlustur: (dto) => api.post('/api/Poliklinik/muayeneolustur', dto),
   aktifDoktorlariGetir: () => api.get('/api/Poliklinik/doktorListesiGetir'),
   aktifServisleriGetir: () => api.get('/api/Poliklinik/ServisListesiGetir'),
+  uzmanlikBranslariniGetir: () => api.get('/api/Poliklinik/uzmanlikBranslariniGetir'),
+  doktorEkle: (dto) => api.post('/api/Poliklinik/doktorEkle', dto),
+  servisEkle: (dto) => api.post('/api/Poliklinik/servisEkle', dto),
   randevuIptalEt: (id) => api.patch('/api/Poliklinik/randevuiptalet', null, { params: { id } }),
 
   muayeneKaydiGetir: (id) => api.get('/api/Poliklinik/muayeneGetir', { params: { id } }),

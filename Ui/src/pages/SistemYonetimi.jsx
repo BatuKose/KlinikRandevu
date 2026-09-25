@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { parametreService } from '../services/parametreService';
+import { baseURL } from '../services/api';
 import { getApiErrorMessage } from '../utils/apiError';
 import LogListesi from '../components/sistemYonetimi/LogListesi';
+import DoktorEkle from '../components/sistemYonetimi/DoktorEkle';
+import ServisEkle from '../components/sistemYonetimi/ServisEkle';
 import './SistemYonetimi.css';
 
 const BOSH_PARAMETRE = {
@@ -268,11 +271,32 @@ export default function SistemYonetimi() {
           Kullanıcı Ekle
         </button>
         <button
+          className={`tab-btn ${aktifTab === 'doktor' ? 'aktif' : ''}`}
+          onClick={() => setAktifTab('doktor')}
+        >
+          Doktor Ekle
+        </button>
+        <button
+          className={`tab-btn ${aktifTab === 'servis' ? 'aktif' : ''}`}
+          onClick={() => setAktifTab('servis')}
+        >
+          Servis Ekle
+        </button>
+        <button
           className={`tab-btn ${aktifTab === 'loglar' ? 'aktif' : ''}`}
           onClick={() => setAktifTab('loglar')}
         >
           Loglar
         </button>
+        <a
+          className="tab-btn tab-link"
+          href={`${baseURL}/hangfire/recurring`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Hangfire job panelini yeni sekmede açar"
+        >
+          Job Servisi ↗
+        </a>
       </div>
 
       {aktifTab === 'parametreler' && (
@@ -349,6 +373,18 @@ export default function SistemYonetimi() {
       {aktifTab === 'kullanici' && (
         <div className="icerik">
           <KullaniciEkle />
+        </div>
+      )}
+
+      {aktifTab === 'doktor' && (
+        <div className="icerik">
+          <DoktorEkle />
+        </div>
+      )}
+
+      {aktifTab === 'servis' && (
+        <div className="icerik">
+          <ServisEkle />
         </div>
       )}
 

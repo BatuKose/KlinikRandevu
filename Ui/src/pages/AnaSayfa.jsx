@@ -54,7 +54,7 @@ const moduller = [
     baslik: 'Randevu',
     aciklama: 'Randevu oluşturma ve doktor çalışma planları',
     yol: '/randevu',
-    aktif: false,
+    aktif: true,
     ikon: <IkonRandevu />,
   },
   {

@@ -165,3 +165,52 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ── Modal içi hasta arama adımı (ör. Yeni Randevu modalı) ── */
+.hkm-arama-bolum {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hkm-arama-satir {
+  display: flex;
+  gap: 8px;
+}
+
+.hkm-arama-satir input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border: 1px solid var(--renk-kenar);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.hkm-arama-satir input:focus {
+  border-color: var(--renk-birincil);
+  box-shadow: 0 0 0 3px var(--renk-birincil-acik);
+}
+
+.hkm-secili-hasta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px 0;
+  font-size: 0.85rem;
+  color: var(--renk-metin-ikincil);
+}
+
+.hkm-link-btn {
+  background: none;
+  border: none;
+  color: var(--renk-birincil);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.82rem;
+  padding: 0;
+}

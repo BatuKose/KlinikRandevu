@@ -6,4 +6,7 @@ export const parametreService = {
   guncelle: (id, data) => api.patch(`/SistemParametreleri/parametreguncelle/${id}`, data),
   cacheTemizle: () => api.post('/SistemParametreleri/cache-temizle'),
   kullaniciEkle: (data) => api.post('/SistemParametreleri/kullaniciekle', data),
+  loglariGetir: (baslangic, bitis, aksiyonTipi) =>
+    api.get('/SistemParametreleri/loglar', { params: { baslangic, bitis, aksiyonTipi: aksiyonTipi || undefined } }),
+  logTipleriniGetir: () => api.get('/SistemParametreleri/log-tipleri'),
 };

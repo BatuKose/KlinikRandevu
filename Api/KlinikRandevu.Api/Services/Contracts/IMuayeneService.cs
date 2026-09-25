@@ -24,6 +24,9 @@ namespace Services.Contracts
         Task<teshisler> TeshisEkle(int muayeneId, string teshis);
         Task<int> MuayeneKapat(int id);
         Task<TaahütnameDTO> TaahütnameEkleAsync(TaahütnameEkleDTO taahütname);
+        Task<List<HastaTaahütnameListeDTO>> HastaninTaahütnameleriniGetirAsync(int protokol);
+        Task<TaahütnameGuncelleDTO> TaahütnameGuncelleAsync(TaahütnameGuncelleDTO model);
+        Task TaahütnameIptalAsync(int id);
         Task<OdemeYapDTO> OdemeYap(OdemeYapDTO odeme);
         Task<TedaviEkleDTO> MuayeneyeTedaviEKle(TedaviEkleDTO giris);
         Task<OdemeIptalDTO> OdemeIade(OdemeIptalDTO odemeIptal);

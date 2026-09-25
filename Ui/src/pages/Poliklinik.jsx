@@ -9,6 +9,7 @@ import MuayeneAcForm from '../components/muayene/MuayeneAcForm';
 import TeshisBolumu from '../components/muayene/TeshisBolumu';
 import TedaviBolumu from '../components/muayene/TedaviBolumu';
 import OdemeBolumu from '../components/muayene/OdemeBolumu';
+import TaahutnameBolumu from '../components/muayene/TaahutnameBolumu';
 import './Poliklinik.css';
 
 function yerelTarih(d) {
@@ -184,6 +185,7 @@ export default function Poliklinik() {
   const [hata, setHata] = useState('');
   const [durumDegistiriliyor, setDurumDegistiriliyor] = useState(false);
   const [yenidenYukleTetik, setYenidenYukleTetik] = useState(0);
+  const [aktifSekme, setAktifSekme] = useState('muayene');
 
   const detayiYukle = useCallback(async () => {
     if (!randevuId && !muayeneIdParam) return;
@@ -276,7 +278,10 @@ export default function Poliklinik() {
     }
   };
 
-  const listeyeDon = () => navigate('/poliklinik');
+  const listeyeDon = () => {
+    setAktifSekme('muayene');
+    navigate('/poliklinik');
+  };
 
   // ── Randevu/muayene bağlamı olmadan sayfa açıldıysa: poliklinik + tarih bazlı hasta listesi ──
   if (!girisVarMi) {
@@ -352,19 +357,47 @@ export default function Poliklinik() {
             </div>
           </div>
 
-          <div className="mk-grid">
-            <TeshisBolumu muayeneId={muayene.id} kapali={!!muayene.bitisSaati} />
-            <TedaviBolumu
+          <div className="mk-tab-bar">
+            <button
+              type="button"
+              className={`mk-tab-btn ${aktifSekme === 'muayene' ? 'mk-tab-aktif' : ''}`}
+              onClick={() => setAktifSekme('muayene')}
+            >
+              Muayene
+            </button>
+            <button
+              type="button"
+              className={`mk-tab-btn ${aktifSekme === 'taahutname' ? 'mk-tab-aktif' : ''}`}
+              onClick={() => setAktifSekme('taahutname')}
+            >
+              Taahütname
+            </button>
+          </div>
+
+          {aktifSekme === 'muayene' && (
+            <div className="mk-grid">
+              <TeshisBolumu muayeneId={muayene.id} kapali={!!muayene.bitisSaati} />
+              <TedaviBolumu
+                muayeneId={muayene.id}
+                kapali={!!muayene.bitisSaati}
+                onDegisti={() => setYenidenYukleTetik((t) => t + 1)}
+              />
+              <OdemeBolumu
+                muayeneId={muayene.id}
+                yenidenYukleTetik={yenidenYukleTetik}
+                onDegisti={() => setYenidenYukleTetik((t) => t + 1)}
+              />
+            </div>
+          )}
+
+          {aktifSekme === 'taahutname' && (
+            <TaahutnameBolumu
               muayeneId={muayene.id}
-              kapali={!!muayene.bitisSaati}
-              onDegisti={() => setYenidenYukleTetik((t) => t + 1)}
-            />
-            <OdemeBolumu
-              muayeneId={muayene.id}
+              protokol={muayene.protocolNo}
               yenidenYukleTetik={yenidenYukleTetik}
               onDegisti={() => setYenidenYukleTetik((t) => t + 1)}
             />
-          </div>
+          )}
         </>
       )}
     </div>

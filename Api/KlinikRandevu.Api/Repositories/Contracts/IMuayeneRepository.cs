@@ -70,6 +70,8 @@ namespace Repositories.Contracts
         Task<double> TedaviKaydininToplamBorucunuGetir(int dosyaid);
         Task<TedaviKaydi> SingleTedaviKaydiGetir(int dosyaid);
         Task<Taahütname>taahütnameGetir(int dosyaid);
+        Task<Taahütname?> TaahütnameIdIleGetir(int id);
+        Task<List<HastaTaahütnameListeDTO>> HastaninTaahütnameleriniGetir(int protokol);
         Task<List<TedaviKaydi>> MuayeneKaydininOdenecekTedavileri(int muayeneId);
         Task<Tetkikler> TetkikGetir(string bilgi);
         Task<Patient> HastaBilgisiGetir(int protokol);

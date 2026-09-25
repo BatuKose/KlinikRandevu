@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { parametreService } from '../services/parametreService';
 import { getApiErrorMessage } from '../utils/apiError';
+import LogListesi from '../components/sistemYonetimi/LogListesi';
 import './SistemYonetimi.css';
 
 const BOSH_PARAMETRE = {
@@ -266,6 +267,12 @@ export default function SistemYonetimi() {
         >
           Kullanıcı Ekle
         </button>
+        <button
+          className={`tab-btn ${aktifTab === 'loglar' ? 'aktif' : ''}`}
+          onClick={() => setAktifTab('loglar')}
+        >
+          Loglar
+        </button>
       </div>
 
       {aktifTab === 'parametreler' && (
@@ -342,6 +349,12 @@ export default function SistemYonetimi() {
       {aktifTab === 'kullanici' && (
         <div className="icerik">
           <KullaniciEkle />
+        </div>
+      )}
+
+      {aktifTab === 'loglar' && (
+        <div className="icerik">
+          <LogListesi />
         </div>
       )}
 

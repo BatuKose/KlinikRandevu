@@ -732,8 +732,36 @@ namespace Repositories.EFCore
 
         public async Task<Taahütname> taahütnameGetir(int dosyaid)
         {
-            var result = await _repositoryContext.taahütname.SingleOrDefaultAsync(t=>t.MuayeneId==dosyaid);
+            var result = await _repositoryContext.taahütname.FirstOrDefaultAsync(t=>t.MuayeneId==dosyaid && !t.iptal);
             return result;
+        }
+
+        public async Task<Taahütname?> TaahütnameIdIleGetir(int id)
+        {
+            return await _repositoryContext.taahütname.FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task<List<HastaTaahütnameListeDTO>> HastaninTaahütnameleriniGetir(int protokol)
+        {
+            return await (from t in _repositoryContext.taahütname.AsNoTracking()
+                          join m in _repositoryContext.MuayeneKaydis on t.MuayeneId equals m.Id
+                          join p in _repositoryContext.Polikliniks on m.PolNo equals p.PolNo
+                          where m.ProtocolNo == protokol
+                          orderby t.TahütTarihi descending
+                          select new HastaTaahütnameListeDTO
+                          {
+                              Id = t.Id,
+                              MuayeneId = t.MuayeneId,
+                              MuayeneTarihi = m.MuayeneTarihi,
+                              PolAdi = p.Name,
+                              ToplamBorc = t.ToplamBorc,
+                              TahütTarihi = t.TahütTarihi,
+                              SonOdemeTarihi = t.SonOdemeTarihi,
+                              BilgilendirmeSms = t.BilgilendirmeSms,
+                              BilgilendirmeMail = t.BilgilendirmeMail,
+                              iptal = t.iptal,
+                              odendi = t.odendi
+                          }).ToListAsync();
         }
 
         public async Task<Patient> HastaBilgisiGetir(int protokol)

@@ -84,7 +84,12 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.mk-grid > .mk-panel {
+  margin-bottom: 0;
+  min-width: 0;
 }
 
 .mk-bolum h2 {
@@ -384,5 +389,110 @@
   .mk-pol-secim {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+/* ── Detay sekmeleri (Muayene / Taahütname) ── */
+.mk-tab-bar {
+  display: flex;
+  gap: 4px;
+  background: var(--renk-kart);
+  border: 1px solid var(--renk-kenar);
+  border-radius: var(--radius);
+  padding: 4px;
+  width: fit-content;
+  margin-bottom: 16px;
+  box-shadow: var(--golge);
+}
+
+.mk-tab-btn {
+  font-family: inherit;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--renk-metin-ikincil);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mk-tab-btn:hover {
+  background: var(--renk-arkaplan);
+  color: var(--renk-metin);
+}
+
+.mk-tab-btn.mk-tab-aktif {
+  background: var(--renk-birincil);
+  color: #fff;
+}
+
+/* ── Taahütname bölümü ── */
+.mk-tah-baslik {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.mk-tah-baslik h2 {
+  margin-bottom: 0;
+}
+
+.mk-tah-item {
+  flex-wrap: wrap;
+}
+
+.mk-tah-item-guncel {
+  border-color: var(--renk-birincil);
+  background: var(--renk-birincil-acik);
+}
+
+.mk-tah-bilgi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mk-tah-satir1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mk-tah-satir2 {
+  font-size: 0.8rem;
+  color: var(--renk-metin-ikincil);
+}
+
+.mk-tah-guncel-etiket {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--renk-birincil);
+}
+
+.mk-tah-btn {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+}
+
+.mk-durum-iptal {
+  color: var(--renk-tehlike);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+@media (max-width: 639px) {
+  .mk-tab-bar {
+    width: 100%;
+  }
+
+  .mk-tab-btn {
+    flex: 1;
   }
 }

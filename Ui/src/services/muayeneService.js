@@ -30,4 +30,11 @@ export const muayeneService = {
   odemeYap: (dto) => api.post('/api/Poliklinik/odenemeYap', dto),
   odemeIptalEt: (dto) => api.patch('/api/Poliklinik/OdemeIptal', dto),
   muayeneKapat: (id) => api.patch('/api/Poliklinik/muayenebitis', null, { params: { id } }),
+
+  hastaninTaahutnameleriniGetir: (protokol) =>
+    api.get('/api/Poliklinik/hastaninTaahutnameleriniGetir', { params: { protokol } }),
+  // Backend route'u "taahütnameEKle" (ü'lü); yol elle kodlanıyor.
+  taahutnameEkle: (dto) => api.post('/api/Poliklinik/taah%C3%BCtnameEKle', dto),
+  taahutnameGuncelle: (dto) => api.put('/api/Poliklinik/taahutnameGuncelle', dto),
+  taahutnameIptalEt: (id) => api.patch('/api/Poliklinik/taahutnameIptalEt', null, { params: { id } }),
 };

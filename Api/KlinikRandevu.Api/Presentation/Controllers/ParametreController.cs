@@ -63,6 +63,18 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.IcdApiManager.IcdApiTokenAl();
             return Ok(result);
         }
+        [HttpGet("loglar")]
+        public async Task<IActionResult> LoglariGetir([FromQuery] DateTime baslangic, [FromQuery] DateTime bitis, [FromQuery] string? aksiyonTipi)
+        {
+            var result = await _ServiceManager.UserLogService.LoglariGetirAsync(baslangic, bitis, aksiyonTipi);
+            return Ok(result);
+        }
+        [HttpGet("log-tipleri")]
+        public async Task<IActionResult> LogTipleriniGetir()
+        {
+            var result = await _ServiceManager.UserLogService.AksiyonTipleriniGetirAsync();
+            return Ok(result);
+        }
         [HttpPost("kullaniciekle")]
         public IActionResult UserEkle([FromBody] userEkleDTO user)
         {

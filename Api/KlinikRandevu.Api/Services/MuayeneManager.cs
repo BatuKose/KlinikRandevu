@@ -873,6 +873,42 @@ namespace Services
                 odendi=result.odendi
             };
         }
+        public async Task<List<HastaTaahütnameListeDTO>> HastaninTaahütnameleriniGetirAsync(int protokol)
+        {
+            if (protokol <= 0) throw new BadRequestException("Protokol sıfırdan büyük olmalıdır");
+            var hasta = await _repositoryManager.Muayene.hastaVarmiProtokol(protokol);
+            if (!hasta) throw new NotFoundException("Hasta bulunamadı");
+            return await _repositoryManager.Muayene.HastaninTaahütnameleriniGetir(protokol);
+        }
+        public async Task<TaahütnameGuncelleDTO> TaahütnameGuncelleAsync(TaahütnameGuncelleDTO model)
+        {
+            if (model is null) throw new BadRequestException("Taahütname bilgileri boş olamaz");
+            var taahütname = await _repositoryManager.Muayene.TaahütnameIdIleGetir(model.Id)
+                ?? throw new NotFoundException("Taahütname bulunamadı");
+            if (taahütname.iptal) throw new BadRequestException("İptal edilmiş taahütname güncellenemez");
+            if (taahütname.odendi) throw new BadRequestException("Ödenmiş taahütname güncellenemez");
+            if (model.SonOdemeTarihi.Date < taahütname.TahütTarihi.Date)
+                throw new BadRequestException("Son ödeme tarihi taahütname tarihinden önce olamaz");
+
+            if (taahütname.SonOdemeTarihi.Date != model.SonOdemeTarihi.Date)
+            {
+                taahütname.SonOdemeTarihi = model.SonOdemeTarihi;
+                // Vade değiştiği için hatırlatma job'u yeni tarihte tekrar bilgilendirsin.
+                taahütname.BilgilendirmeSms = false;
+                taahütname.BilgilendirmeMail = false;
+                await _repositoryManager.saveAsyc();
+            }
+            return model;
+        }
+        public async Task TaahütnameIptalAsync(int id)
+        {
+            var taahütname = await _repositoryManager.Muayene.TaahütnameIdIleGetir(id)
+                ?? throw new NotFoundException("Taahütname bulunamadı");
+            if (taahütname.iptal) throw new BadRequestException("Taahütname zaten iptal edilmiş");
+            if (taahütname.odendi) throw new BadRequestException("Ödenmiş taahütname iptal edilemez");
+            taahütname.iptal = true;
+            await _repositoryManager.saveAsyc();
+        }
         public async Task<OdemeYapDTO> OdemeYap(OdemeYapDTO odeme)
         {
             if (odeme is null) throw new BadRequestException("Odeme bilgileri boş olamaz");

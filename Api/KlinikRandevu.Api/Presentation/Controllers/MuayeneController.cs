@@ -116,6 +116,24 @@ namespace Presentation.Controllers
             var result= await _ServiceManager.MuayeneService.TaahütnameEkleAsync(taahütname);
             return Ok(ApiResponse<TaahütnameDTO>.SuccessResponse(result, "Tahütname Başarıyla eklendi"));
         }
+        [HttpGet("hastaninTaahutnameleriniGetir")]
+        public async Task<IActionResult> HastaninTaahutnameleriniGetir([FromQuery] int protokol)
+        {
+            var result = await _ServiceManager.MuayeneService.HastaninTaahütnameleriniGetirAsync(protokol);
+            return Ok(ApiResponse<List<HastaTaahütnameListeDTO>>.SuccessResponse(result));
+        }
+        [HttpPut("taahutnameGuncelle")]
+        public async Task<IActionResult> TaahutnameGuncelle([FromBody] TaahütnameGuncelleDTO model)
+        {
+            var result = await _ServiceManager.MuayeneService.TaahütnameGuncelleAsync(model);
+            return Ok(ApiResponse<TaahütnameGuncelleDTO>.SuccessResponse(result));
+        }
+        [HttpPatch("taahutnameIptalEt")]
+        public async Task<IActionResult> TaahutnameIptalEt([FromQuery] int id)
+        {
+            await _ServiceManager.MuayeneService.TaahütnameIptalAsync(id);
+            return NoContent();
+        }
         [HttpPost("odenemeYap")]
         public async Task<IActionResult> OdemeYap([FromBody] OdemeYapDTO odeneme)
         {

@@ -1,10 +1,16 @@
 # KlinikRandevu - Klinik Randevu Yönetim Sistemi
 
-Klinik ortamlarında hasta kaydı, randevu planlaması, doktor çalışma programı ve muayene kaydı yönetimini sağlayan RESTful Web API projesi.
+Klinik ortamlarında hasta kaydı, randevu planlaması, doktor çalışma programı ve muayene kaydı yönetimini sağlayan tam kapsamlı (full-stack) sistem. **Backend**: .NET 8 RESTful Web API. **Frontend**: React (Vite) ile geliştirilen tek sayfa uygulama (SPA).
+
+```
+KlinikRandevu/
+├── Api/    ← Backend (.NET 8 Web API, 5 katmanlı mimari)
+└── Ui/     ← Frontend (React + Vite SPA)
+```
 
 ---
 
-## Teknolojiler
+## Backend Teknolojileri
 
 | Teknoloji | Versiyon | Ne İşe Yarar? |
 |---|---|---|
@@ -18,6 +24,18 @@ Klinik ortamlarında hasta kaydı, randevu planlaması, doktor çalışma progra
 | **Rate Limiter** | .NET 8 built-in | IP bazlı istek sınırlama. Her IP için 30 saniyede maksimum 100 istek, 3 isteklik kuyruk. |
 | **Memory Cache** | .NET built-in | Sistem parametrelerini 3 saat boyunca bellekte tutar, her istekte DB'ye gitmez. |
 | **ASP.NET Core Identity (EF)** | 8.0.26 | Kullanıcı ve yetki modelleri için temel sağlar. |
+
+---
+
+## Frontend Teknolojileri
+
+| Teknoloji | Versiyon | Ne İşe Yarar? |
+|---|---|---|
+| **React** | 19.2.8 | UI kütüphanesi. Sayfa ve bileşenler fonksiyonel component + hook'larla yazılmıştır. |
+| **Vite** | 8.3.0 | Geliştirme sunucusu ve build aracı. Varsayılan port: `2000`. |
+| **React Router DOM** | 7.18.4 | Sayfa yönlendirme (`/login`, `/hasta-kayit`, `/randevu`, `/poliklinik`, `/sistem-yonetimi`). |
+| **Axios** | 1.20.0 | API istekleri. JWT access token'ı otomatik ekleyen ve 401 durumunda refresh token ile yenileyen interceptor içerir. |
+| **oxlint** | 1.81.0 | Linting. |
 
 ---
 
@@ -116,16 +134,42 @@ Controller'lar ve action filter'lar burada bulunur. HTTP ile iş mantığı aras
 | PATCH | `/hastakayithastasil?protkol=...` | Hastayı pasife alır (soft delete). |
 
 ### Poliklinik & Randevu — `/api/Poliklinik`
+Bu controller randevu, muayene, teşhis/tedavi/ödeme, doktor çalışma planı ve yeşil liste akışlarının tamamını karşılar.
+
 | Method | Endpoint | Açıklama |
 |---|---|---|
 | POST | `/calismaplaniolustur` | Doktor çalışma planı oluşturur. Slot validasyonları uygulanır. |
+| POST | `/CalismaPlaniKopyala` | Bir doktorun çalışma planını başka bir tarihe kopyalar. |
+| POST | `/bransBazliCalismaPlaniKopyala` | Aynı uzmanlık branşındaki doktorlara branş bazlı plan kopyalar. |
 | POST | `/randevuolustur` | Randevu açar. Çakışma, slot, aynı gün kontrolü yapılır. |
-| POST | `/muayeneolustur` | Muayene kaydı açar. `[YetkiKontrol]` korumalı. |
-| GET | `/randevularigetir?baslangic=&bitis=` | Tarih aralığına göre randevuları listeler. |
+| GET | `/randevularigetir?baslangic=&bitis=` | Tarih aralığındaki tüm randevuları listeler (Randevu modülü liste/takvim görünümü bunu kullanır). |
 | GET | `/hastaninrandevusunugetir?protokol=` | Hastanın tüm randevularını listeler. |
+| PATCH | `/randevuiptalet?id=` | Randevuyu iptal eder. |
+| POST | `/muayeneolustur` | Muayene kaydı açar. |
+| GET | `/muayeneGetir?id=` | Muayene kaydını ID ile getirir. |
+| GET | `/muayeneRandevuIleGetir?randevuId=` | Randevuya bağlı muayene kaydını getirir. |
+| PATCH | `/muayenebitis?id=` | Muayeneyi kapatır. |
+| POST | `/{muayeneid}/teshisekle` | Muayeneye teşhis ekler. |
+| GET | `/teshisleriGetir?muayeneId=` | Muayenenin teşhislerini listeler. |
+| POST | `/tedaviEkle` | Muayeneye tedavi ekler. |
+| GET | `/tedavileriGetir?muayeneId=` | Muayenenin tedavilerini listeler. |
+| POST | `/odenemeYap` | Ödeme kaydı oluşturur. |
+| PATCH | `/OdemeIptal` | Ödemeyi iade eder. |
+| GET | `/odemeleriGetir?muayeneId=` | Muayenenin ödemelerini listeler. |
+| GET | `/muayeneBorcGetir?muayeneId=` | Muayenenin kalan borcunu hesaplar. |
+| GET | `/muayeneOdemeToplamGetir?muayeneId=` | Muayeneye yapılan toplam ödemeyi getirir. |
+| GET | `/poliklinikHastaListesiGetir?polNo=&baslangic=&bitis=` | Poliklinik + tarih aralığına göre hasta/muayene listesi. |
+| GET | `/doktorListesiGetir` | Aktif doktorları listeler. |
+| GET | `/ServisListesiGetir` | Aktif poliklinikleri listeler. |
 | PATCH | `/{doktorId}/docpasif` | Doktoru aktif/pasif yapar (ileri randevu varsa engeller). |
 | PATCH | `/{polId}/polpasif` | Polikliniği aktif/pasif yapar. |
 | POST | `/doktor/{doktorNo}/randevu-hatirlatma-mail` | Doktora günlük randevu programını e-posta ile gönderir. |
+| POST | `/DoktorIzınEkle` | Doktora izin günü tanımlar. |
+| POST | `/icdara` | ICD tanı kodu arama (harici ICD API'si üzerinden). |
+| POST | `/taahütnameEKle` | Hastaya taahütname ekler. |
+| POST | `/PoliklinikYesilAlanEKle` | Poliklinik bazlı yeşil liste kuralı tanımlar. |
+| POST | `/HastaYesilAlanEKle` | Hastayı yeşil listeye ekler. |
+| POST | `/randevuluHastalarinBilgileri` | Tarih aralığı + muayene durumuna göre randevulu hasta bilgilerini getirir. |
 
 ### Sistem Parametreleri — `/SistemParametreleri`
 | Method | Endpoint | Açıklama |
@@ -162,13 +206,15 @@ Uygulama davranışları kod değişikliği gerektirmeden DB üzerinden yönetil
 
 ## Kurulum ve Çalıştırma
 
-### Gereksinimler
+### Backend
+
+#### Gereksinimler
 - .NET 8 SDK
 - SQL Server / LocalDB
 
-### 1. Veritabanı Bağlantısı
+#### 1. Veritabanı Bağlantısı
 
-`backend/KlinikRandevu.Api/KlinikRandevu/appsettings.json` dosyasını düzenleyin:
+`Api/KlinikRandevu.Api/KlinikRandevu/appsettings.json` dosyasını düzenleyin:
 
 ```json
 {
@@ -183,20 +229,48 @@ Uygulama davranışları kod değişikliği gerektirmeden DB üzerinden yönetil
 }
 ```
 
-### 2. Migration Uygulama
+#### 2. Migration Uygulama
 
 ```bash
-cd backend/KlinikRandevu.Api/KlinikRandevu
+cd Api/KlinikRandevu.Api/KlinikRandevu
 dotnet ef database update
 ```
 
-### 3. Çalıştırma
+#### 3. Çalıştırma
 
 ```bash
-dotnet run --project backend/KlinikRandevu.Api/KlinikRandevu
+dotnet run --project Api/KlinikRandevu.Api/KlinikRandevu
 ```
 
-Swagger arayüzü: `https://localhost:{port}/swagger`
+Swagger arayüzü: `https://localhost:{port}/swagger` (varsayılan: `https://localhost:1000/swagger`)
+
+### Frontend
+
+#### Gereksinimler
+- Node.js 18+
+
+#### 1. Bağımlılıkları Kurma
+
+```bash
+cd Ui
+npm install
+```
+
+#### 2. API Adresi (opsiyonel)
+
+Frontend varsayılan olarak `https://localhost:1000` adresine istek atar (`src/services/api.js`). Farklı bir adres kullanmak için `Ui/.env` dosyasına ekleyin:
+
+```
+VITE_API_URL=https://localhost:1000
+```
+
+#### 3. Çalıştırma
+
+```bash
+npm run dev
+```
+
+Uygulama `http://localhost:2000` üzerinde açılır. Backend çalışmıyorsa login ve veri çeken sayfalar hata verir.
 
 ---
 
@@ -204,22 +278,42 @@ Swagger arayüzü: `https://localhost:{port}/swagger`
 
 ```
 KlinikRandevu/
-└── backend/
-    └── KlinikRandevu.Api/
-        ├── KlinikRandevu/        # API Host (startup, extensions, migrations)
-        ├── Entities/             # Domain modeller, DTO'lar, enum'lar, exception'lar
-        ├── Repositories/         # EF Core implementasyonları
-        ├── Services/             # İş mantığı
-        └── Presentation/         # Controller'lar, action filter'lar
+├── Api/
+│   └── KlinikRandevu.Api/
+│       ├── KlinikRandevu.Api.sln
+│       ├── KlinikRandevu/        # API Host (Program.cs, appsettings.json, extensions, migrations)
+│       ├── Entities/             # Domain modeller, DTO'lar, enum'lar, exception'lar
+│       ├── Repositories/         # EF Core implementasyonları
+│       ├── Services/             # İş mantığı
+│       └── Presentation/         # Controller'lar, action filter'lar
+└── Ui/
+    ├── src/
+    │   ├── pages/                # Login, AnaSayfa, HastaKayit, Randevu, Poliklinik, SistemYonetimi
+    │   ├── components/           # Sayfa bazlı alt bileşenler ve modaller (hastaKayit/, muayene/, randevu/)
+    │   ├── services/             # Axios tabanlı API çağrıları (authService, hastaService, muayeneService, parametreService)
+    │   ├── context/              # AuthContext (JWT + refresh token yönetimi)
+    │   └── utils/                # Hata mesajı çözümleme, sabit seçenek listeleri
+    └── package.json
 ```
+
+### Frontend Sayfaları
+
+| Sayfa | Yol | Açıklama |
+|---|---|---|
+| Login | `/login` | JWT ile giriş. |
+| Ana Sayfa | `/` | Modül seçim ekranı. |
+| Hasta Kayıt | `/hasta-kayit` | Hasta arama/oluşturma, randevu geçmişi, poliklinik kayıtları. |
+| Randevu | `/randevu` | Randevu listesi (tarih/doktor/poliklinik/durum filtreli) ve haftalık takvim görünümü, yeni randevu oluşturma. |
+| Poliklinik | `/poliklinik` | Poliklinik bazlı hasta listesi, muayene açma/kapama, teşhis, tedavi, ödeme işlemleri. |
+| Sistem Yönetimi | `/sistem-yonetimi` | Sistem parametreleri, kullanıcı ve yetki yönetimi. |
 
 ---
 
 ## Notlar
 
-- UI henüz geliştirilmemiştir. Tüm endpointler Swagger üzerinden test edilebilir.
 - Loglama: uygulama başladığında `logs/` klasörüne günlük dönen dosyalar yazılır (`log-YYYYMMDD.txt`).
 - E-posta servisi şu an DI'a kayıtlı değildir (`ServicesExtensions.cs`'de yorum satırı). Aktif etmek için `IEmailService` kaydını açmak gerekir.
+- Frontend build çıktısı `Ui/dist` altında oluşur (`npm run build`); linting için `npm run lint` (oxlint) kullanılır.
 
 ---
 

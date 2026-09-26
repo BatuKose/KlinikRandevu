@@ -1,24 +1,49 @@
 :root {
+  /* ── Marka ── */
   --renk-birincil: #2563eb;
   --renk-birincil-koyu: #1d4ed8;
   --renk-birincil-acik: #eff6ff;
-  --renk-basari: #16a34a;
-  --renk-tehlike: #dc2626;
-  --renk-uyari: #d97706;
-  --renk-arkaplan: #f8fafc;
+  --renk-birincil-kenar: #bfdbfe;
+
+  /* ── Yüzeyler ve metin ── */
+  --renk-arkaplan: #f5f7fb;
   --renk-kart: #ffffff;
-  --renk-kenar: #e2e8f0;
-  --renk-metin: #1e293b;
+  --renk-yuzey-ikincil: #f8fafc;
+  --renk-kenar: #e4e8ef;
+  --renk-kenar-koyu: #cfd6e1;
+  --renk-metin: #0f172a;
   --renk-metin-ikincil: #64748b;
-  --golge: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --golge-orta: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
-  --radius: 8px;
+  --renk-metin-soluk: #94a3b8;
+
+  /* ── Durum renkleri (metin / zemin / kenar) ── */
+  --renk-basari: #15803d;
+  --renk-basari-zemin: #f0fdf4;
+  --renk-basari-kenar: #bbf7d0;
+  --renk-uyari: #b45309;
+  --renk-uyari-zemin: #fffbeb;
+  --renk-uyari-kenar: #fde68a;
+  --renk-tehlike: #dc2626;
+  --renk-tehlike-zemin: #fef2f2;
+  --renk-tehlike-kenar: #fecaca;
+  --renk-notr: #475569;
+  --renk-notr-zemin: #f1f5f9;
+  --renk-notr-kenar: #e2e8f0;
+
+  /* ── Gölge, köşe, boşluk ── */
+  --golge-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --golge: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --golge-orta: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --golge-buyuk: 0 20px 48px rgba(15, 23, 42, 0.18);
+  --odak-halka: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  --radius-kucuk: 6px;
+  --radius: 10px;
+  --radius-buyuk: 14px;
 
   /* Sidebar */
   --sidebar-genislik: 240px;
   --sidebar-kapali-genislik: 64px;
-  --sidebar-bg: #1e293b;
-  --sidebar-hover: #334155;
+  --sidebar-bg: #0f172a;
+  --sidebar-hover: #1e293b;
   --sidebar-aktif: #2563eb;
   --sidebar-metin: #94a3b8;
   --sidebar-metin-aktif: #ffffff;
@@ -31,8 +56,18 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
   background: var(--renk-arkaplan);
   color: var(--renk-metin);
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }

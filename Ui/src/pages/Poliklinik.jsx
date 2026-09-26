@@ -1,47 +1,59 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { muayeneService } from '../services/muayeneService';
 import { hastaService } from '../services/hastaService';
 import { getApiErrorMessage } from '../utils/apiError';
 import { muayeneDurumEtiket } from '../utils/muayeneSecenekleri';
+import {
+  yerelTarih,
+  bugun,
+  haftaninPazartesisi,
+  gunEkle,
+  tarihFormat,
+  saatFormat,
+  uzunTarihFormat,
+} from '../utils/tarih';
 import { useDoktorVeServisListesi } from '../components/hastaKayit/useDoktorVeServisListesi';
 import MuayeneAcForm from '../components/muayene/MuayeneAcForm';
 import TeshisBolumu from '../components/muayene/TeshisBolumu';
 import TedaviBolumu from '../components/muayene/TedaviBolumu';
 import OdemeBolumu from '../components/muayene/OdemeBolumu';
 import TaahutnameBolumu from '../components/muayene/TaahutnameBolumu';
-import './Poliklinik.css';
 import Bildirim from '../components/bildirim/Bildirim';
+import Ikon from '../components/ui/Ikon';
+import { SayfaBaslik, BosDurum, IskeletListe, IstatistikKart, Avatar } from '../components/ui/Ortak';
+import './Poliklinik.css';
 
-function yerelTarih(d) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const SON_POLIKLINIK_ANAHTARI = 'poliklinik.sonSecilen';
+
+// Son seçilen poliklinik sadece bu tarayıcıda hatırlanır; depolama kapalıysa sessizce boş döner.
+function sonPoliklinigiOku() {
+  try {
+    return localStorage.getItem(SON_POLIKLINIK_ANAHTARI) || '';
+  } catch {
+    return '';
+  }
 }
 
-function bugun() {
-  return yerelTarih(new Date());
+function sonPoliklinigiYaz(deger) {
+  try {
+    if (deger) localStorage.setItem(SON_POLIKLINIK_ANAHTARI, deger);
+    else localStorage.removeItem(SON_POLIKLINIK_ANAHTARI);
+  } catch {
+    // depolama erişilemiyorsa hatırlamadan devam
+  }
 }
 
-function haftaninPazartesisi(d) {
-  const kopya = new Date(d);
-  const gun = kopya.getDay(); // 0 = Pazar, 1 = Pazartesi, ...
-  const fark = gun === 0 ? -6 : 1 - gun;
-  kopya.setDate(kopya.getDate() + fark);
-  return kopya;
+// Muayene saati "HH:mm:ss" TimeSpan olarak geliyor.
+function timeSpanSaat(deger) {
+  return deger ? String(deger).slice(0, 5) : '-';
 }
 
-function tarihFormat(deger) {
-  if (!deger) return '-';
-  return new Date(deger).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-
-function saatFormat(deger) {
-  if (!deger) return '-';
-  return String(deger).slice(0, 5);
-}
-
-function randevuTarihSaat(deger) {
-  return `${tarihFormat(deger)} ${new Date(deger).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
-}
+const DURUM_SEKMELERI = [
+  { anahtar: 'tumu', etiket: 'Tümü' },
+  { anahtar: 'bekleyen', etiket: 'Muayene Bekleyen' },
+  { anahtar: 'acilan', etiket: 'Muayenesi Açılan' },
+];
 
 // ── Girişte: poliklinik + tarih aralığı seç, o aralığa ait muayene kayıtlarını (ve
 // muayenesi henüz açılmamış randevuları) listele. Seçimler (servisNo/tarihler) üst
@@ -59,8 +71,11 @@ function PoliklinikHastaListesi({
   const [hastalar, setHastalar] = useState([]);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [hata, setHata] = useState('');
+  const [aramaMetni, setAramaMetni] = useState('');
+  const [durumFiltre, setDurumFiltre] = useState('tumu');
 
   const aralikGecersiz = baslangicTarih > bitisTarih;
+  const tekGun = baslangicTarih === bitisTarih;
   const secilenServisAdi = servisler.find((s) => String(s.servisNo) === servisNo)?.servisAdi;
 
   const hastalariYukle = useCallback(async () => {
@@ -75,6 +90,7 @@ function PoliklinikHastaListesi({
       );
       setHastalar(data?.data || []);
     } catch (err) {
+      setHastalar([]);
       setHata(getApiErrorMessage(err, 'Hasta listesi alınamadı'));
     } finally {
       setYukleniyor(false);
@@ -87,7 +103,30 @@ function PoliklinikHastaListesi({
       return;
     }
     hastalariYukle();
-  }, [servisNo, baslangicTarih, bitisTarih, hastalariYukle]);
+  }, [servisNo, hastalariYukle]);
+
+  const sayilar = useMemo(() => {
+    const acilan = hastalar.filter((h) => h.muayeneVarMi).length;
+    return { tumu: hastalar.length, acilan, bekleyen: hastalar.length - acilan };
+  }, [hastalar]);
+
+  const gosterilecek = useMemo(() => {
+    const metin = aramaMetni.trim().toLocaleLowerCase('tr-TR');
+    return hastalar.filter((h) => {
+      if (durumFiltre === 'bekleyen' && h.muayeneVarMi) return false;
+      if (durumFiltre === 'acilan' && !h.muayeneVarMi) return false;
+      if (!metin) return true;
+      return `${h.ad} ${h.soyad} ${h.protokol} ${h.tc}`.toLocaleLowerCase('tr-TR').includes(metin);
+    });
+  }, [hastalar, aramaMetni, durumFiltre]);
+
+  const aktifHizli =
+    tekGun && baslangicTarih === bugun()
+      ? 'bugun'
+      : baslangicTarih === yerelTarih(haftaninPazartesisi(new Date())) &&
+          bitisTarih === yerelTarih(gunEkle(haftaninPazartesisi(new Date()), 6))
+        ? 'hafta'
+        : '';
 
   const bugunSec = () => {
     setBaslangicTarih(bugun());
@@ -96,71 +135,232 @@ function PoliklinikHastaListesi({
 
   const buHaftaSec = () => {
     const pazartesi = haftaninPazartesisi(new Date());
-    const pazar = new Date(pazartesi);
-    pazar.setDate(pazar.getDate() + 6);
     setBaslangicTarih(yerelTarih(pazartesi));
-    setBitisTarih(yerelTarih(pazar));
+    setBitisTarih(yerelTarih(gunEkle(pazartesi, 6)));
   };
 
   return (
-    <div className="mk-panel">
-      <div className="mk-pol-secim">
-        <label className="mk-alan">
-          <span>Poliklinik</span>
-          <select value={servisNo} onChange={(e) => setServisNo(e.target.value)} disabled={servisYukleniyor}>
-            <option value="">{servisYukleniyor ? 'Yükleniyor...' : 'Seçiniz'}</option>
-            {servisler.map((s) => (
-              <option key={s.servisNo} value={s.servisNo}>{s.servisAdi}</option>
-            ))}
-          </select>
-        </label>
-
-        <label className="mk-alan">
-          <span>Başlangıç Tarihi</span>
-          <input type="date" value={baslangicTarih} onChange={(e) => setBaslangicTarih(e.target.value)} />
-        </label>
-
-        <label className="mk-alan">
-          <span>Bitiş Tarihi</span>
-          <input type="date" value={bitisTarih} onChange={(e) => setBitisTarih(e.target.value)} />
-        </label>
-
-        <div className="mk-hizli-tarih">
-          <button type="button" className="mk-btn" onClick={bugunSec}>Bugün</button>
-          <button type="button" className="mk-btn" onClick={buHaftaSec}>Bu Hafta</button>
-        </div>
-      </div>
-
+    <>
       <Bildirim mesaj={servisHata} />
+      <Bildirim mesaj={hata} />
       {aralikGecersiz && <Bildirim mesaj="Başlangıç tarihi bitiş tarihinden büyük olamaz." tip="uyari" />}
 
-      {!servisNo && <p className="mk-bos-metin">Hasta listesini görmek için bir poliklinik seç.</p>}
-      {servisNo && yukleniyor && <p className="mk-bos-metin">Yükleniyor...</p>}
-      {servisNo && !yukleniyor && <Bildirim mesaj={hata} />}
-      {servisNo && !yukleniyor && !hata && !aralikGecersiz && hastalar.length === 0 && (
-        <p className="mk-bos-metin">
-          {tarihFormat(baslangicTarih)} – {tarihFormat(bitisTarih)} aralığında bu poliklinikte hasta bulunmuyor.
-        </p>
+      <section className="ui-kart pk-arac">
+        <div className="ui-arac-cubugu">
+          <label className="ui-alan pk-pol-alan">
+            <span>Poliklinik</span>
+            <select
+              className="ui-input"
+              value={servisNo}
+              onChange={(e) => setServisNo(e.target.value)}
+              disabled={servisYukleniyor}
+            >
+              <option value="">{servisYukleniyor ? 'Yükleniyor...' : 'Poliklinik seçin'}</option>
+              {servisler.map((s) => (
+                <option key={s.servisNo} value={s.servisNo}>{s.servisAdi}</option>
+              ))}
+            </select>
+          </label>
+          <label className="ui-alan pk-tarih-alan">
+            <span>Başlangıç</span>
+            <input className="ui-input" type="date" value={baslangicTarih} onChange={(e) => setBaslangicTarih(e.target.value)} />
+          </label>
+          <label className="ui-alan pk-tarih-alan">
+            <span>Bitiş</span>
+            <input className="ui-input" type="date" value={bitisTarih} onChange={(e) => setBitisTarih(e.target.value)} />
+          </label>
+          <div className="ui-segment pk-hizli">
+            <button type="button" className={aktifHizli === 'bugun' ? 'ui-segment-aktif' : ''} onClick={bugunSec}>
+              Bugün
+            </button>
+            <button type="button" className={aktifHizli === 'hafta' ? 'ui-segment-aktif' : ''} onClick={buHaftaSec}>
+              Bu Hafta
+            </button>
+          </div>
+          <div className="ui-arac-bosluk" />
+          <button
+            type="button"
+            className="ui-btn ui-btn-ikon"
+            onClick={hastalariYukle}
+            disabled={!servisNo || yukleniyor}
+            title="Listeyi yenile"
+            aria-label="Listeyi yenile"
+          >
+            {yukleniyor ? <span className="ui-spinner" /> : <Ikon ad="yenile" />}
+          </button>
+        </div>
+      </section>
+
+      {!servisNo && (
+        <section className="ui-kart">
+          <BosDurum
+            ikon="stetoskop"
+            baslik="Poliklinik seçin"
+            aciklama="Hasta listesini görmek için yukarıdan çalıştığınız polikliniği seçin. Seçiminiz bu tarayıcıda hatırlanır."
+          />
+        </section>
       )}
 
-      {hastalar.length > 0 && (
-        <ul className="mk-liste">
-          {hastalar.map((k) => (
-            <li
-              key={k.muayeneId ?? `r-${k.dosyaId}`}
-              className="mk-liste-item mk-liste-item-tiklanabilir"
-              onClick={() => onHastaSecildi({ ...k, poliklinikAd: secilenServisAdi })}
-            >
-              <div>
-                <strong>{k.ad} {k.soyad}</strong> · Protokol {k.protokol} · {k.doktor}
-                {!k.muayeneVarMi && <span className="mk-durum-rozet mk-durum-randevu">Randevu</span>}
+      {servisNo && (
+        <>
+          <div className="ui-istatistik-grid">
+            <IstatistikKart ikon="kullanicilar" deger={sayilar.tumu} etiket="Toplam hasta" />
+            <IstatistikKart ikon="bekleme" ton="uyari" deger={sayilar.bekleyen} etiket="Muayene bekleyen" />
+            <IstatistikKart ikon="aktivite" ton="basari" deger={sayilar.acilan} etiket="Muayenesi açılan" />
+          </div>
+
+          <section className="ui-kart pk-liste">
+            <div className="ui-kart-baslik pk-liste-baslik">
+              <div className="ui-segment">
+                {DURUM_SEKMELERI.map((d) => (
+                  <button
+                    key={d.anahtar}
+                    type="button"
+                    className={durumFiltre === d.anahtar ? 'ui-segment-aktif' : ''}
+                    onClick={() => setDurumFiltre(d.anahtar)}
+                  >
+                    {d.etiket} <span className="ui-sayac">{sayilar[d.anahtar]}</span>
+                  </button>
+                ))}
               </div>
-              <span className="mk-kayit-tarih">{randevuTarihSaat(k.tarih)}</span>
-            </li>
-          ))}
-        </ul>
+              <div className="pk-liste-ara">
+                <Ikon ad="ara" />
+                <input
+                  type="search"
+                  placeholder="Listede hasta ara"
+                  value={aramaMetni}
+                  onChange={(e) => setAramaMetni(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {yukleniyor && <IskeletListe satir={5} />}
+
+            {!yukleniyor && !aralikGecersiz && gosterilecek.length === 0 && (
+              <BosDurum
+                ikon="kullanicilar"
+                baslik={hastalar.length === 0 ? 'Bu aralıkta hasta yok' : 'Eşleşen hasta yok'}
+                aciklama={
+                  hastalar.length === 0
+                    ? `${secilenServisAdi || 'Seçili poliklinik'} için ${tarihFormat(baslangicTarih)}${tekGun ? '' : ` – ${tarihFormat(bitisTarih)}`} tarihinde randevu ya da muayene kaydı bulunmuyor.`
+                    : 'Arama veya durum filtresini değiştirmeyi deneyin.'
+                }
+              />
+            )}
+
+            {!yukleniyor && gosterilecek.length > 0 && (
+              <div className="ui-tablo-kapsayici">
+                <table className="ui-tablo">
+                  <thead>
+                    <tr>
+                      <th style={{ width: 56 }}>Sıra</th>
+                      <th style={{ width: tekGun ? 80 : 150 }}>{tekGun ? 'Saat' : 'Tarih / Saat'}</th>
+                      <th>Hasta</th>
+                      <th>Doktor</th>
+                      <th>Durum</th>
+                      <th className="ui-tablo-sag" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gosterilecek.map((k, i) => (
+                      <tr
+                        key={k.muayeneId ?? `r-${k.dosyaId}`}
+                        className="ui-tablo-tiklanabilir"
+                        onClick={() => onHastaSecildi({ ...k, poliklinikAd: secilenServisAdi })}
+                      >
+                        <td><span className="pk-sira ui-sayi">{i + 1}</span></td>
+                        <td>
+                          <span className="pk-saat ui-sayi">{saatFormat(k.tarih)}</span>
+                          {!tekGun && <div className="ui-soluk ui-sayi pk-alt">{tarihFormat(k.tarih)}</div>}
+                        </td>
+                        <td>
+                          <div className="pk-hasta">
+                            <Avatar ad={k.ad} soyad={k.soyad} />
+                            <div>
+                              <div className="pk-hasta-ad">{k.ad} {k.soyad}</div>
+                              <div className="ui-soluk ui-sayi pk-alt">#{k.protokol} · TC {k.tc}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{k.doktor || '-'}</td>
+                        <td>
+                          {k.muayeneVarMi ? (
+                            <span className="ui-rozet ui-rozet-nokta ui-rozet-basari">Muayene açıldı</span>
+                          ) : (
+                            <span className="ui-rozet ui-rozet-nokta ui-rozet-uyari">Bekliyor</span>
+                          )}
+                        </td>
+                        <td className="ui-tablo-sag">
+                          <span className={`ui-btn ui-btn-kucuk${k.muayeneVarMi ? '' : ' ui-btn-birincil'}`}>
+                            {k.muayeneVarMi ? 'Dosyayı Aç' : 'Muayeneye Al'}
+                            <Ikon ad="sagOk" />
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </>
       )}
-    </div>
+    </>
+  );
+}
+
+// ── Muayene detayındaki hasta/karşılaşma özeti ──
+function MuayeneBanner({ muayene, hastaAdSoyad, durumDegistiriliyor, onDurumDegistir }) {
+  const [ad = '', ...soyadParcalari] = (hastaAdSoyad || '').split(' ');
+  const kapali = !!muayene.bitisSaati;
+  return (
+    <section className={`ui-kart pk-banner${kapali ? ' pk-banner-kapali' : ''}`}>
+      <Avatar ad={ad} soyad={soyadParcalari.join(' ')} boyut="buyuk" />
+      <div className="pk-banner-bilgi">
+        <div className="pk-banner-ust">
+          <h2>{hastaAdSoyad || 'Hasta'}</h2>
+          <span className={`ui-rozet ui-rozet-nokta ${kapali ? '' : 'ui-rozet-basari pk-canli'}`}>
+            Muayene {muayeneDurumEtiket(muayene.bitisSaati).toLocaleLowerCase('tr-TR')}
+          </span>
+        </div>
+        <dl className="pk-banner-meta">
+          <div>
+            <dt>Protokol</dt>
+            <dd className="ui-sayi">#{muayene.protocolNo}</dd>
+          </div>
+          <div>
+            <dt>Poliklinik</dt>
+            <dd>{muayene.polAdi || '-'}</dd>
+          </div>
+          <div>
+            <dt>Doktor</dt>
+            <dd>{muayene.doktorAd || '-'}</dd>
+          </div>
+          <div>
+            <dt>Tarih</dt>
+            <dd>{uzunTarihFormat(muayene.muayeneTarihi)}</dd>
+          </div>
+          <div>
+            <dt>Saat</dt>
+            <dd className="ui-sayi">
+              {timeSpanSaat(muayene.baslangicSaati)}
+              {kapali && ` – ${timeSpanSaat(muayene.bitisSaati)}`}
+            </dd>
+          </div>
+        </dl>
+      </div>
+      <div className="pk-banner-aksiyon">
+        <button
+          type="button"
+          className={`ui-btn${kapali ? '' : ' ui-btn-birincil'}`}
+          onClick={onDurumDegistir}
+          disabled={durumDegistiriliyor}
+        >
+          {durumDegistiriliyor ? <span className="ui-spinner" /> : <Ikon ad={kapali ? 'kilitAcik' : 'kilit'} />}
+          {kapali ? 'Muayeneyi Yeniden Aç' : 'Muayeneyi Kapat'}
+        </button>
+      </div>
+    </section>
   );
 }
 
@@ -175,9 +375,14 @@ export default function Poliklinik() {
 
   // Hasta listesi seçimleri (poliklinik + tarih aralığı) — hasta detayına girip
   // listeye dönüldüğünde sıfırlanmasın diye burada, üst bileşende tutuluyor.
-  const [servisNo, setServisNo] = useState('');
+  const [servisNo, setServisNoState] = useState(sonPoliklinigiOku);
   const [baslangicTarih, setBaslangicTarih] = useState(bugun());
   const [bitisTarih, setBitisTarih] = useState(bugun());
+
+  const setServisNo = (deger) => {
+    setServisNoState(deger);
+    sonPoliklinigiYaz(deger);
+  };
 
   const [muayene, setMuayene] = useState(null);
   const [hastaAdSoyad, setHastaAdSoyad] = useState('');
@@ -248,6 +453,7 @@ export default function Poliklinik() {
   }, [muayene]);
 
   const durumDegistir = async () => {
+    if (!muayene.bitisSaati && !window.confirm('Muayeneyi kapatmak istediğine emin misin?')) return;
     setDurumDegistiriliyor(true);
     setHata('');
     try {
@@ -288,9 +494,11 @@ export default function Poliklinik() {
   if (!girisVarMi) {
     return (
       <div className="sayfa">
-        <div className="sayfa-baslik">
-          <h1>Poliklinik</h1>
-        </div>
+        <SayfaBaslik
+          ikon="stetoskop"
+          baslik="Poliklinik"
+          aciklama="Günlük hasta listesi; muayene, teşhis, tedavi ve ödeme işlemleri."
+        />
         <PoliklinikHastaListesi
           onHastaSecildi={hastaSecildi}
           servisNo={servisNo}
@@ -304,16 +512,25 @@ export default function Poliklinik() {
     );
   }
 
+  const kapali = !!muayene?.bitisSaati;
+
   return (
     <div className="sayfa">
-      <div className="sayfa-baslik">
-        <h1>Poliklinik</h1>
-      </div>
+      <nav className="pk-kirinti" aria-label="Konum">
+        <button type="button" onClick={listeyeDon}>
+          <Ikon ad="solOk" /> Hasta Listesi
+        </button>
+        <span aria-hidden="true">/</span>
+        <span className="pk-kirinti-aktif">{hastaAdSoyad || baglamBilgisi?.ad || 'Muayene'}</span>
+      </nav>
 
-      <button type="button" className="mk-btn mk-geri-btn" onClick={listeyeDon}>‹ Hasta Listesine Dön</button>
+      <Bildirim mesaj={hata} />
 
-      {yukleniyor && <p className="mk-bos-metin">Yükleniyor...</p>}
-      {!yukleniyor && <Bildirim mesaj={hata} />}
+      {yukleniyor && (
+        <section className="ui-kart">
+          <IskeletListe satir={3} />
+        </section>
+      )}
 
       {!yukleniyor && randevuBulunamadi && (
         baglamBilgisi?.tc && baglamBilgisi?.protokol ? (
@@ -327,67 +544,70 @@ export default function Poliklinik() {
             onOlusturuldu={muayeneIdIleYukle}
           />
         ) : (
-          <div className="mk-panel">
-            <p className="mk-bos-metin">
-              Bu randevu için henüz muayene kaydı açılmamış. Muayene açmak için hasta listesinden ya da
-              Hasta Kayıt ekranındaki Poliklinik Kayıtları listesinden ilgili kayda tıkla.
-            </p>
-          </div>
+          <section className="ui-kart">
+            <BosDurum
+              ikon="dosya"
+              baslik="Muayene kaydı açılmamış"
+              aciklama="Bu randevu için henüz muayene kaydı yok. Muayene açmak için hasta listesinden ya da Hasta Kayıt ekranındaki kayıtlardan ilgili hastaya tıklayın."
+            >
+              <button type="button" className="ui-btn" onClick={listeyeDon}>
+                <Ikon ad="solOk" /> Hasta listesine dön
+              </button>
+            </BosDurum>
+          </section>
         )
       )}
 
       {!yukleniyor && muayene && (
         <>
-          <div className="mk-panel mk-header">
-            <div className="mk-header-bilgi">
-              <h2>{hastaAdSoyad || 'Hasta'}</h2>
-              <p>
-                Protokol {muayene.protocolNo} · {muayene.doktorAd} · {muayene.polAdi}
-              </p>
-              <p className="mk-alt-baslik">
-                {tarihFormat(muayene.muayeneTarihi)} {saatFormat(muayene.baslangicSaati)}
-              </p>
-            </div>
-            <div className="mk-header-durum">
-              <span className={`mk-durum-rozet ${muayene.bitisSaati ? 'mk-durum-kapali' : 'mk-durum-acik'}`}>
-                {muayeneDurumEtiket(muayene.bitisSaati)}
-              </span>
-              <button type="button" className="mk-btn" onClick={durumDegistir} disabled={durumDegistiriliyor}>
-                {durumDegistiriliyor ? '...' : muayene.bitisSaati ? 'Muayeneyi Yeniden Aç' : 'Muayeneyi Kapat'}
-              </button>
-            </div>
-          </div>
+          <MuayeneBanner
+            muayene={muayene}
+            hastaAdSoyad={hastaAdSoyad}
+            durumDegistiriliyor={durumDegistiriliyor}
+            onDurumDegistir={durumDegistir}
+          />
 
-          <div className="mk-tab-bar">
+          {kapali && (
+            <div className="pk-kapali-uyari" role="status">
+              <Ikon ad="kilit" />
+              Bu muayene kapatılmış. Teşhis ve tedavi eklemek için muayeneyi yeniden açın.
+            </div>
+          )}
+
+          <nav className="ui-sekmeler" aria-label="Muayene bölümleri">
             <button
               type="button"
-              className={`mk-tab-btn ${aktifSekme === 'muayene' ? 'mk-tab-aktif' : ''}`}
+              className={`ui-sekme${aktifSekme === 'muayene' ? ' ui-sekme-aktif' : ''}`}
               onClick={() => setAktifSekme('muayene')}
             >
-              Muayene
+              <Ikon ad="stetoskop" /> Muayene
             </button>
             <button
               type="button"
-              className={`mk-tab-btn ${aktifSekme === 'taahutname' ? 'mk-tab-aktif' : ''}`}
+              className={`ui-sekme${aktifSekme === 'taahutname' ? ' ui-sekme-aktif' : ''}`}
               onClick={() => setAktifSekme('taahutname')}
             >
-              Taahütname
+              <Ikon ad="dosya" /> Taahütname
             </button>
-          </div>
+          </nav>
 
           {aktifSekme === 'muayene' && (
             <div className="mk-grid">
-              <TeshisBolumu muayeneId={muayene.id} kapali={!!muayene.bitisSaati} />
-              <TedaviBolumu
-                muayeneId={muayene.id}
-                kapali={!!muayene.bitisSaati}
-                onDegisti={() => setYenidenYukleTetik((t) => t + 1)}
-              />
-              <OdemeBolumu
-                muayeneId={muayene.id}
-                yenidenYukleTetik={yenidenYukleTetik}
-                onDegisti={() => setYenidenYukleTetik((t) => t + 1)}
-              />
+              <div className="mk-grid-klinik">
+                <TeshisBolumu muayeneId={muayene.id} kapali={kapali} />
+                <TedaviBolumu
+                  muayeneId={muayene.id}
+                  kapali={kapali}
+                  onDegisti={() => setYenidenYukleTetik((t) => t + 1)}
+                />
+              </div>
+              <div className="mk-grid-mali">
+                <OdemeBolumu
+                  muayeneId={muayene.id}
+                  yenidenYukleTetik={yenidenYukleTetik}
+                  onDegisti={() => setYenidenYukleTetik((t) => t + 1)}
+                />
+              </div>
             </div>
           )}
 

@@ -3,11 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { hastaService } from '../services/hastaService';
 import { muayeneService } from '../services/muayeneService';
 import { getApiErrorMessage } from '../utils/apiError';
-import { CINSIYET_SECENEKLERI, KAN_GRUBU_SECENEKLERI } from '../utils/hastaSecenekleri';
+import {
+  CINSIYET_SECENEKLERI,
+  KAN_GRUBU_SECENEKLERI,
+  cinsiyetEtiket,
+  kanGrubuEtiket,
+} from '../utils/hastaSecenekleri';
+import { tarihFormat, saatFormat, yasHesapla } from '../utils/tarih';
 import RandevuVerModal from '../components/hastaKayit/RandevuVerModal';
 import MuayeneKaydiModal from '../components/hastaKayit/MuayeneKaydiModal';
-import './HastaKayit.css';
 import Bildirim from '../components/bildirim/Bildirim';
+import Ikon from '../components/ui/Ikon';
+import { SayfaBaslik, BosDurum, IskeletListe, Avatar, TarihKutu } from '../components/ui/Ortak';
+import './HastaKayit.css';
 
 const BOS_FORM = {
   name: '',
@@ -39,11 +47,154 @@ function formaDonustur(hasta) {
   };
 }
 
-function tarihSaatFormat(deger) {
-  if (!deger) return '-';
-  return new Date(deger).toLocaleString('tr-TR', {
-    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
-  });
+function formDegistiMi(form, hasta) {
+  if (!hasta) return false;
+  const orijinal = formaDonustur(hasta);
+  return Object.keys(orijinal).some((alan) => String(form[alan]) !== String(orijinal[alan]));
+}
+
+// ── Seçili hastanın özet kartı: kimlik bilgileri + hızlı işlemler ──
+function HastaBanner({ hasta, onRandevuVer, onMuayeneAc, onKapat }) {
+  const yas = yasHesapla(hasta.birthDate);
+  return (
+    <section className="ui-kart hk-banner">
+      <Avatar ad={hasta.name} soyad={hasta.surname} boyut="buyuk" />
+      <div className="hk-banner-bilgi">
+        <div className="hk-banner-ust">
+          <h2>{hasta.name} {hasta.surname}</h2>
+          <span className="ui-rozet ui-rozet-bilgi">Protokol #{hasta.protocol}</span>
+        </div>
+        <dl className="hk-banner-meta">
+          <div>
+            <Ikon ad="kimlik" />
+            <dt>TC</dt>
+            <dd className="ui-sayi">{hasta.tcKimlik || '-'}</dd>
+          </div>
+          <div>
+            <Ikon ad="takvim" />
+            <dt>Doğum</dt>
+            <dd>{tarihFormat(hasta.birthDate)}{yas !== null && <span className="ui-soluk"> · {yas} yaş</span>}</dd>
+          </div>
+          <div>
+            <Ikon ad="kullanici" />
+            <dt>Cinsiyet</dt>
+            <dd>{cinsiyetEtiket(hasta.gender)}</dd>
+          </div>
+          <div>
+            <Ikon ad="damla" />
+            <dt>Kan Grubu</dt>
+            <dd><span className="hk-kan-grubu">{kanGrubuEtiket(hasta.bloodType)}</span></dd>
+          </div>
+          <div>
+            <Ikon ad="telefon" />
+            <dt>Telefon</dt>
+            <dd className="ui-sayi">{hasta.phone || '-'}</dd>
+          </div>
+        </dl>
+      </div>
+      <div className="hk-banner-aksiyonlar">
+        <button type="button" className="ui-btn ui-btn-birincil" onClick={onRandevuVer}>
+          <Ikon ad="takvimArti" /> Randevu Ver
+        </button>
+        <button type="button" className="ui-btn" onClick={onMuayeneAc}>
+          <Ikon ad="stetoskop" /> Muayene Aç
+        </button>
+        <button
+          type="button"
+          className="ui-btn ui-btn-hayalet ui-btn-ikon"
+          onClick={onKapat}
+          title="Hastayı kapat"
+          aria-label="Hastayı kapat"
+        >
+          <Ikon ad="kapat" />
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function YaklasanRandevular({ randevular, yukleniyor, iptalEdilenId, onIptal, onSec }) {
+  return (
+    <section className="ui-kart">
+      <div className="ui-kart-baslik">
+        <h2><Ikon ad="takvim" /> Yaklaşan Randevular</h2>
+        {!yukleniyor && <span className="ui-sayac">{randevular.length}</span>}
+      </div>
+      {yukleniyor && <IskeletListe satir={2} avatar={false} />}
+      {!yukleniyor && randevular.length === 0 && (
+        <BosDurum kompakt ikon="takvim" aciklama="Planlanmış randevu bulunmuyor." />
+      )}
+      {!yukleniyor && randevular.length > 0 && (
+        <ul className="hk-randevu-liste">
+          {randevular.map((r) => (
+            <li key={r.dosyaId} className={`hk-randevu${r.iptal ? ' hk-randevu-iptal' : ''}`}>
+              <button type="button" className="hk-randevu-govde" onClick={() => onSec(r)} title="Muayene kaydına git">
+                <TarihKutu tarih={r.randevuTarihi} pasif={r.iptal} />
+                <div className="hk-randevu-bilgi">
+                  <div className="hk-randevu-ust">
+                    <strong>{r.poliklinik}</strong>
+                    <span className="ui-sayi">{saatFormat(r.randevuTarihi)}</span>
+                  </div>
+                  <div className="ui-soluk">{r.doktor}{r.uzmanlikDali ? ` · ${r.uzmanlikDali}` : ''}</div>
+                </div>
+              </button>
+              {r.iptal ? (
+                <span className="ui-rozet ui-rozet-tehlike">İptal</span>
+              ) : (
+                <button
+                  type="button"
+                  className="ui-btn ui-btn-kucuk ui-btn-tehlike"
+                  onClick={() => onIptal(r.dosyaId)}
+                  disabled={iptalEdilenId === r.dosyaId}
+                >
+                  {iptalEdilenId === r.dosyaId ? <span className="ui-spinner" /> : 'İptal'}
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function PoliklinikGecmisi({ kayitlar, yukleniyor, onSec }) {
+  return (
+    <section className="ui-kart">
+      <div className="ui-kart-baslik">
+        <h2><Ikon ad="aktivite" /> Poliklinik Geçmişi</h2>
+        {!yukleniyor && <span className="ui-sayac">{kayitlar.length}</span>}
+      </div>
+      {yukleniyor && <IskeletListe satir={3} avatar={false} />}
+      {!yukleniyor && kayitlar.length === 0 && (
+        <BosDurum kompakt ikon="dosya" aciklama="Hastanın henüz poliklinik kaydı yok." />
+      )}
+      {!yukleniyor && kayitlar.length > 0 && (
+        <ol className="hk-zaman">
+          {kayitlar.map((k) => (
+            <li key={k.muayeneId} className={`hk-zaman-oge${k.kapali ? '' : ' hk-zaman-acik'}`}>
+              <button type="button" className="hk-zaman-kart" onClick={() => onSec(k)}>
+                <div className="hk-zaman-ust">
+                  <strong>{k.poliklinik || 'Poliklinik'}</strong>
+                  <span className={`ui-rozet ui-rozet-nokta ${k.kapali ? '' : 'ui-rozet-basari'}`}>
+                    {k.kapali ? 'Kapalı' : 'Açık'}
+                  </span>
+                </div>
+                <div className="ui-soluk">
+                  {k.doktor || '-'}{k.uzmanlikDali ? ` · ${k.uzmanlikDali}` : ''}
+                </div>
+                <div className="hk-zaman-alt">
+                  <span className="ui-sayi">{tarihFormat(k.tarih)} · {saatFormat(k.tarih)}</span>
+                  {!k.randevuId && <span className="hk-etiket">Randevusuz</span>}
+                  <Ikon ad="sagOk" className="hk-zaman-ok" />
+                </div>
+              </button>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  );
 }
 
 export default function HastaKayit() {
@@ -51,6 +202,7 @@ export default function HastaKayit() {
   const [arama, setArama] = useState('');
   const [aramaHata, setAramaHata] = useState('');
   const [aramaYukleniyor, setAramaYukleniyor] = useState(false);
+  const [aramaSonuclari, setAramaSonuclari] = useState([]);
 
   const [hasta, setHasta] = useState(null);
   const [yeniKayitModu, setYeniKayitModu] = useState(false);
@@ -114,6 +266,16 @@ export default function HastaKayit() {
     }
   };
 
+  const hastaSec = (secilen) => {
+    setHasta(secilen);
+    setYeniKayitModu(false);
+    setForm(formaDonustur(secilen));
+    setAramaSonuclari([]);
+    setFormBasari('');
+    setFormHata('');
+    randevuGecmisiniYukle(secilen.protocol);
+  };
+
   const randevuyuIptalEt = async (dosyaId) => {
     if (!window.confirm('Bu randevuyu iptal etmek istediğine emin misin?')) return;
     setIptalEdilenId(dosyaId);
@@ -157,7 +319,8 @@ export default function HastaKayit() {
     });
   };
 
-  const aramaYap = async () => {
+  const aramaYap = async (e) => {
+    e?.preventDefault();
     const metin = arama.trim();
     if (metin.length < 3) {
       setAramaHata('Arama metni en az 3 karakter olmalıdır');
@@ -167,19 +330,20 @@ export default function HastaKayit() {
     setAramaHata('');
     setFormBasari('');
     setFormHata('');
+    setAramaSonuclari([]);
     setAramaYukleniyor(true);
     try {
       const { data } = await hastaService.ara(metin);
-      const bulunan = data?.[0];
-      if (!bulunan) {
+      const sonuclar = data || [];
+      if (sonuclar.length === 0) {
         secimiTemizle();
         setAramaHata('Hasta kaydı bulunamadı');
-        return;
+      } else if (sonuclar.length === 1) {
+        hastaSec(sonuclar[0]);
+      } else {
+        secimiTemizle();
+        setAramaSonuclari(sonuclar);
       }
-      setHasta(bulunan);
-      setYeniKayitModu(false);
-      setForm(formaDonustur(bulunan));
-      randevuGecmisiniYukle(bulunan.protocol);
     } catch (err) {
       secimiTemizle();
       setAramaHata(getApiErrorMessage(err, 'Hasta kaydı bulunamadı'));
@@ -188,17 +352,12 @@ export default function HastaKayit() {
     }
   };
 
-  const aramaKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      aramaYap();
-    }
-  };
-
   const yeniKayitBaslat = () => {
     secimiTemizle();
+    setAramaSonuclari([]);
     setYeniKayitModu(true);
     setAramaHata('');
+    setFormBasari('');
     const sayisalArama = arama.trim();
     if (/^\d{11}$/.test(sayisalArama)) {
       setForm({ ...BOS_FORM, tcKimlik: sayisalArama });
@@ -232,12 +391,7 @@ export default function HastaKayit() {
         setArama(String(dto.tcKimlik));
         const { data } = await hastaService.ara(String(dto.tcKimlik));
         const olusan = data?.[0];
-        if (olusan) {
-          setHasta(olusan);
-          setYeniKayitModu(false);
-          setForm(formaDonustur(olusan));
-          randevuGecmisiniYukle(olusan.protocol);
-        }
+        if (olusan) hastaSec(olusan);
       } else {
         const dto = {
           name: form.name.trim() || null,
@@ -251,6 +405,11 @@ export default function HastaKayit() {
           email: form.email.trim() || null,
         };
         await hastaService.guncelle(hasta.protocol, dto);
+        // Banner ve "değişiklik var" durumu yeni değerleri göstersin diye yerel kaydı da güncelliyoruz.
+        setHasta((h) => ({
+          ...h,
+          ...Object.fromEntries(Object.entries(dto).filter(([, v]) => v !== null)),
+        }));
         setFormBasari('Hasta bilgileri güncellendi.');
       }
     } catch (err) {
@@ -261,213 +420,250 @@ export default function HastaKayit() {
   };
 
   const hastaSecili = !!hasta;
+  const degisiklikVar = hastaSecili && formDegistiMi(form, hasta);
 
   return (
-    <div className="sayfa hasta-kayit-sayfa">
-      <div className="sayfa-baslik">
-        <h1>Hasta Kayıt</h1>
-      </div>
+    <div className="sayfa">
+      <SayfaBaslik
+        ikon="kullanicilar"
+        baslik="Hasta Kayıt"
+        aciklama="Hasta arayın, kimlik bilgilerini güncelleyin; randevu ve muayene işlemlerini başlatın."
+      >
+        <button type="button" className="ui-btn ui-btn-birincil" onClick={yeniKayitBaslat}>
+          <Ikon ad="kullaniciEkle" /> Yeni Hasta
+        </button>
+      </SayfaBaslik>
 
-      <div className="hasta-kayit-grid">
-        {/* ── SOL: Arama + Hasta Bilgileri ── */}
-        <div className="hk-panel hk-sol">
-          <div className="hk-arama">
-            <input
-              type="text"
-              placeholder="Protokol, TC veya isimle ara ve Enter'a bas..."
-              value={arama}
-              onChange={(e) => setArama(e.target.value)}
-              onKeyDown={aramaKeyDown}
-              disabled={aramaYukleniyor}
-            />
-            <button onClick={aramaYap} disabled={aramaYukleniyor} className="hk-arama-btn">
-              {aramaYukleniyor ? '...' : 'Ara'}
-            </button>
-          </div>
-
-          {aramaHata && (
-            <div className="hk-uyari">
-              {aramaHata}
-              <button type="button" className="hk-link-btn" onClick={yeniKayitBaslat}>
-                Yeni hasta kaydı oluştur
-              </button>
-            </div>
+      {/* ── Arama ── */}
+      <form className="ui-kart hk-arama" onSubmit={aramaYap}>
+        <div className="hk-arama-kutu">
+          <Ikon ad="ara" className="hk-arama-ikon" />
+          <input
+            type="search"
+            placeholder="Protokol no, TC kimlik no veya ad soyad ile ara"
+            value={arama}
+            onChange={(e) => setArama(e.target.value)}
+            disabled={aramaYukleniyor}
+            autoFocus
+          />
+          {aramaYukleniyor ? (
+            <span className="ui-spinner hk-arama-spinner" />
+          ) : (
+            <kbd className="hk-kbd">Enter</kbd>
           )}
+        </div>
+        <button type="submit" className="ui-btn ui-btn-birincil" disabled={aramaYukleniyor}>
+          Ara
+        </button>
+      </form>
 
-          {(hastaSecili || yeniKayitModu) && (
-            <form className="hk-form" onSubmit={kaydet}>
-              <div className="hk-form-baslik">
-                <h2>{yeniKayitModu ? 'Yeni Hasta Kaydı' : `Protokol: ${hasta.protocol}`}</h2>
-                {!yeniKayitModu && (
-                  <button type="button" className="hk-link-btn" onClick={secimiTemizle}>
-                    Kapat
-                  </button>
-                )}
-              </div>
+      {aramaHata && (
+        <div className="hk-arama-uyari" role="status">
+          <Ikon ad="bilgi" />
+          <span>{aramaHata}</span>
+          <button type="button" className="ui-btn ui-btn-kucuk" onClick={yeniKayitBaslat}>
+            <Ikon ad="kullaniciEkle" /> Yeni hasta kaydı oluştur
+          </button>
+        </div>
+      )}
 
-              <div className="hk-alan-grid">
-                <label className="hk-alan">
-                  <span>Ad</span>
-                  <input value={form.name} onChange={(e) => formDegistir('name', e.target.value)} required />
-                </label>
-                <label className="hk-alan">
-                  <span>Soyad</span>
-                  <input value={form.surname} onChange={(e) => formDegistir('surname', e.target.value)} required />
-                </label>
-                <label className="hk-alan">
-                  <span>TC Kimlik No</span>
-                  <input
-                    value={form.tcKimlik}
-                    onChange={(e) => formDegistir('tcKimlik', e.target.value.replace(/\D/g, ''))}
-                    disabled={!yeniKayitModu}
-                    maxLength={11}
-                    required={yeniKayitModu}
-                  />
-                </label>
-                <label className="hk-alan">
-                  <span>Telefon</span>
-                  <input value={form.phone} onChange={(e) => formDegistir('phone', e.target.value)} required />
-                </label>
-                <label className="hk-alan">
-                  <span>Doğum Tarihi</span>
-                  <input
-                    type="date"
-                    value={form.birthDate}
-                    onChange={(e) => formDegistir('birthDate', e.target.value)}
-                    required={yeniKayitModu}
-                  />
-                </label>
-                <label className="hk-alan">
-                  <span>Cinsiyet</span>
-                  <select value={form.gender} onChange={(e) => formDegistir('gender', e.target.value)} required={yeniKayitModu}>
-                    <option value="">Seçiniz</option>
-                    {CINSIYET_SECENEKLERI.map((c) => (
-                      <option key={c.deger} value={c.deger}>{c.etiket}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="hk-alan">
-                  <span>Kan Grubu</span>
-                  <select value={form.bloodType} onChange={(e) => formDegistir('bloodType', e.target.value)} required={yeniKayitModu}>
-                    <option value="">Seçiniz</option>
-                    {KAN_GRUBU_SECENEKLERI.map((k) => (
-                      <option key={k.deger} value={k.deger}>{k.etiket}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="hk-alan">
-                  <span>E-posta</span>
-                  <input type="email" value={form.email} onChange={(e) => formDegistir('email', e.target.value)} />
-                </label>
-                <label className="hk-alan hk-alan-genis">
-                  <span>Adres</span>
-                  <textarea value={form.address} onChange={(e) => formDegistir('address', e.target.value)} rows={2} required />
-                </label>
-              </div>
-
-              <Bildirim mesaj={formHata} onKapat={() => setFormHata('')} />
-              <Bildirim mesaj={formBasari} tip="basari" onKapat={() => setFormBasari('')} />
-
-              <div className="hk-form-aksiyonlar">
-                <button type="submit" className="hk-btn hk-btn-birincil" disabled={kaydediliyor}>
-                  {kaydediliyor ? 'Kaydediliyor...' : yeniKayitModu ? 'Hastayı Kaydet' : 'Bilgileri Güncelle'}
+      {aramaSonuclari.length > 1 && (
+        <section className="ui-kart hk-sonuclar">
+          <div className="ui-kart-baslik">
+            <h2><Ikon ad="kullanicilar" /> Arama Sonuçları</h2>
+            <span className="ui-sayac">{aramaSonuclari.length}</span>
+          </div>
+          <ul>
+            {aramaSonuclari.map((s) => (
+              <li key={s.protocol}>
+                <button type="button" className="hk-sonuc" onClick={() => hastaSec(s)}>
+                  <Avatar ad={s.name} soyad={s.surname} />
+                  <div className="hk-sonuc-bilgi">
+                    <strong>{s.name} {s.surname}</strong>
+                    <span className="ui-soluk ui-sayi">
+                      #{s.protocol} · TC {s.tcKimlik || '-'} · {tarihFormat(s.birthDate)}
+                    </span>
+                  </div>
+                  <Ikon ad="sagOk" className="hk-sonuc-ok" />
                 </button>
-                {!yeniKayitModu && (
-                  <>
-                    <button type="button" className="hk-btn" onClick={() => setRandevuModalAcik(true)}>
-                      Randevu Ver
-                    </button>
-                    <button type="button" className="hk-btn" onClick={() => setMuayeneModalAcik(true)}>
-                      Muayene Kaydı Aç
-                    </button>
-                  </>
-                )}
-              </div>
-            </form>
-          )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-          {!hastaSecili && !yeniKayitModu && !aramaHata && (
-            <div className="hk-bos-durum">
-              <p>Hasta bilgilerini görmek için protokol, TC veya isimle arama yap.</p>
-              <button type="button" className="hk-link-btn" onClick={yeniKayitBaslat}>
-                veya yeni hasta kaydı oluştur
+      {!hastaSecili && !yeniKayitModu && aramaSonuclari.length === 0 && (
+        <section className="ui-kart">
+          <BosDurum
+            ikon="ara"
+            baslik="Henüz hasta seçilmedi"
+            aciklama="Yukarıdan protokol numarası, TC kimlik numarası ya da ad soyad ile arayın. Kayıtlı değilse yeni hasta kaydı oluşturabilirsiniz."
+          />
+        </section>
+      )}
+
+      {hastaSecili && (
+        <HastaBanner
+          hasta={hasta}
+          onRandevuVer={() => setRandevuModalAcik(true)}
+          onMuayeneAc={() => setMuayeneModalAcik(true)}
+          onKapat={secimiTemizle}
+        />
+      )}
+
+      {(hastaSecili || yeniKayitModu) && (
+        <div className={`hk-duzen${yeniKayitModu ? ' hk-duzen-tek' : ''}`}>
+          <form className="ui-kart hk-form" onSubmit={kaydet}>
+            <div className="ui-kart-baslik">
+              <h2>
+                <Ikon ad={yeniKayitModu ? 'kullaniciEkle' : 'dosya'} />
+                {yeniKayitModu ? 'Yeni Hasta Kaydı' : 'Hasta Bilgileri'}
+              </h2>
+              {degisiklikVar && <span className="ui-rozet ui-rozet-uyari ui-rozet-nokta">Kaydedilmemiş değişiklik</span>}
+            </div>
+
+            <div className="hk-form-govde">
+              <fieldset className="hk-bolum">
+                <legend>Kimlik Bilgileri</legend>
+                <div className="hk-alan-grid">
+                  <label className="ui-alan">
+                    <span>Ad<b className="ui-zorunlu">*</b></span>
+                    <input className="ui-input" value={form.name} onChange={(e) => formDegistir('name', e.target.value)} required />
+                  </label>
+                  <label className="ui-alan">
+                    <span>Soyad<b className="ui-zorunlu">*</b></span>
+                    <input className="ui-input" value={form.surname} onChange={(e) => formDegistir('surname', e.target.value)} required />
+                  </label>
+                  <label className="ui-alan">
+                    <span>TC Kimlik No{yeniKayitModu && <b className="ui-zorunlu">*</b>}</span>
+                    <input
+                      className="ui-input ui-sayi"
+                      value={form.tcKimlik}
+                      onChange={(e) => formDegistir('tcKimlik', e.target.value.replace(/\D/g, ''))}
+                      disabled={!yeniKayitModu}
+                      inputMode="numeric"
+                      maxLength={11}
+                      minLength={11}
+                      required={yeniKayitModu}
+                    />
+                  </label>
+                  <label className="ui-alan">
+                    <span>Doğum Tarihi{yeniKayitModu && <b className="ui-zorunlu">*</b>}</span>
+                    <input
+                      className="ui-input"
+                      type="date"
+                      value={form.birthDate}
+                      onChange={(e) => formDegistir('birthDate', e.target.value)}
+                      required={yeniKayitModu}
+                    />
+                  </label>
+                  <label className="ui-alan">
+                    <span>Cinsiyet{yeniKayitModu && <b className="ui-zorunlu">*</b>}</span>
+                    <select className="ui-input" value={form.gender} onChange={(e) => formDegistir('gender', e.target.value)} required={yeniKayitModu}>
+                      <option value="">Seçiniz</option>
+                      {CINSIYET_SECENEKLERI.map((c) => (
+                        <option key={c.deger} value={c.deger}>{c.etiket}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="ui-alan">
+                    <span>Kan Grubu{yeniKayitModu && <b className="ui-zorunlu">*</b>}</span>
+                    <select className="ui-input" value={form.bloodType} onChange={(e) => formDegistir('bloodType', e.target.value)} required={yeniKayitModu}>
+                      <option value="">Seçiniz</option>
+                      {KAN_GRUBU_SECENEKLERI.map((k) => (
+                        <option key={k.deger} value={k.deger}>{k.etiket}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset className="hk-bolum">
+                <legend>İletişim Bilgileri</legend>
+                <div className="hk-alan-grid">
+                  <label className="ui-alan">
+                    <span>Telefon<b className="ui-zorunlu">*</b></span>
+                    <input
+                      className="ui-input ui-sayi"
+                      type="tel"
+                      placeholder="05xx xxx xx xx"
+                      value={form.phone}
+                      onChange={(e) => formDegistir('phone', e.target.value)}
+                      required
+                    />
+                  </label>
+                  <label className="ui-alan">
+                    <span>E-posta</span>
+                    <input
+                      className="ui-input"
+                      type="email"
+                      placeholder="ornek@eposta.com"
+                      value={form.email}
+                      onChange={(e) => formDegistir('email', e.target.value)}
+                    />
+                  </label>
+                  <label className="ui-alan hk-alan-genis">
+                    <span>Adres<b className="ui-zorunlu">*</b></span>
+                    <textarea
+                      className="ui-input"
+                      value={form.address}
+                      onChange={(e) => formDegistir('address', e.target.value)}
+                      rows={2}
+                      required
+                    />
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div className="hk-form-alt">
+              {yeniKayitModu ? (
+                <button type="button" className="ui-btn ui-btn-hayalet" onClick={secimiTemizle} disabled={kaydediliyor}>
+                  Vazgeç
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="ui-btn ui-btn-hayalet"
+                  onClick={() => setForm(formaDonustur(hasta))}
+                  disabled={!degisiklikVar || kaydediliyor}
+                >
+                  Değişiklikleri geri al
+                </button>
+              )}
+              <button
+                type="submit"
+                className="ui-btn ui-btn-birincil"
+                disabled={kaydediliyor || (hastaSecili && !degisiklikVar)}
+              >
+                {kaydediliyor ? <span className="ui-spinner" /> : <Ikon ad="kaydet" />}
+                {yeniKayitModu ? 'Hastayı Kaydet' : 'Değişiklikleri Kaydet'}
               </button>
             </div>
+
+            <Bildirim mesaj={formHata} onKapat={() => setFormHata('')} />
+            <Bildirim mesaj={formBasari} tip="basari" onKapat={() => setFormBasari('')} />
+          </form>
+
+          {hastaSecili && (
+            <aside className="hk-yan">
+              <YaklasanRandevular
+                randevular={randevular}
+                yukleniyor={listeYukleniyor}
+                iptalEdilenId={iptalEdilenId}
+                onIptal={randevuyuIptalEt}
+                onSec={muayeneyeGit}
+              />
+              <PoliklinikGecmisi
+                kayitlar={gecmisKayitlar}
+                yukleniyor={listeYukleniyor}
+                onSec={poliklinikKaydinaGit}
+              />
+              <Bildirim mesaj={listeHata} />
+            </aside>
           )}
         </div>
-
-        {/* ── SAĞ: Randevular + Poliklinik kayıtları ── */}
-        <div className="hk-panel hk-sag">
-          <div className="hk-liste-bolum">
-            <h2>Randevular</h2>
-            {!hastaSecili && <p className="hk-bos-metin">Bir hasta seçildiğinde planlı randevular burada listelenir.</p>}
-            {hastaSecili && !listeYukleniyor && !listeHata && randevular.length === 0 && (
-              <p className="hk-bos-metin">Planlı randevu bulunmuyor.</p>
-            )}
-            {randevular.length > 0 && (
-              <ul className="hk-kayit-liste">
-                {randevular.map((r) => (
-                  <li
-                    key={r.dosyaId}
-                    className={`hk-kayit-item hk-kayit-item-tiklanabilir ${r.iptal ? 'hk-kayit-item-iptal' : 'hk-kayit-item-aktif'}`}
-                    onClick={() => muayeneyeGit(r)}
-                    title="Muayene kaydını görüntülemek için tıkla"
-                  >
-                    <div className="hk-kayit-satir1">
-                      <span className="hk-kayit-poliklinik">{r.poliklinik}</span>
-                      <span className="hk-kayit-tarih">{tarihSaatFormat(r.randevuTarihi)}</span>
-                    </div>
-                    <div className="hk-kayit-satir2">{r.doktor} · {r.uzmanlikDali}</div>
-                    {r.iptal ? (
-                      <span className="hk-kayit-iptal-etiket">İptal Edildi</span>
-                    ) : (
-                      <button
-                        type="button"
-                        className="hk-kayit-iptal-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          randevuyuIptalEt(r.dosyaId);
-                        }}
-                        disabled={iptalEdilenId === r.dosyaId}
-                      >
-                        {iptalEdilenId === r.dosyaId ? 'İptal ediliyor...' : 'İptal Et'}
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="hk-liste-bolum">
-            <h2>Poliklinik Kayıtları</h2>
-            {!hastaSecili && <p className="hk-bos-metin">Bir hasta seçildiğinde geçmiş kayıtlar burada listelenir.</p>}
-            {hastaSecili && listeYukleniyor && <p className="hk-bos-metin">Yükleniyor...</p>}
-            {hastaSecili && !listeYukleniyor && <Bildirim mesaj={listeHata} />}
-            {hastaSecili && !listeYukleniyor && !listeHata && gecmisKayitlar.length === 0 && (
-              <p className="hk-bos-metin">Geçmiş poliklinik kaydı bulunmuyor.</p>
-            )}
-            {gecmisKayitlar.length > 0 && (
-              <ul className="hk-kayit-liste">
-                {gecmisKayitlar.map((k) => (
-                  <li
-                    key={k.muayeneId}
-                    className="hk-kayit-item hk-kayit-item-tiklanabilir"
-                    onClick={() => poliklinikKaydinaGit(k)}
-                    title="Muayene kaydını görüntülemek için tıkla"
-                  >
-                    <div className="hk-kayit-satir1">
-                      <span className="hk-kayit-poliklinik">{k.poliklinik}</span>
-                      <span className="hk-kayit-tarih">{tarihSaatFormat(k.tarih)}</span>
-                    </div>
-                    <div className="hk-kayit-satir2">{k.doktor} · {k.uzmanlikDali}</div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      </div>
+      )}
 
       {randevuModalAcik && hasta && (
         <RandevuVerModal

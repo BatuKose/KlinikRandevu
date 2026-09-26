@@ -61,46 +61,6 @@
   gap: 14px;
 }
 
-.hkm-alan {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.hkm-alan span {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--renk-metin-ikincil);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.hkm-alan input,
-.hkm-alan select,
-.hkm-alan textarea {
-  padding: 8px 12px;
-  border: 1px solid var(--renk-kenar);
-  border-radius: 6px;
-  font-size: 0.9rem;
-  color: var(--renk-metin);
-  background: #fff;
-  font-family: inherit;
-  transition: border-color 0.15s;
-}
-
-.hkm-alan select:disabled {
-  background: var(--renk-arkaplan);
-  color: var(--renk-metin-ikincil);
-  cursor: not-allowed;
-}
-
-.hkm-alan input:focus,
-.hkm-alan select:focus,
-.hkm-alan textarea:focus {
-  outline: none;
-  border-color: var(--renk-birincil);
-  box-shadow: 0 0 0 3px var(--renk-birincil-acik);
-}
 
 .hkm-satir-2 {
   display: grid;
@@ -125,36 +85,6 @@
   padding-top: 4px;
 }
 
-.hkm-btn {
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 9px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  border: 1px solid var(--renk-kenar);
-  background: #fff;
-  color: var(--renk-metin);
-}
-
-.hkm-btn:hover {
-  background: var(--renk-arkaplan);
-}
-
-.hkm-btn-birincil {
-  border-color: var(--renk-birincil);
-  background: var(--renk-birincil);
-  color: #fff;
-}
-
-.hkm-btn-birincil:hover:not(:disabled) {
-  background: var(--renk-birincil-koyu);
-}
-
-.hkm-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 
 /* ── Modal içi hasta arama adımı (ör. Yeni Randevu modalı) ── */
 .hkm-arama-bolum {
@@ -169,21 +99,6 @@
   gap: 8px;
 }
 
-.hkm-arama-satir input {
-  flex: 1;
-  font-family: inherit;
-  font-size: 0.9rem;
-  padding: 8px 12px;
-  border: 1px solid var(--renk-kenar);
-  border-radius: 6px;
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.hkm-arama-satir input:focus {
-  border-color: var(--renk-birincil);
-  box-shadow: 0 0 0 3px var(--renk-birincil-acik);
-}
 
 .hkm-secili-hasta {
   display: flex;

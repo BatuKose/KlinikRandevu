@@ -58,14 +58,22 @@ namespace Services
         public async Task<CalismaPlaniOlusturDTO> CalismaPlaniOlusturAsync(CalismaPlaniOlusturDTO plan)
         {
             if (plan == null) throw new BadRequestException("Çalıma planındaki bütün bilgilerin girilmesi gerekmektedir");
+            if (plan.RandevuSuresiDk <= 0) throw new BadRequestException("Randevu süresi 0'dan büyük olmalıdır");
+            if (plan.BitisSaati <= plan.BaslangicSaati) throw new BadRequestException("Bitiş saati başlangıç saatinden sonra olmalıdır");
+            if ((plan.BitisSaati - plan.BaslangicSaati).TotalMinutes < plan.RandevuSuresiDk)
+                throw new BadRequestException("Çalışma aralığı en az bir randevu süresi kadar olmalıdır");
+            var cakisanPlanVar = await _repositoryManager.Muayene.CakisanCalismaPlaniVarMi(
+                plan.DoktorNo, plan.GunAdi, plan.BaslangicSaati, plan.BitisSaati);
+            if (cakisanPlanVar)
+                throw new BadRequestException("Doktorun bu gün ve saat aralığında çakışan aktif bir çalışma planı bulunmaktadır");
             var haftaSonuKısıtParam = await _repositoryManager.SistemParametresi.GetirAsync("HAFTASONU_CALISMA_PLANI_KISITLA");
             if (haftaSonuKısıtParam is null)
             {
                 parametreEke("HAFTASONU_CALISMA_PLANI_KISITLA");
             }
-            var hastasonuparamD1 = haftaSonuKısıtParam.Deger1?.ToUpper() ?? "HAYIR";
+            var hastasonuparamD1 = haftaSonuKısıtParam?.Deger1?.ToUpper() ?? "HAYIR";
 
-            var izinliPolNolari = (haftaSonuKısıtParam.Deger2 ?? string.Empty)
+            var izinliPolNolari = (haftaSonuKısıtParam?.Deger2 ?? string.Empty)
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Select(x => int.TryParse(x, out var p) ? p : (int?)null)
                 .Where(x => x.HasValue)
@@ -1503,6 +1511,62 @@ namespace Services
             if (polNo <= 0) throw new BadRequestException("Poliklinik seçiniz");
             if (baslangic > bitis) throw new BadRequestException("Başlangıç tarihi bitişten büyük olamaz");
             return await _repositoryManager.Muayene.PoliklinikHastaListesiGetir(polNo, baslangic, bitis);
+        }
+        public async Task<List<CalismaPlaniListeDTO>> CalismaPlanlariGetirAsync(int? doktorNo, int? polNo, bool sadeceAktif)
+        {
+            return await _repositoryManager.Muayene.CalismaPlanlariGetir(doktorNo, polNo, sadeceAktif);
+        }
+        public async Task CalismaPlaniPasifeAlAsync(int id)
+        {
+            var plan = _repositoryManager.Muayene.CalismaPlaniGetir(id);
+            if (plan is null) throw new NotFoundException("Çalışma planı bulunamadı");
+            if (!plan.IsActive) throw new BadRequestException("Çalışma planı zaten pasif durumda");
+
+            var ileriRandevuSayisi = await _repositoryManager.Muayene.CalismaPlanindakiIleriRandevuSayisi(plan);
+            if (ileriRandevuSayisi > 0)
+                throw new BadRequestException(
+                    $"Bu çalışma planına bağlı {ileriRandevuSayisi} adet ileri tarihli randevu bulunmaktadır. Önce randevuları iptal ediniz.");
+
+            plan.IsActive = false;
+            await _repositoryManager.saveAsyc();
+        }
+        public async Task<List<RandevuSlotDTO>> MusaitSlotlariGetirAsync(int doktorNo, int polNo, DateTime tarih)
+        {
+            if (doktorNo <= 0 || polNo <= 0) throw new BadRequestException("Doktor ve poliklinik seçiniz");
+            var gun = tarih.Date;
+            if (gun < DateTime.Today) throw new BadRequestException("Geçmiş tarihe randevu verilemez");
+
+            if (_repositoryManager.Muayene.SeciliGundeDoktorunIzniVarmi(doktorNo, DateOnly.FromDateTime(gun), DateOnly.FromDateTime(gun)))
+                throw new BadRequestException($"Seçilen doktor {gun:dd.MM.yyyy} tarihinde izinlidir");
+
+            var planlar = await _repositoryManager.Muayene.GunlukCalismaPlanlariGetir(doktorNo, polNo, gun.DayOfWeek);
+            if (planlar.Count == 0) return new List<RandevuSlotDTO>();
+
+            var randevular = await _repositoryManager.Muayene.DoktorunGunlukRandevulariGetir(doktorNo, gun);
+            var simdi = DateTime.Now;
+            var slotlar = new List<RandevuSlotDTO>();
+
+            foreach (var plan in planlar)
+            {
+                if (plan.RandevuSuresiDk <= 0) continue;
+                for (var saat = plan.BaslangicSaati;
+                     saat + TimeSpan.FromMinutes(plan.RandevuSuresiDk) <= plan.BitisSaati;
+                     saat += TimeSpan.FromMinutes(plan.RandevuSuresiDk))
+                {
+                    var slotBaslangic = gun + saat;
+                    var slotBitis = slotBaslangic.AddMinutes(plan.RandevuSuresiDk);
+                    slotlar.Add(new RandevuSlotDTO
+                    {
+                        Baslangic = slotBaslangic,
+                        SureDk = plan.RandevuSuresiDk,
+                        Dolu = randevular.Any(r =>
+                            r.RandevuTarihi < slotBitis &&
+                            r.RandevuTarihi.AddMinutes(r.SureDakika) > slotBaslangic),
+                        Gecmis = slotBaslangic < simdi
+                    });
+                }
+            }
+            return slotlar;
         }
     }
 }

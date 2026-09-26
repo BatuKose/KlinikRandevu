@@ -48,5 +48,8 @@ namespace Services.Contracts
         Task<double> MuayeneBorcGetir(int muayeneId);
         Task<double> MuayeneOdemeToplamGetir(int muayeneId);
         Task<List<PoliklinikHastaListesiDTO>> PoliklinikHastaListesiGetir(int polNo, DateTime baslangic, DateTime bitis);
+        Task<List<CalismaPlaniListeDTO>> CalismaPlanlariGetirAsync(int? doktorNo, int? polNo, bool sadeceAktif);
+        Task CalismaPlaniPasifeAlAsync(int id);
+        Task<List<RandevuSlotDTO>> MusaitSlotlariGetirAsync(int doktorNo, int polNo, DateTime tarih);
     }
 }

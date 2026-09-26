@@ -110,5 +110,10 @@ namespace Repositories.Contracts
         Task<List<PoliklinikHastaListesiDTO>> PoliklinikHastaListesiGetir(int polNo, DateTime baslangic, DateTime bitis);
         Task<Poliklinik?> PoliklinikGetirById(int snumber);
         Task<bool> MuayenedeBelirliTedavilerVarmiList(int muayeneId, IEnumerable<string> sutKodlari);
+        Task<List<CalismaPlaniListeDTO>> CalismaPlanlariGetir(int? doktorNo, int? polNo, bool sadeceAktif);
+        Task<bool> CakisanCalismaPlaniVarMi(int doktorNo, DayOfWeek gun, TimeSpan baslangic, TimeSpan bitis);
+        Task<List<DoktorCalismaPlani>> GunlukCalismaPlanlariGetir(int doktorNo, int polNo, DayOfWeek gun);
+        Task<List<Randevu>> DoktorunGunlukRandevulariGetir(int doktorNo, DateTime gun);
+        Task<int> CalismaPlanindakiIleriRandevuSayisi(DoktorCalismaPlani plan);
     }
 }

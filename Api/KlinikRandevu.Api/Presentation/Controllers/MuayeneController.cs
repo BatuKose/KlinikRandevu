@@ -33,6 +33,24 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.CalismaPlaniOlusturAsync(plan);
             return Ok(result);
         }
+        [HttpGet("calismaPlanlariGetir")]
+        public async Task<IActionResult> CalismaPlanlariGetir([FromQuery] int? doktorNo, [FromQuery] int? polNo, [FromQuery] bool sadeceAktif = false)
+        {
+            var result = await _ServiceManager.MuayeneService.CalismaPlanlariGetirAsync(doktorNo, polNo, sadeceAktif);
+            return Ok(ApiResponse<List<CalismaPlaniListeDTO>>.SuccessResponse(result));
+        }
+        [HttpPatch("calismaPlaniPasifeAl")]
+        public async Task<IActionResult> CalismaPlaniPasifeAl([FromQuery] int id)
+        {
+            await _ServiceManager.MuayeneService.CalismaPlaniPasifeAlAsync(id);
+            return NoContent();
+        }
+        [HttpGet("musaitSlotlariGetir")]
+        public async Task<IActionResult> MusaitSlotlariGetir([FromQuery] int doktorNo, [FromQuery] int polNo, [FromQuery] DateTime tarih)
+        {
+            var result = await _ServiceManager.MuayeneService.MusaitSlotlariGetirAsync(doktorNo, polNo, tarih);
+            return Ok(ApiResponse<List<RandevuSlotDTO>>.SuccessResponse(result));
+        }
         [HttpPost("randevuolustur")]
         public async Task<IActionResult> RandevuOlusturAsync([FromBody] RandevuOlusturDTO plan)
         {

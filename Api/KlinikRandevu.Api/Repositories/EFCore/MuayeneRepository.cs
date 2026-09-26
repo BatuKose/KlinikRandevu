@@ -43,8 +43,9 @@ namespace Repositories.EFCore
               .Select(r => new { r.RandevuTarihi, r.SureDakika })
               .ToListAsync();
 
+            // İki aralık, biri diğeri bitmeden başlıyorsa çakışır (aynı dakikada başlayanlar dahil).
             return ayniGunRandevular.Any(
-                r=>r.RandevuTarihi<yeniBaslangic && r.RandevuTarihi.AddMinutes(r.SureDakika)>yeniBaslangic
+                r=>r.RandevuTarihi<yeniBitis && r.RandevuTarihi.AddMinutes(r.SureDakika)>yeniBaslangic
                 );
         }
 
@@ -1082,6 +1083,93 @@ namespace Repositories.EFCore
             return await _repositoryContext.TedaviKaydi
                 .AnyAsync(t => t.MuyaneId == muayeneId
                             && kodListesi.Contains(t.tedaviKodu));
+        }
+        public async Task<List<CalismaPlaniListeDTO>> CalismaPlanlariGetir(int? doktorNo, int? polNo, bool sadeceAktif)
+        {
+            var sorgu = _repositoryContext.DoktorCalismaPlanis.AsNoTracking().AsQueryable();
+            if (doktorNo.HasValue) sorgu = sorgu.Where(c => c.DoktorNo == doktorNo.Value);
+            if (polNo.HasValue) sorgu = sorgu.Where(c => c.PolNo == polNo.Value);
+            if (sadeceAktif) sorgu = sorgu.Where(c => c.IsActive);
+
+            var planlar = await (
+                from c in sorgu
+                join d in _repositoryContext.Doctors on c.DoktorNo equals d.doktorNo into dj
+                from d in dj.DefaultIfEmpty()
+                join p in _repositoryContext.Polikliniks on c.PolNo equals p.PolNo into pj
+                from p in pj.DefaultIfEmpty()
+                select new CalismaPlaniListeDTO
+                {
+                    Id = c.Id,
+                    DoktorNo = c.DoktorNo,
+                    DoktorAd = d.DoktorAd,
+                    PolNo = c.PolNo,
+                    PolAdi = p.Name,
+                    GunAdi = c.GunAdi,
+                    BaslangicSaati = c.BaslangicSaati,
+                    BitisSaati = c.BitisSaati,
+                    RandevuSuresiDk = c.RandevuSuresiDk,
+                    IsActive = c.IsActive,
+                    YesilAlanZorunlu = c.YesilAlanZorunlu
+                }).ToListAsync();
+
+            foreach (var plan in planlar)
+            {
+                if (plan.RandevuSuresiDk > 0)
+                    plan.SlotSayisi = (int)(plan.BitisSaati - plan.BaslangicSaati).TotalMinutes / plan.RandevuSuresiDk;
+            }
+            // Pazartesi haftanın ilk günü olsun (DayOfWeek.Sunday = 0).
+            return planlar
+                .OrderBy(p => p.DoktorAd)
+                .ThenBy(p => ((int)p.GunAdi + 6) % 7)
+                .ThenBy(p => p.BaslangicSaati)
+                .ToList();
+        }
+        public async Task<bool> CakisanCalismaPlaniVarMi(int doktorNo, DayOfWeek gun, TimeSpan baslangic, TimeSpan bitis)
+        {
+            // Doktor aynı saatte iki poliklinikte olamaz; bu yüzden poliklinikten bağımsız bakılıyor.
+            return await _repositoryContext.DoktorCalismaPlanis.AnyAsync(c =>
+                c.DoktorNo == doktorNo &&
+                c.GunAdi == gun &&
+                c.IsActive &&
+                c.BaslangicSaati < bitis &&
+                c.BitisSaati > baslangic);
+        }
+        public async Task<List<DoktorCalismaPlani>> GunlukCalismaPlanlariGetir(int doktorNo, int polNo, DayOfWeek gun)
+        {
+            return await _repositoryContext.DoktorCalismaPlanis.AsNoTracking()
+                .Where(c => c.DoktorNo == doktorNo && c.PolNo == polNo && c.GunAdi == gun && c.IsActive)
+                .OrderBy(c => c.BaslangicSaati)
+                .ToListAsync();
+        }
+        public async Task<List<Randevu>> DoktorunGunlukRandevulariGetir(int doktorNo, DateTime gun)
+        {
+            var gunBaslangic = gun.Date;
+            var gunBitis = gunBaslangic.AddDays(1);
+            return await _repositoryContext.Randevus.AsNoTracking()
+                .Where(r => r.DoktorNo == doktorNo &&
+                            r.HastaTc > 0 &&
+                            !r.iptal &&
+                            r.RandevuTarihi >= gunBaslangic &&
+                            r.RandevuTarihi < gunBitis)
+                .ToListAsync();
+        }
+        public async Task<int> CalismaPlanindakiIleriRandevuSayisi(DoktorCalismaPlani plan)
+        {
+            var simdi = DateTime.Now;
+            // DayOfWeek SQL'e çevrilemediği için gün/saat filtresi bellekte yapılıyor.
+            var ileriRandevular = await _repositoryContext.Randevus.AsNoTracking()
+                .Where(r => r.DoktorNo == plan.DoktorNo &&
+                            r.PolNo == plan.PolNo &&
+                            r.HastaTc > 0 &&
+                            !r.iptal &&
+                            r.RandevuTarihi >= simdi)
+                .Select(r => r.RandevuTarihi)
+                .ToListAsync();
+
+            return ileriRandevular.Count(t =>
+                t.DayOfWeek == plan.GunAdi &&
+                t.TimeOfDay >= plan.BaslangicSaati &&
+                t.TimeOfDay < plan.BitisSaati);
         }
     }
 

@@ -3,6 +3,7 @@ import { muayeneService } from '../../services/muayeneService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { useDoktorVeServisListesi } from '../hastaKayit/useDoktorVeServisListesi';
 import { useUzmanlikBranslari } from './useUzmanlikBranslari';
+import Bildirim from '../bildirim/Bildirim';
 
 const BOS_FORM = {
   doktorAd: '',
@@ -111,12 +112,12 @@ export default function DoktorEkle() {
           <label>E-posta</label>
           <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="doktor@mail.com (günlük program maili için)" />
         </div>
-        {bransHata && <div className="bildirim bildirim-hata">{bransHata}</div>}
-        {mesaj.metin && (
-          <div className={`bildirim ${mesaj.tip === 'basari' ? 'bildirim-basari' : 'bildirim-hata'}`}>
-            {mesaj.metin}
-          </div>
-        )}
+        <Bildirim mesaj={bransHata} />
+        <Bildirim
+          mesaj={mesaj.metin}
+          tip={mesaj.tip === 'basari' ? 'basari' : 'hata'}
+          onKapat={() => setMesaj({ tip: '', metin: '' })}
+        />
         <button type="submit" className="kaydet-btn" disabled={yukleniyor}>
           {yukleniyor ? 'Ekleniyor...' : 'Doktor Ekle'}
         </button>

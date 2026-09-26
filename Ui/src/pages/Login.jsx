@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getApiErrorMessage } from '../utils/apiError';
 import './Login.css';
+import Bildirim from '../components/bildirim/Bildirim';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -72,7 +73,7 @@ export default function Login() {
           />
         </label>
 
-        {hata && <div className="login-hata">{hata}</div>}
+        <Bildirim mesaj={hata} onKapat={() => setHata('')} />
 
         <button type="submit" className="login-buton" disabled={yukleniyor}>
           {yukleniyor ? 'Giriş yapılıyor...' : 'Giriş Yap'}

@@ -4,6 +4,7 @@ import { getApiErrorMessage } from '../utils/apiError';
 import { useDoktorVeServisListesi } from '../components/hastaKayit/useDoktorVeServisListesi';
 import YeniRandevuModal from '../components/randevu/YeniRandevuModal';
 import './Randevu.css';
+import Bildirim from '../components/bildirim/Bildirim';
 
 function yerelTarih(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -183,8 +184,8 @@ function RandevuListesi({ filtre, yenidenYukleTetik, onIptalEdildi }) {
         </div>
       </div>
 
-      {aralikGecersiz && <div className="rd-hata">Başlangıç tarihi bitiş tarihinden büyük olamaz.</div>}
-      {!aralikGecersiz && hata && <div className="rd-hata">{hata}</div>}
+      {aralikGecersiz && <Bildirim mesaj="Başlangıç tarihi bitiş tarihinden büyük olamaz." tip="uyari" />}
+      {!aralikGecersiz && <Bildirim mesaj={hata} />}
       {!aralikGecersiz && yukleniyor && <p className="rd-bos-metin">Yükleniyor...</p>}
       {!aralikGecersiz && !yukleniyor && !hata && gosterilecek.length === 0 && (
         <p className="rd-bos-metin">Seçilen aralık ve filtrelerde randevu bulunmuyor.</p>
@@ -316,7 +317,7 @@ function RandevuTakvimi({ filtre, yenidenYukleTetik, onIptalEdildi }) {
         <button type="button" className="rd-btn" onClick={sonrakiHafta}>Sonraki Hafta ›</button>
       </div>
 
-      {hata && <div className="rd-hata">{hata}</div>}
+      <Bildirim mesaj={hata} />
       {yukleniyor && <p className="rd-bos-metin">Yükleniyor...</p>}
 
       {!yukleniyor && (
@@ -385,7 +386,7 @@ export default function Randevu() {
           </button>
         </div>
 
-        {listeHata && <div className="rd-hata">{listeHata}</div>}
+        <Bildirim mesaj={listeHata} />
         <RandevuFiltreBar doktorlar={doktorlar} servisler={servisler} filtre={filtre} setFiltre={setFiltre} />
       </div>
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { parametreService } from '../../services/parametreService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import './LogListesi.css';
+import Bildirim from '../bildirim/Bildirim';
 
 function yerelTarih(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -112,8 +113,8 @@ export default function LogListesi() {
         </div>
       </div>
 
-      {aralikGecersiz && <div className="log-hata">Başlangıç tarihi bitiş tarihinden büyük olamaz.</div>}
-      {!aralikGecersiz && hata && <div className="log-hata">{hata}</div>}
+      {aralikGecersiz && <Bildirim mesaj="Başlangıç tarihi bitiş tarihinden büyük olamaz." tip="uyari" />}
+      {!aralikGecersiz && <Bildirim mesaj={hata} />}
 
       {!aralikGecersiz && !hata && !yukleniyor && (
         <p className="log-ozet">

@@ -7,6 +7,7 @@ import { CINSIYET_SECENEKLERI, KAN_GRUBU_SECENEKLERI } from '../utils/hastaSecen
 import RandevuVerModal from '../components/hastaKayit/RandevuVerModal';
 import MuayeneKaydiModal from '../components/hastaKayit/MuayeneKaydiModal';
 import './HastaKayit.css';
+import Bildirim from '../components/bildirim/Bildirim';
 
 const BOS_FORM = {
   name: '',
@@ -340,8 +341,8 @@ export default function HastaKayit() {
                 </label>
               </div>
 
-              {formHata && <div className="hk-uyari hk-uyari-hata">{formHata}</div>}
-              {formBasari && <div className="hk-uyari hk-uyari-basari">{formBasari}</div>}
+              <Bildirim mesaj={formHata} onKapat={() => setFormHata('')} />
+              <Bildirim mesaj={formBasari} tip="basari" onKapat={() => setFormBasari('')} />
 
               <div className="hk-form-aksiyonlar">
                 <button type="submit" className="hk-btn hk-btn-birincil" disabled={kaydediliyor}>
@@ -418,7 +419,7 @@ export default function HastaKayit() {
             <h2>Poliklinik Kayıtları</h2>
             {!hastaSecili && <p className="hk-bos-metin">Bir hasta seçildiğinde geçmiş kayıtlar burada listelenir.</p>}
             {hastaSecili && listeYukleniyor && <p className="hk-bos-metin">Yükleniyor...</p>}
-            {hastaSecili && !listeYukleniyor && listeHata && <div className="hk-uyari hk-uyari-hata">{listeHata}</div>}
+            {hastaSecili && !listeYukleniyor && <Bildirim mesaj={listeHata} />}
             {hastaSecili && !listeYukleniyor && !listeHata && gecmisKayitlar.length === 0 && (
               <p className="hk-bos-metin">Geçmiş poliklinik kaydı bulunmuyor.</p>
             )}

@@ -88,16 +88,6 @@
   opacity: 0.6;
 }
 
-.login-hata {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--renk-tehlike);
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius);
-  padding: 8px 10px;
-}
-
 .login-buton {
   font-family: inherit;
   font-size: 0.9rem;

@@ -3,6 +3,7 @@ import { muayeneService } from '../../services/muayeneService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { useDoktorVeServisListesi } from '../hastaKayit/useDoktorVeServisListesi';
 import { useUzmanlikBranslari } from './useUzmanlikBranslari';
+import Bildirim from '../bildirim/Bildirim';
 
 const BOS_FORM = {
   name: '',
@@ -124,12 +125,12 @@ export default function ServisEkle() {
           <input name="onlineRandevuAktif" type="checkbox" checked={form.onlineRandevuAktif} onChange={handleChange} />
           Online randevuya açık
         </label>
-        {bransHata && <div className="bildirim bildirim-hata">{bransHata}</div>}
-        {mesaj.metin && (
-          <div className={`bildirim ${mesaj.tip === 'basari' ? 'bildirim-basari' : 'bildirim-hata'}`}>
-            {mesaj.metin}
-          </div>
-        )}
+        <Bildirim mesaj={bransHata} />
+        <Bildirim
+          mesaj={mesaj.metin}
+          tip={mesaj.tip === 'basari' ? 'basari' : 'hata'}
+          onKapat={() => setMesaj({ tip: '', metin: '' })}
+        />
         <button type="submit" className="kaydet-btn" disabled={yukleniyor}>
           {yukleniyor ? 'Ekleniyor...' : 'Poliklinik Ekle'}
         </button>

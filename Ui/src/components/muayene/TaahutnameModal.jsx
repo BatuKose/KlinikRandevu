@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { muayeneService } from '../../services/muayeneService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import '../hastaKayit/HastaKayitModal.css';
+import Bildirim from '../bildirim/Bildirim';
 
 function yerelTarih(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -72,7 +73,7 @@ export default function TaahutnameModal({ kayit, muayeneId, borc, onKapat, onBas
             </p>
           )}
 
-          {hata && <div className="hkm-hata">{hata}</div>}
+          <Bildirim mesaj={hata} onKapat={() => setHata('')} />
 
           <div className="hkm-footer">
             <button type="button" className="hkm-btn" onClick={onKapat} disabled={kaydediliyor}>

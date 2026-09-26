@@ -3,6 +3,7 @@ import { muayeneService } from '../../services/muayeneService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { useDoktorVeServisListesi } from './useDoktorVeServisListesi';
 import './HastaKayitModal.css';
+import Bildirim from '../bildirim/Bildirim';
 
 export default function RandevuVerModal({ hasta, onKapat, onBasarili }) {
   const { doktorlar, servisler, yukleniyor: listeYukleniyor, hata: listeHata } = useDoktorVeServisListesi();
@@ -52,7 +53,7 @@ export default function RandevuVerModal({ hasta, onKapat, onBasarili }) {
         </div>
 
         <form onSubmit={submit}>
-          {listeHata && <div className="hkm-hata">{listeHata}</div>}
+          <Bildirim mesaj={listeHata} />
 
           <div className="hkm-satir-2">
             <label className="hkm-alan">
@@ -116,7 +117,7 @@ export default function RandevuVerModal({ hasta, onKapat, onBasarili }) {
             <span>Bekleme listesine ekle</span>
           </label>
 
-          {hata && <div className="hkm-hata">{hata}</div>}
+          <Bildirim mesaj={hata} onKapat={() => setHata('')} />
 
           <div className="hkm-footer">
             <button type="button" className="hkm-btn" onClick={onKapat} disabled={kaydediliyor}>

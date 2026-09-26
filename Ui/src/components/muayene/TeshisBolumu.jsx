@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { muayeneService } from '../../services/muayeneService';
 import { getApiErrorMessage } from '../../utils/apiError';
+import Bildirim from '../bildirim/Bildirim';
 
 export default function TeshisBolumu({ muayeneId, kapali }) {
   const [teshisler, setTeshisler] = useState([]);
@@ -50,7 +51,7 @@ export default function TeshisBolumu({ muayeneId, kapali }) {
       <h2>Teşhisler</h2>
 
       {yukleniyor && <p className="mk-bos-metin">Yükleniyor...</p>}
-      {!yukleniyor && hata && <div className="mk-hata">{hata}</div>}
+      {!yukleniyor && <Bildirim mesaj={hata} />}
       {!yukleniyor && !hata && teshisler.length === 0 && (
         <p className="mk-bos-metin">Henüz teşhis eklenmemiş.</p>
       )}
@@ -81,7 +82,7 @@ export default function TeshisBolumu({ muayeneId, kapali }) {
           </button>
         </form>
       )}
-      {ekleHata && <div className="mk-hata">{ekleHata}</div>}
+      <Bildirim mesaj={ekleHata} onKapat={() => setEkleHata('')} />
     </div>
   );
 }

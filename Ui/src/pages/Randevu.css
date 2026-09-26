@@ -37,17 +37,6 @@
   font-size: 0.8rem;
 }
 
-.rd-hata {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--renk-tehlike);
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  margin: 8px 0;
-}
-
 /* ── Filtre çubuğu ── */
 .rd-filtre-bar {
   display: flex;

@@ -11,6 +11,7 @@ import TedaviBolumu from '../components/muayene/TedaviBolumu';
 import OdemeBolumu from '../components/muayene/OdemeBolumu';
 import TaahutnameBolumu from '../components/muayene/TaahutnameBolumu';
 import './Poliklinik.css';
+import Bildirim from '../components/bildirim/Bildirim';
 
 function yerelTarih(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -130,12 +131,12 @@ function PoliklinikHastaListesi({
         </div>
       </div>
 
-      {servisHata && <div className="mk-hata">{servisHata}</div>}
-      {aralikGecersiz && <div className="mk-hata">Başlangıç tarihi bitiş tarihinden büyük olamaz.</div>}
+      <Bildirim mesaj={servisHata} />
+      {aralikGecersiz && <Bildirim mesaj="Başlangıç tarihi bitiş tarihinden büyük olamaz." tip="uyari" />}
 
       {!servisNo && <p className="mk-bos-metin">Hasta listesini görmek için bir poliklinik seç.</p>}
       {servisNo && yukleniyor && <p className="mk-bos-metin">Yükleniyor...</p>}
-      {servisNo && !yukleniyor && hata && <div className="mk-hata">{hata}</div>}
+      {servisNo && !yukleniyor && <Bildirim mesaj={hata} />}
       {servisNo && !yukleniyor && !hata && !aralikGecersiz && hastalar.length === 0 && (
         <p className="mk-bos-metin">
           {tarihFormat(baslangicTarih)} – {tarihFormat(bitisTarih)} aralığında bu poliklinikte hasta bulunmuyor.
@@ -312,7 +313,7 @@ export default function Poliklinik() {
       <button type="button" className="mk-btn mk-geri-btn" onClick={listeyeDon}>‹ Hasta Listesine Dön</button>
 
       {yukleniyor && <p className="mk-bos-metin">Yükleniyor...</p>}
-      {!yukleniyor && hata && <div className="mk-hata">{hata}</div>}
+      {!yukleniyor && <Bildirim mesaj={hata} />}
 
       {!yukleniyor && randevuBulunamadi && (
         baglamBilgisi?.tc && baglamBilgisi?.protokol ? (

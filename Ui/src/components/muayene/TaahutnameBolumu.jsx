@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { muayeneService } from '../../services/muayeneService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import TaahutnameModal from './TaahutnameModal';
+import Bildirim from '../bildirim/Bildirim';
 
 function fiyatFormat(deger) {
   return (deger ?? 0).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' });
@@ -94,7 +95,7 @@ export default function TaahutnameBolumu({ muayeneId, protokol, yenidenYukleTeti
       </div>
 
       {yukleniyor && <p className="mk-bos-metin">Yükleniyor...</p>}
-      {!yukleniyor && hata && <div className="mk-hata">{hata}</div>}
+      {!yukleniyor && <Bildirim mesaj={hata} />}
 
       {!yukleniyor && !hata && (
         <>

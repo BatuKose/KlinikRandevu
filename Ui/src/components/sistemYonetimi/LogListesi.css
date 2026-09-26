@@ -88,17 +88,6 @@
   cursor: not-allowed;
 }
 
-.log-hata {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--renk-tehlike);
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  margin-bottom: 12px;
-}
-
 .log-ozet {
   font-size: 0.82rem;
   color: var(--renk-metin-ikincil);

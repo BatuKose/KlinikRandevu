@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { muayeneService } from '../../services/muayeneService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { useDoktorVeServisListesi } from '../hastaKayit/useDoktorVeServisListesi';
+import Bildirim from '../bildirim/Bildirim';
 
 function yerelTarih(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -55,7 +56,7 @@ export default function MuayeneAcForm({ tc, protokol, adSoyad, doktorAdi, polikl
       <h2>Muayene Kaydı Aç</h2>
       <p className="mk-alt-baslik">{adSoyad} · Protokol {protokol}</p>
 
-      {listeHata && <div className="mk-hata">{listeHata}</div>}
+      <Bildirim mesaj={listeHata} />
 
       <form onSubmit={submit}>
         <div className="mk-satir-2">
@@ -90,7 +91,7 @@ export default function MuayeneAcForm({ tc, protokol, adSoyad, doktorAdi, polikl
           </label>
         </div>
 
-        {hata && <div className="mk-hata">{hata}</div>}
+        <Bildirim mesaj={hata} onKapat={() => setHata('')} />
 
         <button type="submit" className="mk-btn mk-btn-birincil" disabled={kaydediliyor}>
           {kaydediliyor ? 'Kaydediliyor...' : 'Muayene Kaydı Aç'}

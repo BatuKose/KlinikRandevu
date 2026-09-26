@@ -222,26 +222,6 @@
 }
 
 /* ── Bildirim ── */
-.bildirim {
-  padding: 10px 16px;
-  border-radius: var(--radius);
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 12px;
-}
-
-.bildirim-basari {
-  background: #dcfce7;
-  color: var(--renk-basari);
-  border: 1px solid #bbf7d0;
-}
-
-.bildirim-hata {
-  background: #fee2e2;
-  color: var(--renk-tehlike);
-  border: 1px solid #fecaca;
-}
-
 /* ── Modal ── */
 .modal-overlay {
   position: fixed;
@@ -352,15 +332,6 @@
 
 .zorunlu {
   color: var(--renk-tehlike);
-}
-
-.hata-mesaj {
-  background: #fee2e2;
-  color: var(--renk-tehlike);
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 0.875rem;
 }
 
 .iptal-btn {

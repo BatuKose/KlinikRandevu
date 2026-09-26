@@ -17,17 +17,6 @@
   color: var(--renk-uyari);
 }
 
-.mk-hata {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--renk-tehlike);
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  margin: 8px 0;
-}
-
 .mk-alt-baslik {
   font-size: 0.85rem;
   color: var(--renk-metin-ikincil);

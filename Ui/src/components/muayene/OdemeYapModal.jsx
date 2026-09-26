@@ -3,6 +3,7 @@ import { muayeneService } from '../../services/muayeneService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { ODEME_TIPI } from '../../utils/muayeneSecenekleri';
 import '../hastaKayit/HastaKayitModal.css';
+import Bildirim from '../bildirim/Bildirim';
 
 function fiyatFormat(deger) {
   return (deger ?? 0).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' });
@@ -83,7 +84,7 @@ export default function OdemeYapModal({ muayeneId, borc, odenmemisTedaviler, onK
             <strong>{fiyatFormat(odenecekTutar)}</strong>
           </div>
 
-          {hata && <div className="hkm-hata">{hata}</div>}
+          <Bildirim mesaj={hata} onKapat={() => setHata('')} />
 
           <div className="hkm-footer">
             <button type="button" className="hkm-btn" onClick={onKapat} disabled={kaydediliyor}>

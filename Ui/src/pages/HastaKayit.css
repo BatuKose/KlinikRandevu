@@ -79,18 +79,6 @@
   margin-bottom: 14px;
 }
 
-.hk-uyari-hata {
-  color: var(--renk-tehlike);
-  background: #fef2f2;
-  border-color: #fecaca;
-}
-
-.hk-uyari-basari {
-  color: var(--renk-basari);
-  background: #f0fdf4;
-  border-color: #bbf7d0;
-}
-
 .hk-link-btn {
   background: none;
   border: none;

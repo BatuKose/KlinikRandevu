@@ -6,6 +6,7 @@ import LogListesi from '../components/sistemYonetimi/LogListesi';
 import DoktorEkle from '../components/sistemYonetimi/DoktorEkle';
 import ServisEkle from '../components/sistemYonetimi/ServisEkle';
 import './SistemYonetimi.css';
+import Bildirim from '../components/bildirim/Bildirim';
 
 const BOSH_PARAMETRE = {
   parametreAdi: '',
@@ -91,7 +92,7 @@ function ParametreModal({ parametre, onKaydet, onKapat }) {
               placeholder="Açıklama giriniz"
             />
           </div>
-          {hata && <div className="hata-mesaj">{hata}</div>}
+          <Bildirim mesaj={hata} onKapat={() => setHata('')} />
           <div className="modal-footer">
             <button type="button" className="iptal-btn" onClick={onKapat}>İptal</button>
             <button type="submit" className="kaydet-btn" disabled={yukleniyor}>
@@ -165,11 +166,11 @@ function KullaniciEkle() {
           <label>Şifre <span className="zorunlu">*</span></label>
           <input name="password" type="password" value={form.password} onChange={handleChange} required placeholder="Şifre (min 4 karakter)" />
         </div>
-        {mesaj.metin && (
-          <div className={`bildirim ${mesaj.tip === 'basari' ? 'bildirim-basari' : 'bildirim-hata'}`}>
-            {mesaj.metin}
-          </div>
-        )}
+        <Bildirim
+          mesaj={mesaj.metin}
+          tip={mesaj.tip === 'basari' ? 'basari' : 'hata'}
+          onKapat={() => setMesaj({ tip: '', metin: '' })}
+        />
         <button type="submit" className="kaydet-btn" disabled={yukleniyor}>
           {yukleniyor ? 'Ekleniyor...' : 'Kullanıcı Ekle'}
         </button>
@@ -311,7 +312,7 @@ export default function SistemYonetimi() {
             </div>
           </div>
 
-          {hata && <div className="bildirim bildirim-hata">{hata}</div>}
+          <Bildirim mesaj={hata} onKapat={() => setHata('')} />
 
           {yukleniyor ? (
             <div className="yukleniyor">Yükleniyor...</div>

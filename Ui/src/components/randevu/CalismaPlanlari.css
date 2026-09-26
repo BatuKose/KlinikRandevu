@@ -1,0 +1,96 @@
+.cp-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cp-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--renk-metin-ikincil);
+  padding-bottom: 9px;
+  cursor: pointer;
+}
+
+.cp-gun-secici {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cp-gun-chip {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  min-width: 48px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--renk-kenar);
+  background: #fff;
+  color: var(--renk-metin-ikincil);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.cp-gun-chip:hover {
+  border-color: var(--renk-birincil);
+  color: var(--renk-birincil);
+}
+
+.cp-gun-chip-secili,
+.cp-gun-chip-secili:hover {
+  border-color: var(--renk-birincil);
+  background: var(--renk-birincil);
+  color: #fff;
+}
+
+.cp-onizleme {
+  font-size: 0.82rem;
+  color: var(--renk-birincil);
+  background: var(--renk-birincil-acik);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.cp-islemler {
+  display: flex;
+  gap: 6px;
+}
+
+.cp-mini-btn {
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--renk-birincil);
+  background: #fff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.cp-mini-btn:hover {
+  background: var(--renk-birincil-acik);
+}
+
+.cp-durum-aktif {
+  color: var(--renk-basari);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.cp-durum-yesil {
+  margin-left: 6px;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.cp-pasif-satir td {
+  color: var(--renk-metin-ikincil);
+}

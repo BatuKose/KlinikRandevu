@@ -4,6 +4,7 @@ import { muayeneService } from '../../services/muayeneService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { useDoktorVeServisListesi } from '../hastaKayit/useDoktorVeServisListesi';
 import '../hastaKayit/HastaKayitModal.css';
+import SlotSecici from './SlotSecici';
 import Bildirim from '../bildirim/Bildirim';
 
 export default function YeniRandevuModal({ onKapat, onBasarili }) {
@@ -16,8 +17,7 @@ export default function YeniRandevuModal({ onKapat, onBasarili }) {
 
   const [doktorNo, setDoktorNo] = useState('');
   const [polNo, setPolNo] = useState('');
-  const [randevuTarihi, setRandevuTarihi] = useState('');
-  const [sureDakika, setSureDakika] = useState('15');
+  const [slot, setSlot] = useState(null);
   const [notlar, setNotlar] = useState('');
   const [bekleme, setBekleme] = useState(false);
 
@@ -56,6 +56,10 @@ export default function YeniRandevuModal({ onKapat, onBasarili }) {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (!slot) {
+      setHata('Lütfen bir randevu saati seçiniz');
+      return;
+    }
     setHata('');
     setKaydediliyor(true);
     try {
@@ -64,8 +68,8 @@ export default function YeniRandevuModal({ onKapat, onBasarili }) {
         polNo: Number(polNo),
         hastaTc: hasta.tcKimlik,
         protocolNo: hasta.protocol,
-        randevuTarihi,
-        sureDakika: Number(sureDakika),
+        randevuTarihi: slot.baslangic,
+        sureDakika: slot.sureDk,
         notlar: notlar.trim() || null,
         randevuBekleme: bekleme,
       });
@@ -152,26 +156,13 @@ export default function YeniRandevuModal({ onKapat, onBasarili }) {
               </label>
             </div>
 
-            <label className="hkm-alan">
-              <span>Randevu Tarihi ve Saati</span>
-              <input
-                type="datetime-local"
-                value={randevuTarihi}
-                onChange={(e) => setRandevuTarihi(e.target.value)}
-                required
-              />
-            </label>
-
-            <label className="hkm-alan">
-              <span>Süre (Dakika)</span>
-              <input
-                type="number"
-                min="1"
-                value={sureDakika}
-                onChange={(e) => setSureDakika(e.target.value)}
-                required
-              />
-            </label>
+            <SlotSecici
+              doktorNo={doktorNo}
+              polNo={polNo}
+              secili={slot}
+              onSec={setSlot}
+              beklemeIzinli={bekleme}
+            />
 
             <label className="hkm-alan">
               <span>Notlar</span>
@@ -179,7 +170,14 @@ export default function YeniRandevuModal({ onKapat, onBasarili }) {
             </label>
 
             <label className="hkm-alan hkm-checkbox">
-              <input type="checkbox" checked={bekleme} onChange={(e) => setBekleme(e.target.checked)} />
+              <input
+                type="checkbox"
+                checked={bekleme}
+                onChange={(e) => {
+                  setBekleme(e.target.checked);
+                  if (!e.target.checked && slot?.dolu) setSlot(null);
+                }}
+              />
               <span>Bekleme listesine ekle</span>
             </label>
 

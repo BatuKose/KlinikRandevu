@@ -16,6 +16,14 @@ export const muayeneService = {
   servisEkle: (dto) => api.post('/api/Poliklinik/servisEkle', dto),
   randevuIptalEt: (id) => api.patch('/api/Poliklinik/randevuiptalet', null, { params: { id } }),
 
+  calismaPlanlariGetir: (params) => api.get('/api/Poliklinik/calismaPlanlariGetir', { params }),
+  calismaPlaniOlustur: (dto) => api.post('/api/Poliklinik/calismaplaniolustur', dto),
+  calismaPlaniKopyala: (calismaPlaniId, yeniGun) =>
+    api.post('/api/Poliklinik/CalismaPlaniKopyala', { calismaPlaniId, yeniGün: yeniGun }),
+  calismaPlaniPasifeAl: (id) => api.patch('/api/Poliklinik/calismaPlaniPasifeAl', null, { params: { id } }),
+  musaitSlotlariGetir: (doktorNo, polNo, tarih) =>
+    api.get('/api/Poliklinik/musaitSlotlariGetir', { params: { doktorNo, polNo, tarih } }),
+
   muayeneKaydiGetir: (id) => api.get('/api/Poliklinik/muayeneGetir', { params: { id } }),
   muayeneRandevuIleGetir: (randevuId) =>
     api.get('/api/Poliklinik/muayeneRandevuIleGetir', { params: { randevuId } }),

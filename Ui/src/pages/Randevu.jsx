@@ -3,6 +3,7 @@ import { muayeneService } from '../services/muayeneService';
 import { getApiErrorMessage } from '../utils/apiError';
 import { useDoktorVeServisListesi } from '../components/hastaKayit/useDoktorVeServisListesi';
 import YeniRandevuModal from '../components/randevu/YeniRandevuModal';
+import CalismaPlanlari from '../components/randevu/CalismaPlanlari';
 import './Randevu.css';
 import Bildirim from '../components/bildirim/Bildirim';
 
@@ -384,17 +385,30 @@ export default function Randevu() {
           >
             Takvim
           </button>
+          <button
+            type="button"
+            className={`rd-btn ${view === 'plan' ? 'rd-btn-birincil' : ''}`}
+            onClick={() => setView('plan')}
+          >
+            Çalışma Planları
+          </button>
         </div>
 
-        <Bildirim mesaj={listeHata} />
-        <RandevuFiltreBar doktorlar={doktorlar} servisler={servisler} filtre={filtre} setFiltre={setFiltre} />
+        {view !== 'plan' && (
+          <>
+            <Bildirim mesaj={listeHata} />
+            <RandevuFiltreBar doktorlar={doktorlar} servisler={servisler} filtre={filtre} setFiltre={setFiltre} />
+          </>
+        )}
       </div>
 
-      {view === 'liste' ? (
+      {view === 'liste' && (
         <RandevuListesi filtre={filtre} yenidenYukleTetik={yenidenYukleTetik} onIptalEdildi={tetikle} />
-      ) : (
+      )}
+      {view === 'takvim' && (
         <RandevuTakvimi filtre={filtre} yenidenYukleTetik={yenidenYukleTetik} onIptalEdildi={tetikle} />
       )}
+      {view === 'plan' && <CalismaPlanlari />}
 
       {yeniRandevuAcik && (
         <YeniRandevuModal

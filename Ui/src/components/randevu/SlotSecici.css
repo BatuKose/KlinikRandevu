@@ -1,0 +1,71 @@
+.slot-secici {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.slot-btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 7px 0;
+  border-radius: 6px;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: var(--renk-basari);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.slot-btn:hover:not(:disabled) {
+  border-color: var(--renk-basari);
+  transform: translateY(-1px);
+}
+
+.slot-btn.slot-dolu {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: var(--renk-tehlike);
+}
+
+.slot-btn.slot-gecmis {
+  border-color: var(--renk-kenar);
+  background: var(--renk-arkaplan);
+  color: var(--renk-metin-ikincil);
+  text-decoration: line-through;
+}
+
+.slot-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.slot-btn.slot-secili {
+  border-color: var(--renk-birincil);
+  background: var(--renk-birincil);
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--renk-birincil-acik);
+}
+
+.slot-bilgi {
+  font-size: 0.8rem;
+  color: var(--renk-metin-ikincil);
+  line-height: 1.4;
+}
+
+.slot-bilgi-uyari {
+  color: var(--renk-uyari);
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  padding: 8px 10px;
+}

@@ -15,6 +15,7 @@ namespace Services.Contracts
         Task<MuayeneKayitiOlusturDTO> MuayeneKayitiOlustur(MuayeneKayitiOlusturDTO muayene);
         Task<List<HastaRandevulariniGetirDTO>> HastaRandevulariniGetir(DateTime baslangic, DateTime bitis);
         Task<List<HastaRandevulariniGetirDTO>> HastanınRandevulariniGetir(int protokol);
+        Task<List<HastaninPoliklinikKayitlariDTO>> HastaninPoliklinikKayitlariniGetir(int protokol);
         Task<Doctor> DoktoruPasifeAl(int doktor);
         Task<Poliklinik> PoluPasifeAl(int polno);
         Task DoktorGunlukProgramMailiGonderAsync(int doktorNo);

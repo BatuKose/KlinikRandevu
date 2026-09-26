@@ -82,23 +82,32 @@ export default function HastaKayit() {
     setListeYukleniyor(true);
     setListeHata('');
     try {
-      const { data } = await muayeneService.hastaninRandevulariniGetir(protokol);
-      const simdi = new Date();
-      const gecmis = [];
-      const gelecek = [];
-      (data || []).forEach((kayit) => {
-        (new Date(kayit.randevuTarihi) < simdi ? gecmis : gelecek).push(kayit);
-      });
-      gecmis.sort((a, b) => new Date(b.randevuTarihi) - new Date(a.randevuTarihi));
-      gelecek.sort((a, b) => new Date(a.randevuTarihi) - new Date(b.randevuTarihi));
-      setGecmisKayitlar(gecmis);
-      setRandevular(gelecek);
-    } catch (err) {
-      setGecmisKayitlar([]);
-      setRandevular([]);
-      // Backend randevusu olmayan hasta için 404 dönüyor; bu bir hata değil, boş liste demek.
-      if (err?.response?.status !== 404) {
-        setListeHata(getApiErrorMessage(err, 'Randevu bilgileri alınamadı'));
+      // Randevular: sadece ileri tarihli randevular. Poliklinik kayıtları: randevulu ya da
+      // randevusuz açılmış tüm muayene kayıtları (ayrı endpoint'ten).
+      const [randevuSonuc, kayitSonuc] = await Promise.allSettled([
+        muayeneService.hastaninRandevulariniGetir(protokol),
+        muayeneService.hastaninPoliklinikKayitlariniGetir(protokol),
+      ]);
+
+      if (randevuSonuc.status === 'fulfilled') {
+        const simdi = new Date();
+        const gelecek = (randevuSonuc.value.data || [])
+          .filter((kayit) => new Date(kayit.randevuTarihi) >= simdi)
+          .sort((a, b) => new Date(a.randevuTarihi) - new Date(b.randevuTarihi));
+        setRandevular(gelecek);
+      } else {
+        setRandevular([]);
+        // Backend randevusu olmayan hasta için 404 dönüyor; bu bir hata değil, boş liste demek.
+        if (randevuSonuc.reason?.response?.status !== 404) {
+          setListeHata(getApiErrorMessage(randevuSonuc.reason, 'Randevu bilgileri alınamadı'));
+        }
+      }
+
+      if (kayitSonuc.status === 'fulfilled') {
+        setGecmisKayitlar(kayitSonuc.value.data?.data || []);
+      } else {
+        setGecmisKayitlar([]);
+        setListeHata(getApiErrorMessage(kayitSonuc.reason, 'Poliklinik kayıtları alınamadı'));
       }
     } finally {
       setListeYukleniyor(false);
@@ -129,6 +138,21 @@ export default function HastaKayit() {
         doktorAd: kayit.doktor,
         poliklinikAd: kayit.poliklinik,
         randevuTarihi: kayit.randevuTarihi,
+      },
+    });
+  };
+
+  // Muayene kaydı zaten var; randevusuz açılmış olabileceği için muayeneId ile gidiyoruz.
+  const poliklinikKaydinaGit = (kayit) => {
+    navigate(`/poliklinik?muayeneId=${kayit.muayeneId}`, {
+      state: {
+        ad: kayit.ad,
+        soyad: kayit.soyad,
+        tc: kayit.tc,
+        protokol: kayit.protokol,
+        doktorAd: kayit.doktor,
+        poliklinikAd: kayit.poliklinik,
+        randevuTarihi: kayit.tarih,
       },
     });
   };
@@ -427,14 +451,14 @@ export default function HastaKayit() {
               <ul className="hk-kayit-liste">
                 {gecmisKayitlar.map((k) => (
                   <li
-                    key={k.dosyaId}
+                    key={k.muayeneId}
                     className="hk-kayit-item hk-kayit-item-tiklanabilir"
-                    onClick={() => muayeneyeGit(k)}
+                    onClick={() => poliklinikKaydinaGit(k)}
                     title="Muayene kaydını görüntülemek için tıkla"
                   >
                     <div className="hk-kayit-satir1">
                       <span className="hk-kayit-poliklinik">{k.poliklinik}</span>
-                      <span className="hk-kayit-tarih">{tarihSaatFormat(k.randevuTarihi)}</span>
+                      <span className="hk-kayit-tarih">{tarihSaatFormat(k.tarih)}</span>
                     </div>
                     <div className="hk-kayit-satir2">{k.doktor} · {k.uzmanlikDali}</div>
                   </li>

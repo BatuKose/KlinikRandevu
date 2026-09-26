@@ -597,6 +597,14 @@ namespace Services
 
             return result;
         }
+        public async Task<List<HastaninPoliklinikKayitlariDTO>> HastaninPoliklinikKayitlariniGetir(int protokol)
+        {
+            if (protokol <= 0) throw new BadRequestException("Protokolü sıfırdan büyük olmalıdır");
+            var hasta = await _repositoryManager.Muayene.hastaVarmiProtokol(protokol);
+            if (!hasta) throw new NotFoundException("Hasta bulunamadı");
+
+            return await _repositoryManager.Muayene.HastaninPoliklinikKayitlariniGetir(protokol);
+        }
         public async Task<Doctor>DoktoruPasifeAl(int doktor)
         {
             var doktorVarMi= await _repositoryManager.Muayene.doktorVarMI(doktor);

@@ -76,6 +76,12 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.HastanınRandevulariniGetir(protokol);
             return Ok(result);
         }
+        [HttpGet("hastaninPoliklinikKayitlariniGetir")]
+        public async Task<IActionResult> HastaninPoliklinikKayitlariniGetir([FromQuery] int protokol)
+        {
+            var result = await _ServiceManager.MuayeneService.HastaninPoliklinikKayitlariniGetir(protokol);
+            return Ok(ApiResponse<List<HastaninPoliklinikKayitlariDTO>>.SuccessResponse(result));
+        }
         [HttpPatch("{doktorId:int}/docpasif")]
         public async Task<IActionResult> DoktoruPasifeAl([FromRoute] int doktorId)
         {

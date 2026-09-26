@@ -3,6 +3,8 @@ import api from './api';
 export const muayeneService = {
   hastaninRandevulariniGetir: (protokol) =>
     api.get('/api/Poliklinik/hastaninrandevusunugetir', { params: { protokol } }),
+  hastaninPoliklinikKayitlariniGetir: (protokol) =>
+    api.get('/api/Poliklinik/hastaninPoliklinikKayitlariniGetir', { params: { protokol } }),
   randevulariGetir: (baslangic, bitis) =>
     api.get('/api/Poliklinik/randevularigetir', { params: { baslangic, bitis } }),
   poliklinikHastaListesiGetir: (polNo, baslangic, bitis) =>

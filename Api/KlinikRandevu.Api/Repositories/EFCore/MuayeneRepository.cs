@@ -322,6 +322,38 @@ namespace Repositories.EFCore
                AND p.Protocol=@protkol
             ORDER BY r.RandevuTarihi", sqlParams).ToListAsync();
         }
+        public async Task<List<HastaninPoliklinikKayitlariDTO>> HastaninPoliklinikKayitlariniGetir(int protokol)
+        {
+            var sqlParams = new[]
+            {
+                new SqlParameter("@protokol", SqlDbType.Int) { Value = protokol }
+            };
+
+            // Randevulu/randevusuz ayrımı yapmadan hastanın açılmış tüm muayene kayıtları;
+            // doktor/poliklinik sonradan pasife alınsa bile geçmiş kayıt kaybolmasın diye LEFT JOIN.
+            return await _repositoryContext.Database
+                .SqlQueryRaw<HastaninPoliklinikKayitlariDTO>(@"
+            SELECT
+                m.Id AS MuayeneId,
+                m.RandevuId AS RandevuId,
+                p.Protocol AS Protokol,
+                p.Name AS Ad,
+                p.Surname AS Soyad,
+                p.TcKimlik AS Tc,
+                pol.Name AS Poliklinik,
+                d.DoktorAd AS Doktor,
+                uz.Ad AS UzmanlikDali,
+                CAST(CAST(m.MuayeneTarihi AS date) AS datetime) + CAST(m.BaslangicSaati AS datetime) AS Tarih,
+                CAST(CASE WHEN m.BitisSaati IS NULL THEN 0 ELSE 1 END AS bit) AS Kapali
+            FROM MuayeneKayitlari AS m
+            INNER JOIN Patients AS p ON p.Protocol = m.ProtocolNo
+            LEFT JOIN Poliklinikler AS pol ON pol.PolNo = m.PolNo
+            LEFT JOIN Doktorlar AS d ON d.doktorNo = m.DoktorNo
+            LEFT JOIN UzmanlikDallari AS uz ON uz.Kod = d.doktorUzKod
+            WHERE m.IsActive = 1
+              AND m.ProtocolNo = @protokol
+            ORDER BY m.MuayeneTarihi DESC, m.BaslangicSaati DESC", sqlParams).ToListAsync();
+        }
         public async Task<List<DoktorRandevuHatirlatmaEmailDTO>>DoktorRandevuHatirlatma(int doktorno)
         {
             var sqlParams = new[]

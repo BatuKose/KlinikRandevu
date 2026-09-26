@@ -108,5 +108,7 @@ namespace Repositories.Contracts
         Task<List<TedaviKaydi>> TedavileriGetir(int muayeneId);
         Task<List<odeme>> OdemeleriGetir(int muayeneId);
         Task<List<PoliklinikHastaListesiDTO>> PoliklinikHastaListesiGetir(int polNo, DateTime baslangic, DateTime bitis);
+        Task<Poliklinik?> PoliklinikGetirById(int snumber);
+        Task<bool> MuayenedeBelirliTedavilerVarmiList(int muayeneId, IEnumerable<string> sutKodlari);
     }
 }

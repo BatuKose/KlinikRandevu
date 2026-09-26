@@ -808,6 +808,30 @@ namespace Services
                         throw new BadRequestException("Muayene'ye teşhis eklemeden sonlandıramazsınız");
                     }
                 }
+                var dahiliyeParametre = await _repositoryManager.SistemParametresi.GetirAsync("DAHILEYE_POLLERI_BELIRLI_TEDAVILER_OLMADAN_KAPANMASIN");
+                if (dahiliyeParametre is null)
+                {
+                    parametreEke("dahiliyeParametre");
+                }
+                var dahiliyeParamDeger = dahiliyeParametre?.Deger1?.ToUpper() ?? "HAYIR";
+                if (dahiliyeParamDeger=="EVET")
+                {
+                    var servis = await _repositoryManager.Muayene.PoliklinikGetirById(muayene.PolNo);
+                    if (servis!=null && servis.PolUzKod==PoliklinikEnum.UzmanlikBransi.IcHastaliklari)
+                    {
+                        var sutKodlari = (dahiliyeParametre?.Deger2 ?? string.Empty).Split(new[] { ',', ';', '|', ' ' },
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                        if (sutKodlari.Count() > 0)
+                        {
+                            bool tedavilerEklenmisMi = await _repositoryManager.Muayene.MuayenedeBelirliTedavilerVarmiList(muayene.Id, sutKodlari);
+                            if (!tedavilerEklenmisMi)
+                            {
+                                throw new ParamException($"İç hastalıkları branşlarına kayıtlı servislerde {string.Join(", ", sutKodlari)} bakanlık kodlu tedaviler eklenmeden muayene kapatılmaz");
+                            }
+                        }
+                    }
+                }
                 var now = DateTime.Now;
                 TimeSpan bitisSaati = new TimeSpan(now.Hour, now.Minute, now.Second);
                 muayene.BitisSaati= bitisSaati;

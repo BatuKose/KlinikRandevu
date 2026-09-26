@@ -1070,6 +1070,19 @@ namespace Repositories.EFCore
 
             return sonuc.OrderBy(x => x.Tarih).ToList();
         }
+        public async Task<Poliklinik?>PoliklinikGetirById(int snumber)
+        {
+            var servis= await _repositoryContext.Polikliniks.SingleOrDefaultAsync(s=>s.PolNo == snumber);
+            return servis;
+        }
+        public async  Task<bool> MuayenedeBelirliTedavilerVarmiList( int muayeneId, IEnumerable<string> sutKodlari)
+        {
+            var kodListesi = sutKodlari.ToList();
+
+            return await _repositoryContext.TedaviKaydi
+                .AnyAsync(t => t.MuyaneId == muayeneId
+                            && kodListesi.Contains(t.tedaviKodu));
+        }
     }
 
 }

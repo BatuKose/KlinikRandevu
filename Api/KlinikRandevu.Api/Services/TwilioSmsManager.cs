@@ -128,6 +128,27 @@ namespace Services
 
             return config.IsActive;
         }
+
+        public async Task<List<SmsConfigListeDto>> SmsConfigListeleAsync()
+        {
+            var liste = await _repositoryManager.SmsConfig
+                .AsNoTracking()
+                .OrderByDescending(s => s.IsActive)
+                .ThenByDescending(s => s.Id)
+                .ToListAsync();
+
+            // Token UI'ye gitmesin, sadece son 4 hanesi görünsün.
+            return liste.Select(s => new SmsConfigListeDto
+            {
+                Id = s.Id,
+                AccountId = s.AccountId,
+                FromNumber = s.FromNumber,
+                IsActive = s.IsActive,
+                TokenMaskeli = string.IsNullOrEmpty(s.Token) || s.Token.Length <= 4
+                    ? "****"
+                    : new string('*', 8) + s.Token[^4..]
+            }).ToList();
+        }
         public async Task<bool> SmsGonderAsync(string telefonNumarası, string gonderilcekMesaj)
         {
             string twilioCepStandart;

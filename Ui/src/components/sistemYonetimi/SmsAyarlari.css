@@ -1,0 +1,84 @@
+.sms-uyari {
+  font-size: 0.875rem;
+  color: var(--renk-uyari);
+  font-weight: 600;
+}
+
+.sms-token {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  color: var(--renk-metin-ikincil);
+  letter-spacing: 0.5px;
+}
+
+.sms-islemler {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sms-durum-btn {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.sms-durum-btn.aktif-yap {
+  background: var(--renk-basari-zemin);
+  color: var(--renk-basari);
+  border: 1px solid var(--renk-basari-kenar);
+}
+
+.sms-durum-btn.aktif-yap:hover:not(:disabled) {
+  background: var(--renk-basari);
+  color: #fff;
+}
+
+.sms-durum-btn.pasif-yap {
+  background: var(--renk-tehlike-zemin);
+  color: var(--renk-tehlike);
+  border: 1px solid var(--renk-tehlike-kenar);
+}
+
+.sms-durum-btn.pasif-yap:hover:not(:disabled) {
+  background: var(--renk-tehlike);
+  color: #fff;
+}
+
+.sms-durum-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sms-token-alani {
+  display: flex;
+  gap: 8px;
+}
+
+.sms-token-alani input {
+  flex: 1;
+  min-width: 0;
+}
+
+.sms-goster-btn {
+  padding: 0 12px;
+  background: var(--renk-kart);
+  color: var(--renk-birincil);
+  border: 1px solid var(--renk-kenar);
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sms-goster-btn:hover {
+  background: var(--renk-birincil-acik);
+}
+
+.sms-ipucu {
+  font-size: 0.78rem;
+  color: var(--renk-metin-ikincil);
+}

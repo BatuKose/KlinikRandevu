@@ -85,11 +85,17 @@ namespace Presentation.Controllers
            _ServiceManager.SistemParametreService.userEkle(user);
             return NoContent();
         }
-        [HttpPost("smsayarikaydet")]
-        public IActionResult SmsConfigEkle([FromBody] InsertSmsConfigDto model)
+        [HttpGet("smsayarlari")]
+        public async Task<IActionResult> SmsConfigListele()
         {
-            _ServiceManager.TwilioSmsManager.SmsConfigEkleAsync(model);
-            return  Ok(ApiResponse<InsertSmsConfigDto>.SuccessResponse(model));
+            var liste = await _ServiceManager.TwilioSmsManager.SmsConfigListeleAsync();
+            return Ok(ApiResponse<List<SmsConfigListeDto>>.SuccessResponse(liste));
+        }
+        [HttpPost("smsayarikaydet")]
+        public async Task<IActionResult> SmsConfigEkle([FromBody] InsertSmsConfigDto model)
+        {
+            var id = await _ServiceManager.TwilioSmsManager.SmsConfigEkleAsync(model);
+            return Ok(ApiResponse<int>.SuccessResponse(id));
         }
         [HttpPut("smsayarigüncelle")]
         public async Task<IActionResult> Guncelle(UpdateSmsConfigDto model)

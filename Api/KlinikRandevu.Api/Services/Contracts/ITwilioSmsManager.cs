@@ -14,5 +14,6 @@ namespace Services.Contracts
         Task<int> SmsConfigEkleAsync(InsertSmsConfigDto model);
         Task SmsConfigGuncelleAsync(UpdateSmsConfigDto model);
         Task<bool> SmsConfigAktifPasifAsync(int id);
+        Task<List<SmsConfigListeDto>> SmsConfigListeleAsync();
     }
 }

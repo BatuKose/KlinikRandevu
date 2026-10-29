@@ -5,6 +5,7 @@ import { getApiErrorMessage } from '../utils/apiError';
 import LogListesi from '../components/sistemYonetimi/LogListesi';
 import DoktorEkle from '../components/sistemYonetimi/DoktorEkle';
 import ServisEkle from '../components/sistemYonetimi/ServisEkle';
+import SmsAyarlari from '../components/sistemYonetimi/SmsAyarlari';
 import './SistemYonetimi.css';
 import Bildirim from '../components/bildirim/Bildirim';
 
@@ -284,6 +285,12 @@ export default function SistemYonetimi() {
           Servis Ekle
         </button>
         <button
+          className={`tab-btn ${aktifTab === 'sms' ? 'aktif' : ''}`}
+          onClick={() => setAktifTab('sms')}
+        >
+          SMS Ayarları
+        </button>
+        <button
           className={`tab-btn ${aktifTab === 'loglar' ? 'aktif' : ''}`}
           onClick={() => setAktifTab('loglar')}
         >
@@ -386,6 +393,12 @@ export default function SistemYonetimi() {
       {aktifTab === 'servis' && (
         <div className="icerik">
           <ServisEkle />
+        </div>
+      )}
+
+      {aktifTab === 'sms' && (
+        <div className="icerik">
+          <SmsAyarlari />
         </div>
       )}
 

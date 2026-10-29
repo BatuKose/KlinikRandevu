@@ -454,7 +454,7 @@ namespace KlinikRandevu.Migrations
                             Address = "BURSA, Türkiye",
                             BirthDate = new DateTime(2001, 2, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BloodType = 6,
-                            CreatedAt = new DateTime(2026, 9, 12, 21, 20, 10, 985, DateTimeKind.Local).AddTicks(7772),
+                            CreatedAt = new DateTime(2026, 10, 29, 2, 10, 14, 771, DateTimeKind.Local).AddTicks(7705),
                             Gender = 2,
                             IsActive = true,
                             Name = "BATUHAN",
@@ -713,7 +713,7 @@ namespace KlinikRandevu.Migrations
                             Aciklama = "D1: Aktif mi (EVET/HAYIR), D2: Hata mesajı",
                             Aktif = true,
                             Deger1 = "EVET",
-                            OlusturmaTarihi = new DateTime(2026, 9, 12, 21, 20, 10, 986, DateTimeKind.Local).AddTicks(7960),
+                            OlusturmaTarihi = new DateTime(2026, 10, 29, 2, 10, 14, 772, DateTimeKind.Local).AddTicks(6675),
                             ParametreAdi = "KADIN_DOGUM_ERKEK_YASAKLA"
                         },
                         new
@@ -724,9 +724,37 @@ namespace KlinikRandevu.Migrations
                             Deger1 = "EVET",
                             Deger2 = "0",
                             Deger3 = "16",
-                            OlusturmaTarihi = new DateTime(2026, 9, 12, 21, 20, 10, 986, DateTimeKind.Local).AddTicks(7970),
+                            OlusturmaTarihi = new DateTime(2026, 10, 29, 2, 10, 14, 772, DateTimeKind.Local).AddTicks(6684),
                             ParametreAdi = "PEDIATRI_YAS_LIMITI"
                         });
+                });
+
+            modelBuilder.Entity("Entities.Models.SmsConfig", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FromNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SmsConfig");
                 });
 
             modelBuilder.Entity("Entities.Models.Taahütname", b =>

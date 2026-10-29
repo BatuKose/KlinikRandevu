@@ -1,15 +1,19 @@
 ﻿using Entities.Constants;
+using Entities.Data_Transfer_Objects.Muayene;
 using Entities.Data_Transfer_Objects.Parametre;
+using Entities.Data_Transfer_Objects.Sms;
 using Entities.Data_Transfer_Objects.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
 using Presentation.ActionFilters;
+using Presentation.Wrappers;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Twilio.Rest.Intelligence.V3;
 
 namespace Presentation.Controllers
 {
@@ -80,6 +84,24 @@ namespace Presentation.Controllers
         {
            _ServiceManager.SistemParametreService.userEkle(user);
             return NoContent();
+        }
+        [HttpPost("smsayarikaydet")]
+        public IActionResult SmsConfigEkle([FromBody] InsertSmsConfigDto model)
+        {
+            _ServiceManager.TwilioSmsManager.SmsConfigEkleAsync(model);
+            return  Ok(ApiResponse<InsertSmsConfigDto>.SuccessResponse(model));
+        }
+        [HttpPut("smsayarigüncelle")]
+        public async Task<IActionResult> Guncelle(UpdateSmsConfigDto model)
+        {
+            await _ServiceManager.TwilioSmsManager.SmsConfigGuncelleAsync(model);
+            return NoContent();
+        }
+        [HttpPatch("sms/{id:int}/aktif-pasif")]
+        public async Task<IActionResult> AktifPasif(int id)
+        {
+            var aktifMi = await _ServiceManager.TwilioSmsManager.SmsConfigAktifPasifAsync(id);
+            return Ok(ApiResponse<bool>.SuccessResponse(aktifMi));
         }
     }
 }

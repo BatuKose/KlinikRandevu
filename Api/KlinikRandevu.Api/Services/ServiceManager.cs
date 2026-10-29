@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Repositories.Contracts;
+using Repositories.EFCore;
 using Services.Contracts;
 namespace Services
 {
@@ -30,7 +31,8 @@ namespace Services
             ILogger<TwilioSmsManager> TwilioLogger,
             ILogger<IcdApiManager> IcdApiLogger,
             ILogger<JobManger> jobLogger,
-            ILogger<EmailManager> MailLogger
+            ILogger<EmailManager> MailLogger,
+            RepositoryContext context
             )
         {
             _mailService = new Lazy<IEmailService>(() =>
@@ -46,7 +48,7 @@ namespace Services
             _userLogService= new Lazy<IUserLogService>(() => new UserLogManager(repositoryManager));
             _userYetkiService= new Lazy<IUserYetkiService>(() => new UserYetkiManager(repositoryManager, cache));
             _nagerDateService = new Lazy<INagerDateService>(() => new NagerDateManager(repositoryManager, httpClientFactory));
-            _twilioSmsManager= new Lazy<ITwilioSmsManager>(() => new TwilioSmsManager(configuration, TwilioLogger));
+            _twilioSmsManager= new Lazy<ITwilioSmsManager>(() => new TwilioSmsManager(configuration, TwilioLogger, context));
             _IcdApiManager=new Lazy<IIcdApiManager>(() => new IcdApiManager(configuration, httpClientFactory, IcdApiLogger, repositoryManager));
             _jobService = new Lazy<IJobService>(() =>
                 new JobManger(repositoryManager, _mailService.Value, _twilioSmsManager.Value, jobLogger));   

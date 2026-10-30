@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Entities.Data_Transfer_Objects.Email;
+using Entities.Models;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
@@ -61,6 +62,47 @@ namespace Repositories.EFCore
         {
             bool epostaVarmi = _repositoryContext.Users.Any(e => e.Email==eposta);
             return epostaVarmi;
+        }
+        public async Task<GetEmailConfigDTO?> GetEmail()
+        {
+            var email = await _repositoryContext.EmailConfig
+                .AsNoTracking()
+                .Where(e => e.Active)
+                .Select(e => new GetEmailConfigDTO
+                {
+                   SenderEmail = e.SenderEmail,
+                   Password= e.Password,
+                   Port= e.Port,
+                   SenderName= e.SenderName,
+                   SmtpServer=e.SmtpServer
+                })
+                .FirstOrDefaultAsync();
+
+            return email;
+        }
+
+        public async Task<List<EmailConfig>> EmailConfigListele()
+        {
+            return await _repositoryContext.EmailConfig
+                .AsNoTracking()
+                .OrderByDescending(e => e.Active)
+                .ThenByDescending(e => e.Id)
+                .ToListAsync();
+        }
+
+        public async Task<EmailConfig?> EmailConfigGetirById(int id)
+        {
+            return await _repositoryContext.EmailConfig.FirstOrDefaultAsync(e => e.Id == id);
+        }
+
+        public async Task<bool> BaskaAktifEmailConfigVarMi(int haricId)
+        {
+            return await _repositoryContext.EmailConfig.AnyAsync(e => e.Active && e.Id != haricId);
+        }
+
+        public void EmailConfigEkle(EmailConfig entity)
+        {
+            _repositoryContext.EmailConfig.Add(entity);
         }
     }
 }

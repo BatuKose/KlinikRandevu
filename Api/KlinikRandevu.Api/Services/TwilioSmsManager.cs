@@ -136,8 +136,6 @@ namespace Services
                 .OrderByDescending(s => s.IsActive)
                 .ThenByDescending(s => s.Id)
                 .ToListAsync();
-
-            // Token UI'ye gitmesin, sadece son 4 hanesi görünsün.
             return liste.Select(s => new SmsConfigListeDto
             {
                 Id = s.Id,

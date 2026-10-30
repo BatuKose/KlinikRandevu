@@ -36,7 +36,7 @@ namespace Services
             )
         {
             _mailService = new Lazy<IEmailService>(() =>
-                new EmailManager(configuration,MailLogger));
+                new EmailManager(configuration,MailLogger, repositoryManager));
             _patientService = new Lazy<IPatientService>(() =>
                 new PatientManager(repositoryManager));
             _MuayeneService = new Lazy<IMuayeneService>(() =>

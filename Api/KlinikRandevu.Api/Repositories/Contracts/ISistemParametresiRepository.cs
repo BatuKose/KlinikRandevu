@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Entities.Data_Transfer_Objects.Email;
+using Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +18,10 @@ namespace Repositories.Contracts
         void userekle(User user);
         bool aynıUsernameVarmi(string username);
         bool ayniEpostaVarmi(string eposta);
+        Task<GetEmailConfigDTO?> GetEmail();
+        Task<List<EmailConfig>> EmailConfigListele();
+        Task<EmailConfig?> EmailConfigGetirById(int id);
+        Task<bool> BaskaAktifEmailConfigVarMi(int haricId);
+        void EmailConfigEkle(EmailConfig entity);
     }
 }

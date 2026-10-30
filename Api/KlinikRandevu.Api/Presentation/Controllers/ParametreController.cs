@@ -1,4 +1,5 @@
 ﻿using Entities.Constants;
+using Entities.Data_Transfer_Objects.Email;
 using Entities.Data_Transfer_Objects.Muayene;
 using Entities.Data_Transfer_Objects.Parametre;
 using Entities.Data_Transfer_Objects.Sms;
@@ -107,6 +108,30 @@ namespace Presentation.Controllers
         public async Task<IActionResult> AktifPasif(int id)
         {
             var aktifMi = await _ServiceManager.TwilioSmsManager.SmsConfigAktifPasifAsync(id);
+            return Ok(ApiResponse<bool>.SuccessResponse(aktifMi));
+        }
+        [HttpGet("emailayarlari")]
+        public async Task<IActionResult> EmailConfigListele()
+        {
+            var liste = await _ServiceManager.EmailService.EmailConfigListeleAsync();
+            return Ok(ApiResponse<List<EmailConfigListeDto>>.SuccessResponse(liste));
+        }
+        [HttpPost("emailayarikaydet")]
+        public async Task<IActionResult> EmailConfigEkle([FromBody] InsertEmailConfigDto model)
+        {
+            var id = await _ServiceManager.EmailService.EmailConfigEkleAsync(model);
+            return Ok(ApiResponse<int>.SuccessResponse(id));
+        }
+        [HttpPut("emailayariguncelle")]
+        public async Task<IActionResult> EmailConfigGuncelle([FromBody] UpdateEmailConfigDto model)
+        {
+            await _ServiceManager.EmailService.EmailConfigGuncelleAsync(model);
+            return NoContent();
+        }
+        [HttpPatch("email/{id:int}/aktif-pasif")]
+        public async Task<IActionResult> EmailConfigAktifPasif(int id)
+        {
+            var aktifMi = await _ServiceManager.EmailService.EmailConfigAktifPasifAsync(id);
             return Ok(ApiResponse<bool>.SuccessResponse(aktifMi));
         }
     }

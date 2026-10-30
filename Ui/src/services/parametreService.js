@@ -13,4 +13,8 @@ export const parametreService = {
   smsAyariEkle: (data) => api.post('/SistemParametreleri/smsayarikaydet', data),
   smsAyariGuncelle: (data) => api.put(`/SistemParametreleri/${encodeURIComponent('smsayarigüncelle')}`, data),
   smsAyariAktifPasif: (id) => api.patch(`/SistemParametreleri/sms/${id}/aktif-pasif`),
+  emailAyarlariGetir: () => api.get('/SistemParametreleri/emailayarlari'),
+  emailAyariEkle: (data) => api.post('/SistemParametreleri/emailayarikaydet', data),
+  emailAyariGuncelle: (data) => api.put('/SistemParametreleri/emailayariguncelle', data),
+  emailAyariAktifPasif: (id) => api.patch(`/SistemParametreleri/email/${id}/aktif-pasif`),
 };

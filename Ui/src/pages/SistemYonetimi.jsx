@@ -6,6 +6,7 @@ import LogListesi from '../components/sistemYonetimi/LogListesi';
 import DoktorEkle from '../components/sistemYonetimi/DoktorEkle';
 import ServisEkle from '../components/sistemYonetimi/ServisEkle';
 import SmsAyarlari from '../components/sistemYonetimi/SmsAyarlari';
+import EmailAyarlari from '../components/sistemYonetimi/EmailAyarlari';
 import './SistemYonetimi.css';
 import Bildirim from '../components/bildirim/Bildirim';
 
@@ -291,6 +292,12 @@ export default function SistemYonetimi() {
           SMS Ayarları
         </button>
         <button
+          className={`tab-btn ${aktifTab === 'email' ? 'aktif' : ''}`}
+          onClick={() => setAktifTab('email')}
+        >
+          Email Ayarları
+        </button>
+        <button
           className={`tab-btn ${aktifTab === 'loglar' ? 'aktif' : ''}`}
           onClick={() => setAktifTab('loglar')}
         >
@@ -399,6 +406,12 @@ export default function SistemYonetimi() {
       {aktifTab === 'sms' && (
         <div className="icerik">
           <SmsAyarlari />
+        </div>
+      )}
+
+      {aktifTab === 'email' && (
+        <div className="icerik">
+          <EmailAyarlari />
         </div>
       )}
 

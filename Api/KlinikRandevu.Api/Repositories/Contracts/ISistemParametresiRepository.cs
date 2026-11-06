@@ -23,5 +23,6 @@ namespace Repositories.Contracts
         Task<EmailConfig?> EmailConfigGetirById(int id);
         Task<bool> BaskaAktifEmailConfigVarMi(int haricId);
         void EmailConfigEkle(EmailConfig entity);
+        Task<User> GetUserByUsername(string username);
     }
 }

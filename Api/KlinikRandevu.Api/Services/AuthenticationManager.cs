@@ -4,6 +4,7 @@ using Entities.Data_Transfer_Objects.UserLog;
 using Entities.Exceptions.CustomExceptions;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -133,17 +134,34 @@ namespace Services
                 string paramName = "LOGIN_LOG_TUTULSUN";
                 parametreEke(paramName);
             }
-            if (loginLogParametre != null && loginLogParametre.Deger1?.ToUpper() == "EVET")
+            var ipObj = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
+            if (ipObj?.IsIPv4MappedToIPv6 == true)
             {
-                var ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "İp adresi bulunamadı";
+                ipObj=ipObj.MapToIPv4();
+            }
+            var ip=ipObj?.ToString();
+                if (loginLogParametre != null && loginLogParametre.Deger1?.ToUpper() == "EVET")
+            {  
                 var log = new UserLog
                 {
+
                     UserId = user.UserID,
                     AksiyonTipi = "Sisteme giriş",
-                    IpAdresi = ip,
+                    IpAdresi = ip ??null,
                     EntityTipi = "users"
                 };
                  _repositoryManager.UserLogRepository.LoginLogYaz(log);  
+            }
+
+            var loginParam = await _repositoryManager.SistemParametresi.GetirAsync("LOGIN_BILGI_MAILI_GONDER");
+            if( loginParam is null)
+            {
+                parametreEke("LOGIN_BILGI_MAILI_GONDER");
+            }
+            var loginParamDeger1 = loginParam?.Deger1?.ToUpper() ?? "HAYIR";
+            if( loginParamDeger1 =="EVET")
+            {
+                BackgroundJob.Enqueue<IJobService>(job=>job.LoginBilgiMailGonder(loginDTO.username,ip));
             }
 
             return await GenerateTokenResponseAsync(user);

@@ -51,7 +51,7 @@ namespace Services
             _twilioSmsManager= new Lazy<ITwilioSmsManager>(() => new TwilioSmsManager(configuration, TwilioLogger, context));
             _IcdApiManager=new Lazy<IIcdApiManager>(() => new IcdApiManager(configuration, httpClientFactory, IcdApiLogger, repositoryManager));
             _jobService = new Lazy<IJobService>(() =>
-                new JobManger(repositoryManager, _mailService.Value, _twilioSmsManager.Value, jobLogger));   
+                new JobManger(repositoryManager, _mailService.Value, _twilioSmsManager.Value, jobLogger, httpClientFactory));   
         }
         public IPatientService PatientService => _patientService.Value;
         public IMuayeneService MuayeneService => _MuayeneService.Value;

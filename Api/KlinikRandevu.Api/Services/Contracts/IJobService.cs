@@ -15,5 +15,6 @@ namespace Services.Contracts
         Task TaahütnameBilgilendirme();
         Task RandevuBekletenHastalariBildir();
         Task RandevuOzelMesajGonder();
+        Task LoginBilgiMailGonder(string username,string ip);
     }
 }

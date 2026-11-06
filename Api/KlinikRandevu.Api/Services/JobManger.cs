@@ -1,4 +1,5 @@
-﻿using Entities.Data_Transfer_Objects.Muayene;
+﻿using Entities.Data_Transfer_Objects.Job;
+using Entities.Data_Transfer_Objects.Muayene;
 using Entities.Exeptions.CustomExceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Components.Forms;
@@ -8,6 +9,7 @@ using Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,13 +21,16 @@ namespace Services
         private readonly IEmailService _emailManager;
         private readonly ITwilioSmsManager _twilioSmsManager;
         private readonly ILogger<JobManger> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public JobManger(IRepositoryManager repositoryManager, IEmailService emailManager, ITwilioSmsManager twilioSmsManager, ILogger<JobManger> logger)
+        public JobManger(IRepositoryManager repositoryManager, IEmailService emailManager,
+            ITwilioSmsManager twilioSmsManager, ILogger<JobManger> logger, IHttpClientFactory httpClientFactory)
         {
             _repositoryManager=repositoryManager;
             _emailManager=emailManager;
             _twilioSmsManager=twilioSmsManager;
             _logger=logger;
+            _httpClientFactory=httpClientFactory;
         }
 
         public async Task HatirlatmalariGonderAsync()
@@ -457,6 +462,52 @@ namespace Services
                 }
             }
 
+        }
+
+        public async Task LoginBilgiMailGonder(string username, string ip)
+        {
+            var user = await _repositoryManager.SistemParametresi.GetUserByUsername(username);
+            if(user != null)
+            {
+             
+                var mailAdresi = user.Email;
+               
+                if (!string.IsNullOrEmpty(mailAdresi))
+                {
+                    var ipAdresi = ip;
+                    var konum = await KonumGetir(ip);
+                    string baslik = $"Sisteme giriş bildirimi";
+                    string gonderilcekMesaj = $"Hesabınıza giriş yapıldı.\n" +
+                            $"Tarih: {DateTime.Now:dd.MM.yyyy HH:mm}\n" +
+                            $"IP: {ip}\n" +
+                            $"Yaklaşık konum: {konum} " +
+                            $"İşlemi yapan siz değilseniz şifre yenileme yapınız."; ;
+
+                    await _emailManager.MailGonderAsync(mailAdresi, baslik, gonderilcekMesaj);
+                }
+
+            }
+        }
+        private async Task<string>KonumGetir(string? ip)
+        {
+            if (string.IsNullOrWhiteSpace(ip) || ip == "::1" || ip.StartsWith("127."))
+                return "Yerel ağ (localhost)";
+            try
+            {
+                var client= _httpClientFactory.CreateClient();
+                var sonuc = await client.GetFromJsonAsync<IpKonumDto>(
+                    $"http://ip-api.com/json/{ip}?fields=status,country,regionName,city"
+                    );
+                return sonuc?.Status == "success"
+                   ? $"{sonuc.City}, {sonuc.RegionName}, {sonuc.Country}"
+                   : "Bilinmiyor";
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogWarning(ex, $"Konum alınmadı: {ip}");
+                return "Bilinmiyor";
+            }
         }
     }
 }

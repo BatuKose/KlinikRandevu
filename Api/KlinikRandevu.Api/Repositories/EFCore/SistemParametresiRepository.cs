@@ -104,5 +104,10 @@ namespace Repositories.EFCore
         {
             _repositoryContext.EmailConfig.Add(entity);
         }
+        public async Task<User> GetUserByUsername(string  username)
+        {
+            var result = await _repositoryContext.Users.FirstOrDefaultAsync(u => u.UserName==username);
+            return result;
+        }
     }
 }

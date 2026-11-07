@@ -8,6 +8,7 @@ import HastaKayit from './pages/HastaKayit';
 import Randevu from './pages/Randevu';
 import Poliklinik from './pages/Poliklinik';
 import SistemYonetimi from './pages/SistemYonetimi';
+import Raporlama from './pages/Raporlama';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="hasta-kayit" element={<HastaKayit />} />
             <Route path="randevu" element={<Randevu />} />
             <Route path="poliklinik" element={<Poliklinik />} />
+            <Route path="raporlama" element={<Raporlama />} />
             <Route path="sistem-yonetimi" element={<SistemYonetimi />} />
           </Route>
         </Routes>

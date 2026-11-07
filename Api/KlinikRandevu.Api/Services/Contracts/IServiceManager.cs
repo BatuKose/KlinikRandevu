@@ -19,5 +19,6 @@ namespace Services.Contracts
         ITwilioSmsManager TwilioSmsManager { get; }
         IIcdApiManager IcdApiManager { get; }
         IJobService jobService { get; }
+        IRaporlamaService RaporlamaService { get; }
     }
 }

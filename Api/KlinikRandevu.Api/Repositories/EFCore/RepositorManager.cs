@@ -20,6 +20,7 @@ namespace Repositories.EFCore
         private readonly Lazy<IUserYetkiRepository> _userYetkiRepository;
         private readonly Lazy<ITatilRepository> _tatilRepository;
         private readonly Lazy<IIcdApiRepository> _IcdApiRepository;
+        private readonly Lazy<IRaporlamaRepository> _raporlamaRepository;
         public RepositoryManager(RepositoryContext repositoryContext)
         {
             _repositoryContext = repositoryContext;
@@ -37,6 +38,7 @@ namespace Repositories.EFCore
             _userYetkiRepository = new Lazy<IUserYetkiRepository>(() => new UserYetkiRepository(_repositoryContext));
             _tatilRepository = new Lazy<ITatilRepository>(() => new TatilRepository(_repositoryContext));
             _IcdApiRepository= new Lazy<IIcdApiRepository>(() => new IcdApiRepository(_repositoryContext));
+            _raporlamaRepository= new Lazy<IRaporlamaRepository>(() => new RaporlamaRepository(_repositoryContext));
         }
 
         public IPatientRepository Patient => _patientRepository.Value;
@@ -76,5 +78,6 @@ namespace Repositories.EFCore
         public IUserYetkiRepository UserYetkiRepository=> _userYetkiRepository.Value;
         public ITatilRepository TatilRepository => _tatilRepository.Value;
         public IIcdApiRepository IcdApiRepository=>_IcdApiRepository.Value;
+        public IRaporlamaRepository RaporlamaRepository=> _raporlamaRepository.Value;
     }
 }

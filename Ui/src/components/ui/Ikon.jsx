@@ -183,6 +183,20 @@ const YOLLAR = {
       <path d="M7 2v4.2a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2" />
     </>
   ),
+  grafik: (
+    <>
+      <path d="M3 3v18h18" />
+      <rect x="7" y="12" width="3" height="6" rx="0.5" />
+      <rect x="12" y="8" width="3" height="10" rx="0.5" />
+      <rect x="17" y="5" width="3" height="13" rx="0.5" />
+    </>
+  ),
+  trend: (
+    <>
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+      <polyline points="16 7 22 7 22 13" />
+    </>
+  ),
   tik: <polyline points="20 6 9 17 4 12" />,
   bilgi: (
     <>

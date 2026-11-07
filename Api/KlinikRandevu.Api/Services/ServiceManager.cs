@@ -21,6 +21,7 @@ namespace Services
         private readonly Lazy<ITwilioSmsManager> _twilioSmsManager;
         private readonly Lazy<IIcdApiManager> _IcdApiManager;
         private readonly Lazy<IJobService> _jobService;
+        private readonly Lazy<IRaporlamaService> _raporlamaService;
         public ServiceManager(
             IRepositoryManager repositoryManager,
             IMemoryCache cache,
@@ -32,6 +33,7 @@ namespace Services
             ILogger<IcdApiManager> IcdApiLogger,
             ILogger<JobManger> jobLogger,
             ILogger<EmailManager> MailLogger,
+            ILogger<RaporlamaManager> RaporlamaLogger,
             RepositoryContext context
             )
         {
@@ -51,7 +53,8 @@ namespace Services
             _twilioSmsManager= new Lazy<ITwilioSmsManager>(() => new TwilioSmsManager(configuration, TwilioLogger, context));
             _IcdApiManager=new Lazy<IIcdApiManager>(() => new IcdApiManager(configuration, httpClientFactory, IcdApiLogger, repositoryManager));
             _jobService = new Lazy<IJobService>(() =>
-                new JobManger(repositoryManager, _mailService.Value, _twilioSmsManager.Value, jobLogger, httpClientFactory));   
+                new JobManger(repositoryManager, _mailService.Value, _twilioSmsManager.Value, jobLogger, httpClientFactory));
+            _raporlamaService= new Lazy<IRaporlamaService>(()=>new RaporlamaManager(repositoryManager, cache, RaporlamaLogger));
         }
         public IPatientService PatientService => _patientService.Value;
         public IMuayeneService MuayeneService => _MuayeneService.Value;
@@ -64,5 +67,6 @@ namespace Services
         public ITwilioSmsManager TwilioSmsManager => _twilioSmsManager.Value;
         public IIcdApiManager IcdApiManager => _IcdApiManager.Value;
         public IJobService jobService => _jobService.Value;     
+        public IRaporlamaService RaporlamaService => _raporlamaService.Value;
     }
 }

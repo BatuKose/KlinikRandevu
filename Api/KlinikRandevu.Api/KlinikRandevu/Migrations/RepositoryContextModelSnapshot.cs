@@ -489,7 +489,7 @@ namespace KlinikRandevu.Migrations
                             Address = "BURSA, Türkiye",
                             BirthDate = new DateTime(2001, 2, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BloodType = 6,
-                            CreatedAt = new DateTime(2026, 10, 31, 1, 38, 6, 434, DateTimeKind.Local).AddTicks(5941),
+                            CreatedAt = new DateTime(2026, 11, 21, 13, 39, 49, 865, DateTimeKind.Local).AddTicks(8522),
                             Gender = 2,
                             IsActive = true,
                             Name = "BATUHAN",
@@ -634,6 +634,9 @@ namespace KlinikRandevu.Migrations
                     b.Property<DateTime>("RandevuTarihi")
                         .HasColumnType("datetime");
 
+                    b.Property<bool>("RandevuyaGelmedi")
+                        .HasColumnType("bit");
+
                     b.Property<int>("SureDakika")
                         .HasColumnType("int");
 
@@ -748,7 +751,7 @@ namespace KlinikRandevu.Migrations
                             Aciklama = "D1: Aktif mi (EVET/HAYIR), D2: Hata mesajı",
                             Aktif = true,
                             Deger1 = "EVET",
-                            OlusturmaTarihi = new DateTime(2026, 10, 31, 1, 38, 6, 435, DateTimeKind.Local).AddTicks(4663),
+                            OlusturmaTarihi = new DateTime(2026, 11, 21, 13, 39, 49, 867, DateTimeKind.Local).AddTicks(244),
                             ParametreAdi = "KADIN_DOGUM_ERKEK_YASAKLA"
                         },
                         new
@@ -759,7 +762,7 @@ namespace KlinikRandevu.Migrations
                             Deger1 = "EVET",
                             Deger2 = "0",
                             Deger3 = "16",
-                            OlusturmaTarihi = new DateTime(2026, 10, 31, 1, 38, 6, 435, DateTimeKind.Local).AddTicks(4669),
+                            OlusturmaTarihi = new DateTime(2026, 11, 21, 13, 39, 49, 867, DateTimeKind.Local).AddTicks(254),
                             ParametreAdi = "PEDIATRI_YAS_LIMITI"
                         });
                 });

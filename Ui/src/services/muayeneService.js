@@ -17,6 +17,9 @@ export const muayeneService = {
   doktorEkle: (dto) => api.post('/api/Poliklinik/doktorEkle', dto),
   servisEkle: (dto) => api.post('/api/Poliklinik/servisEkle', dto),
   randevuIptalEt: (id) => api.patch('/api/Poliklinik/randevuiptalet', null, { params: { id } }),
+  // Toggle: geldi ↔ gelmedi. Muayenesi açılmış randevuda backend 400 döner.
+  randevuyaGelmediIsaretle: (randevuId) =>
+    api.patch('/api/Poliklinik/randevuyagelmedi', null, { params: { randevuId } }),
 
   calismaPlanlariGetir: (params) => api.get('/api/Poliklinik/calismaPlanlariGetir', { params }),
   calismaPlaniOlustur: (dto) => api.post('/api/Poliklinik/calismaplaniolustur', dto),

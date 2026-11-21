@@ -116,5 +116,7 @@ namespace Repositories.Contracts
         Task<List<DoktorCalismaPlani>> GunlukCalismaPlanlariGetir(int doktorNo, int polNo, DayOfWeek gun);
         Task<List<Randevu>> DoktorunGunlukRandevulariGetir(int doktorNo, DateTime gun);
         Task<int> CalismaPlanindakiIleriRandevuSayisi(DoktorCalismaPlani plan);
+        public Randevu? RandevuGetir(int id);
+        public bool RandevuyaMuayeneAcilmisMi(int randevuId);
     }
 }

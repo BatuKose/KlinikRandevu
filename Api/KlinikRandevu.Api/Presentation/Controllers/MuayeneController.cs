@@ -284,5 +284,11 @@ namespace Presentation.Controllers
             var result = await _ServiceManager.MuayeneService.PoliklinikHastaListesiGetir(polNo, baslangic, bitis);
             return Ok(ApiResponse<List<PoliklinikHastaListesiDTO>>.SuccessResponse(result));
         }
+        [HttpPatch("randevuyagelmedi")]
+        public IActionResult RandevuyaGelmedi([FromQuery] int randevuId)
+        {
+            _ServiceManager.MuayeneService.RandevuyaGelmediIsaretle(randevuId);
+            return NoContent();
+        }
     }
 }

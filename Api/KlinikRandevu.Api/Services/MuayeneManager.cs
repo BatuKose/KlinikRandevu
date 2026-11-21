@@ -1576,5 +1576,31 @@ namespace Services
             }
             return slotlar;
         }
+        public void RandevuyaGelmediIsaretle(int randevuId)
+        {
+            if(randevuId<=0)
+            {
+                throw new BadRequestException("Geçersiz randevu id");
+            }
+            var randevuModel =  _repositoryManager.Muayene.RandevuGetir(randevuId);
+            if(randevuModel == null)
+            {
+                throw new NotFoundException("Randevu Bulunamadı kontrol ediniz");
+            }
+            bool kayitAcildiMi = _repositoryManager.Muayene.RandevuyaMuayeneAcilmisMi(randevuId);
+            if(kayitAcildiMi)
+            {
+                throw new BadRequestException("Muayenesi açılan kayda, randevuya gelmedi olarak işaretlenmez");
+            }
+            if(randevuModel.RandevuyaGelmedi==false)
+            {
+                randevuModel.RandevuyaGelmedi= true;
+            }
+            else
+            {
+                randevuModel.RandevuyaGelmedi=false;
+            }
+            _repositoryManager.Save();
+        }
     }
 }

@@ -13,5 +13,6 @@ namespace Entities.Data_Transfer_Objects.Muayene
         public string Doktor { get; set; }
         public DateTime Tarih { get; set; }
         public bool MuayeneVarMi { get; set; }
+        public bool RandevuyaGelmedi { get; set; }
     }
 }

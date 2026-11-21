@@ -97,9 +97,37 @@
   pointer-events: none;
 }
 
-.ui-tablo-tiklanabilir:hover .ui-btn:not(.ui-btn-birincil) {
+.ui-tablo-tiklanabilir:hover .ui-btn:not(.ui-btn-birincil):not(.pk-gelmedi-btn) {
   border-color: var(--renk-birincil);
   color: var(--renk-birincil);
+}
+
+.pk-aksiyonlar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Satır tıklanabilir olsa da gelmedi butonu kendi tıklamasını alır. */
+.ui-tablo-tiklanabilir .pk-gelmedi-btn {
+  pointer-events: auto;
+}
+
+.pk-gelmedi-btn:not(:disabled):hover {
+  border-color: var(--renk-tehlike);
+  color: var(--renk-tehlike);
+}
+
+.pk-satir-gelmedi .pk-hasta,
+.pk-satir-gelmedi .pk-saat,
+.pk-satir-gelmedi td:nth-child(4) {
+  opacity: 0.55;
+}
+
+.pk-satir-gelmedi .pk-hasta-ad {
+  text-decoration: line-through;
 }
 
 /* ═══════════ Muayene detayı ═══════════ */

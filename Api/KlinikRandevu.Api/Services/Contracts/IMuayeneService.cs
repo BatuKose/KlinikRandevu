@@ -52,5 +52,6 @@ namespace Services.Contracts
         Task<List<CalismaPlaniListeDTO>> CalismaPlanlariGetirAsync(int? doktorNo, int? polNo, bool sadeceAktif);
         Task CalismaPlaniPasifeAlAsync(int id);
         Task<List<RandevuSlotDTO>> MusaitSlotlariGetirAsync(int doktorNo, int polNo, DateTime tarih);
+        public void RandevuyaGelmediIsaretle(int randevuId);
     }
 }

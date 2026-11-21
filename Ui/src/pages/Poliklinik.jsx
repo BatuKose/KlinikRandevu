@@ -53,6 +53,7 @@ const DURUM_SEKMELERI = [
   { anahtar: 'tumu', etiket: 'Tümü' },
   { anahtar: 'bekleyen', etiket: 'Muayene Bekleyen' },
   { anahtar: 'acilan', etiket: 'Muayenesi Açılan' },
+  { anahtar: 'gelmedi', etiket: 'Gelmedi' },
 ];
 
 // ── Girişte: poliklinik + tarih aralığı seç, o aralığa ait muayene kayıtlarını (ve
@@ -73,6 +74,7 @@ function PoliklinikHastaListesi({
   const [hata, setHata] = useState('');
   const [aramaMetni, setAramaMetni] = useState('');
   const [durumFiltre, setDurumFiltre] = useState('tumu');
+  const [isaretlenenId, setIsaretlenenId] = useState(null);
 
   const aralikGecersiz = baslangicTarih > bitisTarih;
   const tekGun = baslangicTarih === bitisTarih;
@@ -105,16 +107,46 @@ function PoliklinikHastaListesi({
     hastalariYukle();
   }, [servisNo, hastalariYukle]);
 
+  // Randevuya gelmedi işaretini aç/kapat (backend toggle). Başarılıysa satırı
+  // yerinde güncelliyoruz; tüm listeyi yeniden çekmeye gerek yok.
+  const gelmediDegistir = async (kayit) => {
+    if (
+      !kayit.randevuyaGelmedi &&
+      !window.confirm(`${kayit.ad} ${kayit.soyad} randevuya gelmedi olarak işaretlensin mi?`)
+    ) {
+      return;
+    }
+    setIsaretlenenId(kayit.dosyaId);
+    setHata('');
+    try {
+      await muayeneService.randevuyaGelmediIsaretle(kayit.dosyaId);
+      setHastalar((liste) =>
+        liste.map((h) =>
+          !h.muayeneVarMi && h.dosyaId === kayit.dosyaId
+            ? { ...h, randevuyaGelmedi: !h.randevuyaGelmedi }
+            : h
+        )
+      );
+    } catch (err) {
+      setHata(getApiErrorMessage(err, 'Randevu durumu güncellenemedi'));
+    } finally {
+      setIsaretlenenId(null);
+    }
+  };
+
   const sayilar = useMemo(() => {
     const acilan = hastalar.filter((h) => h.muayeneVarMi).length;
-    return { tumu: hastalar.length, acilan, bekleyen: hastalar.length - acilan };
+    const gelmedi = hastalar.filter((h) => !h.muayeneVarMi && h.randevuyaGelmedi).length;
+    return { tumu: hastalar.length, acilan, gelmedi, bekleyen: hastalar.length - acilan - gelmedi };
   }, [hastalar]);
 
   const gosterilecek = useMemo(() => {
     const metin = aramaMetni.trim().toLocaleLowerCase('tr-TR');
     return hastalar.filter((h) => {
-      if (durumFiltre === 'bekleyen' && h.muayeneVarMi) return false;
+      const gelmedi = !h.muayeneVarMi && h.randevuyaGelmedi;
+      if (durumFiltre === 'bekleyen' && (h.muayeneVarMi || gelmedi)) return false;
       if (durumFiltre === 'acilan' && !h.muayeneVarMi) return false;
+      if (durumFiltre === 'gelmedi' && !gelmedi) return false;
       if (!metin) return true;
       return `${h.ad} ${h.soyad} ${h.protokol} ${h.tc}`.toLocaleLowerCase('tr-TR').includes(metin);
     });
@@ -207,6 +239,7 @@ function PoliklinikHastaListesi({
             <IstatistikKart ikon="kullanicilar" deger={sayilar.tumu} etiket="Toplam hasta" />
             <IstatistikKart ikon="bekleme" ton="uyari" deger={sayilar.bekleyen} etiket="Muayene bekleyen" />
             <IstatistikKart ikon="aktivite" ton="basari" deger={sayilar.acilan} etiket="Muayenesi açılan" />
+            <IstatistikKart ikon="takvimX" ton="tehlike" deger={sayilar.gelmedi} etiket="Randevuya gelmedi" />
           </div>
 
           <section className="ui-kart pk-liste">
@@ -262,11 +295,14 @@ function PoliklinikHastaListesi({
                     </tr>
                   </thead>
                   <tbody>
-                    {gosterilecek.map((k, i) => (
+                    {gosterilecek.map((k, i) => {
+                      const gelmedi = !k.muayeneVarMi && k.randevuyaGelmedi;
+                      const isaretleniyor = isaretlenenId === k.dosyaId && !k.muayeneVarMi;
+                      return (
                       <tr
                         key={k.muayeneId ?? `r-${k.dosyaId}`}
-                        className="ui-tablo-tiklanabilir"
-                        onClick={() => onHastaSecildi({ ...k, poliklinikAd: secilenServisAdi })}
+                        className={gelmedi ? 'pk-satir-gelmedi' : 'ui-tablo-tiklanabilir'}
+                        onClick={gelmedi ? undefined : () => onHastaSecildi({ ...k, poliklinikAd: secilenServisAdi })}
                       >
                         <td><span className="pk-sira ui-sayi">{i + 1}</span></td>
                         <td>
@@ -286,18 +322,44 @@ function PoliklinikHastaListesi({
                         <td>
                           {k.muayeneVarMi ? (
                             <span className="ui-rozet ui-rozet-nokta ui-rozet-basari">Muayene açıldı</span>
+                          ) : gelmedi ? (
+                            <span className="ui-rozet ui-rozet-nokta ui-rozet-tehlike">Gelmedi</span>
                           ) : (
                             <span className="ui-rozet ui-rozet-nokta ui-rozet-uyari">Bekliyor</span>
                           )}
                         </td>
                         <td className="ui-tablo-sag">
-                          <span className={`ui-btn ui-btn-kucuk${k.muayeneVarMi ? '' : ' ui-btn-birincil'}`}>
-                            {k.muayeneVarMi ? 'Dosyayı Aç' : 'Muayeneye Al'}
-                            <Ikon ad="sagOk" />
-                          </span>
+                          <div className="pk-aksiyonlar">
+                            {!k.muayeneVarMi && (
+                              <button
+                                type="button"
+                                className={`ui-btn ui-btn-kucuk pk-gelmedi-btn${gelmedi ? '' : ' ui-btn-hayalet'}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  gelmediDegistir(k);
+                                }}
+                                disabled={isaretleniyor}
+                                title={gelmedi ? 'Gelmedi işaretini kaldır' : 'Randevuya gelmedi olarak işaretle'}
+                              >
+                                {isaretleniyor ? (
+                                  <span className="ui-spinner" />
+                                ) : (
+                                  <Ikon ad={gelmedi ? 'takvimTik' : 'takvimX'} />
+                                )}
+                                {gelmedi ? 'Geldi' : 'Gelmedi'}
+                              </button>
+                            )}
+                            {!gelmedi && (
+                              <span className={`ui-btn ui-btn-kucuk${k.muayeneVarMi ? '' : ' ui-btn-birincil'}`}>
+                                {k.muayeneVarMi ? 'Dosyayı Aç' : 'Muayeneye Al'}
+                                <Ikon ad="sagOk" />
+                              </span>
+                            )}
+                          </div>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

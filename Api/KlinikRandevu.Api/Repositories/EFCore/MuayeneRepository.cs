@@ -464,6 +464,11 @@ namespace Repositories.EFCore
             return randevu;
 
         }
+        public Randevu? RandevuGetir(int id)
+        {
+            var randevu =  _repositoryContext.Randevus.SingleOrDefault(x => x.Id== id && x.iptal==false);
+            return randevu;
+        }
         public void teshisEkle(teshisler teshisler)
         {
             _repositoryContext.Add(teshisler);
@@ -1097,7 +1102,8 @@ namespace Repositories.EFCore
                     Tc = hasta.TcKimlik,
                     Doktor = doktor?.DoktorAd,
                     Tarih = r.RandevuTarihi,
-                    MuayeneVarMi = false
+                    MuayeneVarMi = false,
+                    RandevuyaGelmedi = r.RandevuyaGelmedi
                 });
             }
 
@@ -1188,7 +1194,6 @@ namespace Repositories.EFCore
         public async Task<int> CalismaPlanindakiIleriRandevuSayisi(DoktorCalismaPlani plan)
         {
             var simdi = DateTime.Now;
-            // DayOfWeek SQL'e çevrilemediği için gün/saat filtresi bellekte yapılıyor.
             var ileriRandevular = await _repositoryContext.Randevus.AsNoTracking()
                 .Where(r => r.DoktorNo == plan.DoktorNo &&
                             r.PolNo == plan.PolNo &&
@@ -1202,6 +1207,22 @@ namespace Repositories.EFCore
                 t.DayOfWeek == plan.GunAdi &&
                 t.TimeOfDay >= plan.BaslangicSaati &&
                 t.TimeOfDay < plan.BitisSaati);
+        }
+        public bool RandevuyaMuayeneAcilmisMi(int randevuId)
+        {
+            var sqlParams = new[]
+{
+                new SqlParameter("@randevuId", SqlDbType.Int) { Value = randevuId }
+            };
+
+            return _repositoryContext.Database.SqlQueryRaw<int>(@"
+                    select 
+                        COUNT(*) AS Value
+                        from 
+                        MuayeneKayitlari m
+                        LEFT JOIN Randevular r on m.RandevuId=r.Id
+                        where r.Id=@randevuId and m.IsActive=1 and r.iptal=0
+                ", sqlParams).AsEnumerable().First() > 0;
         }
     }
 

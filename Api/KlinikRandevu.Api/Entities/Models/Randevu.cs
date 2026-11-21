@@ -21,6 +21,7 @@ namespace Entities.Models
             public DateTime CreatedAt { get; set; } = DateTime.Now;
             public bool hatirlatmaMailiGonderildi { get; set; } = false;
             public bool RandevuOzelMesajGonderildi { get; set; } = false;
+            public bool RandevuyaGelmedi {  get; set; } = false;
         }
 }
 
